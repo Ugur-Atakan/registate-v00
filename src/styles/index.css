@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #1649FF;
+    --accent: #9EE248;
+    --text: #333333;
+    --hover-text: #3B82F6;
+    --background: #fff;
+    --background-alt: #ECEFF1;
+  }
+
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply min-h-full;
+  }
+
+  #root {
+    @apply min-h-full;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[--primary] text-white px-6 py-3 rounded-lg font-medium transition-all
+    hover:bg-white hover:text-[--hover-text] hover:shadow-md
+    disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none 
+    focus:ring-2 focus:ring-[--primary] focus:border-transparent;
+  }
+
+  .auth-container {
+    @apply min-h-screen grid md:grid-cols-2 grid-cols-1;
+  }
+
+  .auth-form-side {
+    @apply flex items-center justify-center bg-white p-4 md:p-8 overflow-auto;
+  }
+
+  .auth-image-side {
+    @apply hidden md:flex items-center justify-center bg-[--background-alt] overflow-hidden;
+  }
+
+  .auth-form-container {
+    @apply w-full max-w-md space-y-6;
+  }
+}
