@@ -9,24 +9,31 @@ import Payment from '../pages/Payment';
 import ProtectedRoute from './ProtectedRoute';
 import Services from '../pages/Services';
 
-import BankAccountGuide from '../pages/feature-pages/bankAccountGuide';
-import Formation from '../pages/feature-pages/formation';
-import RegisteredAgent from '../pages/feature-pages/registeredAgent';
-import CompanyNameCheck from '../pages/feature-pages/CompanyNameCheck';
-import FormationDocuments from '../pages/feature-pages/formationDocuments';
-import OnlineDashboard from '../pages/feature-pages/onlineDashboard';
-import CustomerSupport from '../pages/feature-pages/customerSupport';
-import VirtualMailbox from '../pages/feature-pages/VirtualMailbox';
-import ComplianceReminder from '../pages/feature-pages/complianceReminder';
-import AnnualReportFiling from '../pages/feature-pages/AnnualReportFiling';
-import BoiReportFiling from '../pages/feature-pages/boiReportFiling';
-import PostIncDocuments from '../pages/feature-pages/postIncDocuments';
-import EIN from '../pages/feature-pages/EIN';
+import {
+  BankAccountGuide,
+  Formation,
+  RegisteredAgent,
+  CompanyNameCheck,
+  FormationDocuments,
+  OnlineDashboard,
+  CustomerSupport,
+  VirtualMailbox,
+  ComplianceReminder,
+  AnnualReportFiling,
+  BoiReportFiling,
+  PostIncDocuments,
+  EIN,
+} from '../pages/feature-pages';
+import CompanyTypeQuiz from '../pages/CompanyTypeQuiz';
+import AfterBilling from '../pages/AfterBilling';
+import AfterBillingDetails from '../pages/AfterBilling/Details';
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Welcome />} />
+      <Route path="/after-billing" element={<AfterBilling />} />
+      <Route path="/after-billing-details" element={<AfterBillingDetails/>} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route
@@ -34,6 +41,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <CompanyFormation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/company-type-quiz"
+        element={
+          <ProtectedRoute>
+            <CompanyTypeQuiz />
           </ProtectedRoute>
         }
       />

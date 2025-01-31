@@ -42,12 +42,7 @@ export default function CompanyTypeQuiz() {
 
   const handleComplete = () => {
     const recommendation = getRecommendation();
-    navigate('/company-type', { 
-      state: { 
-        recommendation,
-        fromQuiz: true
-      }
-    });
+    navigate('/company-formation', { state: { fromQuiz: true, recommendation } });
   };
 
   const currentQuestion = questions[currentStep];

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../config/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
-import { ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import CompanyType from "./CompanyType";
 import RegistrationState from "./RegistrationState";
 import CompanyName from "./CompanyName";
@@ -42,7 +42,9 @@ const steps = [
 ];
 
 export default function CompanyFormation() {
+
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormationFormData>(INITIAL_DATA);
@@ -60,10 +62,15 @@ export default function CompanyFormation() {
     }
   };
 
+  useEffect(() => {
+    console.log("CompanyFormation sayfasına gelindi.");
+    console.log("Geliş Yeri:", location.state?.from || "Bilinmiyor");
+    console.log("Parametreler:", location.state || "Yok");
+  }, [location]);
 
-    useEffect(() => {
-      console.log(formData);
-    }, [formData]);
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
 
   const handleSubmit = async () => {
@@ -98,7 +105,7 @@ export default function CompanyFormation() {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <CompanyType formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />;
+        return <CompanyType formData={formData} setFormData={setFormData} prevStep={back} nextStep={next} fromQuiz={location.state?.fromQuiz} recommendation={location.state?.recommendation}  />;
       case 2:
         return (
           <RegistrationState formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />
@@ -117,85 +124,11 @@ export default function CompanyFormation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Progress Bar */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-gray-500">
-              Step {currentStep} of {steps.length}
-            </span>
-            <span className="text-sm font-medium text-[--primary]">
-              {Math.round((currentStep / steps.length) * 100)}% Complete
-            </span>
-          </div>
-          <div className="relative">
-            <div className="overflow-hidden h-2 flex rounded-full bg-gray-200">
-              <div
-                className="transition-all duration-500 ease-out bg-[--primary]"
-                style={{ width: `${(currentStep / steps.length) * 100}%` }}
-              />
-            </div>
-            <div className="absolute top-4 w-full flex justify-between">
-              {steps.map((step, index) => (
-                <div
-                  key={step.id}
-                  className={`flex flex-col items-center ${
-                    index === 0
-                      ? "items-start"
-                      : index === steps.length - 1
-                      ? "items-end"
-                      : ""
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 
-                      transition-all duration-300 ${
-                        currentStep > step.id
-                          ? "bg-[--primary] border-[--primary] text-white"
-                          : currentStep === step.id
-                          ? "border-[--primary] text-[--primary] bg-white"
-                          : "border-gray-300 text-gray-300 bg-white"
-                      }`}
-                  >
-                    {currentStep > step.id ? (
-                      <CheckCircle2 size={16} />
-                    ) : (
-                      <span className="text-sm">{step.id}</span>
-                    )}
-                  </div>
-                  <div className="mt-2 text-center">
-                    <div
-                      className={`text-sm font-medium ${
-                        currentStep >= step.id
-                          ? "text-gray-900"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {step.title}
-                    </div>
-                    <div
-                      className={`text-xs ${
-                        currentStep >= step.id
-                          ? "text-gray-600"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {step.description}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Form Content */}
-        <div className="mx-auto">
-          <div className="bg-white shadow-lg rounded-xl">
+    <div className="mx-auto">
+          <div className="bg-white shadow-lg rounded-xl p-6">
             {renderStep()}
             {/* Navigation Buttons */}
-            <div className="mt-8 flex justify-between">
+            <div className="mt-6 flex justify-between">
               {currentStep !== 1 && (
                 <button
                   type="button"
@@ -230,8 +163,8 @@ export default function CompanyFormation() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      
+
   );
 }
 

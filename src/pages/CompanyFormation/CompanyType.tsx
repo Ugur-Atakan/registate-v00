@@ -8,7 +8,7 @@ interface CompanyTypeProps {
   recommendation?: "LLC" | "C-CORP";
   fromQuiz?: boolean;
   formData: FormationFormData;
-  setFormData: any;
+  setFormData: React.Dispatch<React.SetStateAction<FormationFormData>>;
   prevStep?: () => void;
   nextStep?: () => void;
 }
@@ -19,7 +19,6 @@ export default function CompanyType({
   setFormData,
   recommendation,
   fromQuiz,
-  prevStep,
   nextStep,
 }: CompanyTypeProps) {
   const navigate = useNavigate();
@@ -32,7 +31,9 @@ export default function CompanyType({
     try {
       setFormData({ ...formData, companyType: selectedType });
       setLoading(true);
-      nextStep && nextStep();
+      if (nextStep) {
+        nextStep();
+      }
       toast.success("Company type saved successfully");
     } catch (error) {
       console.error("Error updating document: ", error);
@@ -117,7 +118,7 @@ export default function CompanyType({
                 className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
                   ${
                     selectedType === "C-CORP"
-                      ? "border-[--primary] shadow-md"
+                      ? "border-[--primary]  shadow-md"
                       : "border-transparent hover:border-gray-200"
                   }`}
                 onClick={() => setSelectedType("C-CORP")}
