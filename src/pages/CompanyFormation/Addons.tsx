@@ -63,7 +63,7 @@ export default function Addons({ formData, setFormData }: AddonsProps) {
   // Detaylar sayfasına yönlendirme
   const goDetails = () => {
     if (availableAddons[currentIndex]) {
-      navigate(`/addon-details/${availableAddons[currentIndex].id}`);
+      navigate(`/features/${availableAddons[currentIndex].id}`);
     }
   };
 
