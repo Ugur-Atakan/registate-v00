@@ -77,3 +77,21 @@ export const planFeatures: Record<string, PlanFeature> = {
       features: Object.values(planFeatures), // Tüm özellikleri içerir
     },
   };
+
+  export const upsellItems: { [key in "silver" | "gold" | "platinum"]: string[] } = {
+    silver: [
+      planFeatures.ein.id,
+      planFeatures.virtualMailbox.id,
+      planFeatures.complianceReminder.id,
+      planFeatures.bankAccountGuide.id,
+      planFeatures.annualReportFiling.id,
+      planFeatures.boiReportFiling.id,
+      planFeatures.postIncDocuments.id,
+    ],
+    gold: [
+      planFeatures.annualReportFiling.id,
+      planFeatures.boiReportFiling.id,
+      planFeatures.postIncDocuments.id,
+    ],
+    platinum: [] // Platinum paketinde tüm özellikler dahil olduğu için addon yok
+  };

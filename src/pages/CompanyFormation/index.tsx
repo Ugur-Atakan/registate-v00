@@ -10,9 +10,9 @@ import CompanyType from "./CompanyType";
 import RegistrationState from "./RegistrationState";
 import CompanyName from "./CompanyName";
 import PlanSelection from "./PlanSelection";
-import Upsells from "./Upsells";
 import Review from "./Review";
 import { FormationFormData } from "../../types/FormData";
+import Addons from "./addons";
 
 
 const INITIAL_DATA: FormationFormData = {
@@ -115,7 +115,7 @@ export default function CompanyFormation() {
       case 4:
         return <PlanSelection formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />;
       case 5:
-        return <Upsells formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />;
+        return <Addons formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />;
       case 6:
         return <Review formData={formData} setFormData={setFormData} prevStep={back} nextStep={next}  />;
       default:
