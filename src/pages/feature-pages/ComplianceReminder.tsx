@@ -1,8 +1,0 @@
-export  default function ComplianceReminder() {
-    return (
-        <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Compliance Reminder</h1>
-            <p className="text-gray-600">Stay compliant with the latest regulations.</p>
-        </div>
-    );
-    }

@@ -1,8 +1,7 @@
-import { PlanFeature } from "../utils/plans";
+import {PricingPlan } from "../utils/plans";
 
 export type CompanyType = "LLC" | "C-CORP" | null;
 export type StateType = "Wyoming" | "Delaware" | null;
-export type PlanType = "silver" | "gold" | "platinum" | null;
 export type CompanyDesignator =
   | "LLC"
   | "L.L.C"
@@ -19,6 +18,14 @@ export interface FormationFormData {
   registrationState: StateType;
   companyName: string;
   companyDesignator: CompanyDesignator;
-  selectedPlan: PlanType;
-  upsellProducts: PlanFeature[];
+  selectedPlan: PricingPlan|null;
+  upsellProducts: any[];
+}
+
+
+export interface AddonsProps {
+  formData: FormationFormData;
+  setFormData: any;
+  prevStep?: () => void;
+  nextStep?: () => void;
 }

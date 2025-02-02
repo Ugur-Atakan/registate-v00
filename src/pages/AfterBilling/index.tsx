@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Users,
   Plus,
@@ -15,7 +15,7 @@ import {
   Director,
   AfterBillingFormData,
 } from "../../types/AfterBilling";
-import { PlanType } from "../../types/FormData";
+import { PricingPlan } from "../../utils/plans";
 
 const initialDirector: Director = {
   id: crypto.randomUUID(),
@@ -27,7 +27,8 @@ const initialDirector: Director = {
 };
 
 export default function AfterBilling() {
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>("silver");
+  const [selectedPlan, setSelectedPlan] = useState();
+  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<AfterBillingFormData>({
@@ -35,12 +36,19 @@ export default function AfterBilling() {
     parValuePerShare: 0.0001,
     directors: [{ ...initialDirector }],
   });
-  const [errors, setErrors] = useState<
+const [errors, setErrors] = useState<
     Partial<Record<keyof AfterBillingFormData, string>>
   >({});
   const [directorErrors, setDirectorErrors] = useState<
     Record<string, Partial<Record<keyof Director, string>>>
   >({});
+
+
+  useEffect(() => {
+    const planId = location.state?.planId;
+    setSelectedPlan(planId);
+  }, []);
+
 
   const validateEmail = (email: string): boolean => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -106,6 +114,8 @@ export default function AfterBilling() {
     setDirectorErrors(newDirectorErrors);
     return isValid;
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

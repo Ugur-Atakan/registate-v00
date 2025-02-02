@@ -55,7 +55,7 @@ export default function CompanyTypeQuiz() {
         <div className="auth-form-container">
           <div>
             <img
-              src="http://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-12 mb-8"
             />

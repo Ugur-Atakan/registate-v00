@@ -13,12 +13,6 @@ import {
 import { FormationFormData } from "../../types/FormData";
 import { PlanFeature } from "../../utils/plans";
 
-const planPrices = {
-  silver: 424,
-  gold: 624,
-  platinum: 1524,
-};
-
 //bu veriler backendden çekilecek
 
 interface ReviewProps {
@@ -59,7 +53,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
 
   // ✅ Toplam fiyatı hesapla (Plan Fiyatı + Eklenen Upsell Ürünleri)
   const totalPrice =
-    planPrices[formData.selectedPlan!] +
+    formData.selectedPlan!.price +
     selectedUpsells.reduce((sum, upsell) => sum + (upsell.price || 0), 0);
 
   return (
@@ -70,7 +64,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
           {/* Header */}
           <div className="flex-shrink-0">
             <img
-              src="http://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-4"
             />
@@ -156,14 +150,14 @@ export default function Review({ formData, nextStep }: ReviewProps) {
                 <div>
                   <h2 className="font-medium">Formation Package</h2>
                   <p className="text-sm text-[--primary] capitalize">
-                    {formData.selectedPlan} Plan
+                    {formData.selectedPlan?.name} Plan
                   </p>
                 </div>
               </div>
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-600">Package Price</span>
                 <span className="text-lg font-bold">
-                  ${planPrices[formData.selectedPlan!]}
+                  ${formData.selectedPlan?.price}
                 </span>
               </div>
               <div className="space-y-1.5 mt-3">
@@ -227,7 +221,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Formation Package</span>
                 <span className="font-medium">
-                  ${planPrices[formData.selectedPlan!]}
+                  ${formData.selectedPlan?.price}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
@@ -243,9 +237,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
             <div className="border-t border-gray-100 mt-4 pt-4">
               <div className="flex justify-between items-center">
                 <span className="font-bold">Total</span>
-                <span className="text-xl font-bold">
-                  ${totalPrice} USD
-                </span>
+                <span className="text-xl font-bold">${totalPrice} USD</span>
               </div>
             </div>
           </div>

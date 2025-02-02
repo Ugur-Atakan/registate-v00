@@ -12,7 +12,7 @@ import {
 import toast from "react-hot-toast";
 import { FormationFormData } from "../../types/FormData";
 
-import { planFeatures,pricingPlans  } from "../..//utils/plans";
+import { planFeatures,PricingPlan,pricingPlans  } from "../..//utils/plans";
 interface PlanSelectionProps {
   formData: FormationFormData;
   setFormData: any;
@@ -25,14 +25,12 @@ export default function PlanSelection({
   setFormData,
   nextStep,
 }: PlanSelectionProps) {
-  const [selectedPlan, setSelectedPlan] = useState<
-    "silver" | "gold" | "platinum" | null
-  >(null);
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan>();
   const [loading, setLoading] = useState(false);
 
 
   // Plan seçme işlemi
-  const handleSelectPlan = async (plan: "silver" | "gold" | "platinum") => {
+  const handleSelectPlan = async (plan:PricingPlan) => {
     setLoading(true);
     try {
      setFormData({ ...formData, selectedPlan: plan });
@@ -47,8 +45,8 @@ export default function PlanSelection({
   };
 
   // Plan ikonlarını belirle
-  const getPlanIcon = (plan: string) => {
-    switch (plan) {
+  const getPlanIcon = (planid:string) => {
+    switch (planid) {
       case "silver":
         return <Zap size={24} className="text-gray-600" />;
       case "gold":
@@ -91,7 +89,7 @@ export default function PlanSelection({
               key={key}
               className={`relative bg-white rounded-2xl p-6 transition-all duration-300
                 ${
-                  selectedPlan === key
+                  selectedPlan?.id === key
                     ? "ring-2 ring-[--primary] shadow-lg transform scale-[1.02]"
                     : "hover:shadow-lg border border-gray-100"
                 }`}
@@ -152,7 +150,7 @@ export default function PlanSelection({
               </div>
 
               <button
-                onClick={() => handleSelectPlan(key as "silver" | "gold" | "platinum")}
+                onClick={() => handleSelectPlan(plan)}
                 disabled={loading}
                 className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 
     flex items-center justify-center gap-2 mt-6

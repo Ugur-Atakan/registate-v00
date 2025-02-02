@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { db } from '../config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { PricingPlan } from '../utils/plans';
 
 export interface RegistrationData {
   companyType: string | null;
   registrationState: string | null;
   companyName: string | null;
   companyDesignator: string | null;
-  selectedPlan: string | null;
+  selectedPlan: PricingPlan | null;
   companySetupStarted: boolean;
   companySetupStep: string;
 }

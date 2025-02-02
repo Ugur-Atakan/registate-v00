@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Building2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
@@ -14,8 +13,7 @@ interface CompanyNameProps {
   nextStep?: () => void;
 }
 
-export default function CompanyName({formData, setFormData,prevStep,nextStep }: CompanyNameProps) {
-  const navigate = useNavigate();
+export default function CompanyName({formData, setFormData,nextStep }: CompanyNameProps) {
   const [companyName, setCompanyName] = useState('');
   const [selectedDesignator, setSelectedDesignator] = useState<Designator>('');
   const [companyType, setCompanyType] = useState<'LLC' | 'C-CORP' | null>(null);
@@ -63,7 +61,6 @@ export default function CompanyName({formData, setFormData,prevStep,nextStep }: 
       });
 
       triggerConfetti();
-      // Sonraki sayfaya yönlendirme işlemi buraya mutlaka yapılacak
       setTimeout(() => {
        nextStep && nextStep();
       }, 1000);
@@ -85,7 +82,7 @@ export default function CompanyName({formData, setFormData,prevStep,nextStep }: 
         <div className="auth-form-container">
           <div>
             <img
-              src="http://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-12 mb-8"
             />

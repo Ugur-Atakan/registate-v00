@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { 
   Zap,
@@ -11,9 +10,8 @@ import {
   DollarSign,
   Timer
 } from 'lucide-react';
-import { db } from '../../config/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { AddonsProps } from '../../types/FormData';
 
 type FilingSpeed = 'standard' | '24hour' | 'sameday';
 
@@ -26,8 +24,7 @@ interface FilingOption {
   icon: React.ElementType;
 }
 
-export default function ExpeditedFiling() {
-  const navigate = useNavigate();
+export default function ExpeditedFiling({ formData, setFormData, prevStep, nextStep }: AddonsProps) {
   const { user } = useAuth();
   const [selectedSpeed, setSelectedSpeed] = useState<FilingSpeed>('standard');
   const [loading, setLoading] = useState(false);
@@ -67,13 +64,18 @@ export default function ExpeditedFiling() {
     setLoading(true);
     try {
       const selectedOption = filingOptions.find(option => option.id === selectedSpeed);
-      await updateDoc(doc(db, 'users', user.uid), {
-        filingSpeed: selectedSpeed,
-        filingFee: STATE_FEE + (selectedOption?.additionalFee || 0),
-        updatedAt: new Date().toISOString()
+      const filingFee = STATE_FEE + (selectedOption?.additionalFee || 0);
+      // Yerel formData state'ine upsell ürünü ekleme
+      setFormData({
+        ...formData,
+        upsellProducts: [
+          ...(formData.upsellProducts || []),
+          { filingSpeed: selectedSpeed, filingFee: filingFee }
+        ]
       });
 
-      navigate('/review', { replace: true });
+      if (nextStep) nextStep();
+      
     } catch (error) {
       console.error('Error saving filing speed:', error);
       toast.error('Failed to save your selection. Please try again.');
@@ -90,7 +92,7 @@ export default function ExpeditedFiling() {
           {/* Header */}
           <div className="flex-shrink-0">
             <img
-              src="http://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-6"
             />
@@ -130,9 +132,7 @@ export default function ExpeditedFiling() {
                   }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-lg ${
-                    selectedSpeed === option.id ? 'bg-white' : 'bg-gray-50'
-                  }`}>
+                  <div className={`p-2 rounded-lg ${selectedSpeed === option.id ? 'bg-white' : 'bg-gray-50'}`}>
                     <option.icon
                       size={20}
                       className={selectedSpeed === option.id ? 'text-[--primary]' : 'text-gray-400'}

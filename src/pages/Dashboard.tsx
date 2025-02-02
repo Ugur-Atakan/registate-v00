@@ -11,13 +11,15 @@ import {
   Briefcase
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import { PricingPlan } from '../utils/plans';
+import { useNavigate } from 'react-router-dom';
 
 interface UserData {
   companyType: string;
   registrationState: string;
   companyName: string;
   companyDesignator: string;
-  selectedPlan: string;
+  selectedPlan: PricingPlan;
 }
 
 interface FormationStep {
@@ -32,6 +34,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const formationSteps: FormationStep[] = [
     {
@@ -121,6 +124,22 @@ export default function Dashboard() {
           </p>
         </div>
 
+        <div className="flex items-start px-6 py-4 border-b border-gray-200 border border-gray-200">
+                  <div className={`p-3 rounded-full`}>
+                    <Building2 className="text-[--accent]" size={24} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mx-auto justify-center">
+                      <h3 className="font-semibold">Eksik Bilgiler var</h3>
+                      <span className={"text-sm font-medium capitalize text-[--primary] text-blue-400"} onClick={() => navigate('/after-billing', { replace: true, state: { planId: 'platinum' } })}>
+                       Soruları cevapla
+                      </span>
+                    </div>
+                    <p className="text-gray-600">Şirket kurulumuna devam edebilmemiz için bazı bilgieri paylaşman gerekiyor</p>
+                  </div>
+                </div>
+        
+
         {/* Formation Progress Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-6 border-b border-gray-200">
@@ -131,6 +150,7 @@ export default function Dashboard() {
               </span>
             </div>
 
+
             {/* Progress Bar */}
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <div 
@@ -140,8 +160,13 @@ export default function Dashboard() {
             </div>
           </div>
 
+
+
+          
           {/* Steps */}
           <div className="divide-y divide-gray-200">
+
+            
             {formationSteps.map((step, index) => (
               <div 
                 key={step.id}

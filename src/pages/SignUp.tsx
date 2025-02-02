@@ -83,10 +83,10 @@ export default function SignUp() {
       return;
     }
 
-    if (!requirements.every(req => req.met)) {
-      toast.error('Please meet all password requirements');
-      return;
-    }
+    // if (!requirements.every(req => req.met)) {
+    //   toast.error('Please meet all password requirements');
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -122,7 +122,7 @@ export default function SignUp() {
             {/* Logo */}
             <div className="flex-shrink-0 mb-6">
               <img
-                src="http://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+                src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
                 alt="Registate"
                 className="h-12"
               />
@@ -231,7 +231,7 @@ export default function SignUp() {
 
       <div className="hidden md:block relative bg-[#1649FF]/5">
         <img
-          src="http://registate.betterwp.site/wp-content/uploads/2025/01/pexels-pixabay-162539-2.webp"
+          src="https://registate.betterwp.site/wp-content/uploads/2025/01/pexels-pixabay-162539-2.webp"
           alt="Business Setup"
           className="absolute inset-0 w-full h-full object-cover"
         />

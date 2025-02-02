@@ -2,6 +2,7 @@
     id: string;
     name: string;
     price?: number;
+    order?: number;
   }
 
   export interface PricingPlan {
@@ -10,6 +11,7 @@
     price: number;
     subtitle: string;
     features: PlanFeature[];
+    addons?: PlanFeature[];
   }
 
   export interface PricingPlans {
@@ -27,13 +29,39 @@ export const planFeatures: Record<string, PlanFeature> = {
   onlineDashboard: { id: "online-dashboard", name: "Access to Registate Online Dashboard", price: 10 },
   customerSupport: { id: "customer-support", name: "Lifetime Customer Support", price: 0 },
   ein: { id: "ein", name: "EIN (Employer Identification Number)", price: 0 },
-  virtualMailbox: { id: "virtual-mailbox", name: "Virtual Mailbox (lowest package)", price: 0 },
+  virtualMailbox: { id: "virtual-mailbox", name: "Virtual Mailbox", price: 0 },
   complianceReminder: { id: "compliance-reminder", name: "Compliance Reminder", price: 19 },
   bankAccountGuide: { id: "bank-account-guide", name: "Bank Account Guide" , price: 16},
   annualReportFiling: { id: "annual-report-filing", name: "Annual Report Filing & Franchise Tax", price: 14 },
   boiReportFiling: { id: "boi-report-filing", name: "BOI Report Filing" , price: 23},
   postIncDocuments: { id: "post-inc-documents", name: "Post-Inc Documents (one-time submission)", price: 10 },
+  expeditedFiling: { id: "expedited-filing", name: "Expedited Filing", price: 20 },
 };
+
+
+  // Silver Paket Addonları
+  export const silverAddons: PlanFeature[] = [
+    { id: "expedited-filing", name: "Expedited Filing", price: 20, order: 1 },
+    { id: "ein", name: "EIN (Employer Identification Number)", price: 0, order: 2 },
+    { id: "virtual-mailbox", name: "Virtual Mailbox", price: 0, order: 3 },
+    { id: "annual-report-filing", name: "Annual Report Filing & Franchise Tax", price: 14, order: 4 },
+    { id: "boi-report-filing", name: "BOI Report Filing", price: 23, order: 5 },
+  ];
+  
+  // Gold Paket Addonları
+  export const goldAddons: PlanFeature[] = [
+    { id: "expedited-filing", name: "Expedited Filing", price: 20, order: 1 },
+    { id: "virtual-mailbox", name: "Virtual Mailbox", price: 0, order: 2 },
+    { id: "annual-report-filing", name: "Annual Report Filing & Franchise Tax", price: 14, order: 3 },
+    { id: "boi-report-filing", name: "BOI Report Filing", price: 23, order: 4 },
+  ];
+  
+  // Platinum Paket Addonları
+  export const platinumAddons: PlanFeature[] = [
+    { id: "expedited-filing", name: "Expedited Filing", price: 20, order: 1 },
+    { id: "virtual-mailbox", name: "Virtual Mailbox", price: 0, order: 2 },
+  ];
+
 
   // Planları oluştur
   export const pricingPlans:PricingPlans = {
@@ -50,6 +78,7 @@ export const planFeatures: Record<string, PlanFeature> = {
         planFeatures.onlineDashboard,
         planFeatures.customerSupport,
       ],
+      addons: silverAddons,
     },
     gold: {
       id: "gold",
@@ -68,6 +97,7 @@ export const planFeatures: Record<string, PlanFeature> = {
         planFeatures.complianceReminder,
         planFeatures.bankAccountGuide,
       ],
+      addons: goldAddons,
     },
     platinum: {
       id: "platinum",
@@ -75,23 +105,6 @@ export const planFeatures: Record<string, PlanFeature> = {
       price: 623,
       subtitle: "Full Compliance",
       features: Object.values(planFeatures), // Tüm özellikleri içerir
+      addons: platinumAddons,
     },
-  };
-
-  export const upsellItems: { [key in "silver" | "gold" | "platinum"]: string[] } = {
-    silver: [
-      planFeatures.ein.id,
-      planFeatures.virtualMailbox.id,
-      planFeatures.complianceReminder.id,
-      planFeatures.bankAccountGuide.id,
-      planFeatures.annualReportFiling.id,
-      planFeatures.boiReportFiling.id,
-      planFeatures.postIncDocuments.id,
-    ],
-    gold: [
-      planFeatures.annualReportFiling.id,
-      planFeatures.boiReportFiling.id,
-      planFeatures.postIncDocuments.id,
-    ],
-    platinum: [] // Platinum paketinde tüm özellikler dahil olduğu için addon yok
   };
