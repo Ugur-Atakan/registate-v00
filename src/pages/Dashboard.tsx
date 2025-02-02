@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+ // BURASI BACKENDDEN GELECEK
   const formationSteps: FormationStep[] = [
     {
       id: 1,

@@ -15,7 +15,6 @@ import {
   Director,
   AfterBillingFormData,
 } from "../../types/AfterBilling";
-import { PricingPlan } from "../../utils/plans";
 
 const initialDirector: Director = {
   id: crypto.randomUUID(),
