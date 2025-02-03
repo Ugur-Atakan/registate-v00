@@ -108,3 +108,76 @@ export const planFeatures: Record<string, PlanFeature> = {
       addons: platinumAddons,
     },
   };
+
+
+  const pricingplansDB=[
+    {
+      "id": "e8ee0cbd-039e-4ade-a9cf-8c9cc3d91994",
+      "name": "Silver Plan",
+      "price": 300,
+      "stripeId": "price_1JXXWW...",
+      "subtitle": "Best plan for startups",
+      "features": []
+    },
+    {
+      "id": "f2f0bcca-d1bc-4ae5-ae3b-82974c2790d6",
+      "name": "Gold Plan",
+      "price": 300,
+      "stripeId": "price_1JXXWW...",
+      "subtitle": "Best plan for startups",
+      "features": [
+        {
+          "order": 3,
+          "name": "BOI"
+        }
+      ]
+    },
+    {
+      "id": "7d2a54f7-2d9a-452b-b6d7-1b90fca21f54",
+      "name": "Platinum Plan",
+      "price": 300,
+      "stripeId": "price_1JXXWWa..",
+      "subtitle": "Best plan for ege",
+      "features": []
+    }
+  ]
+
+
+
+
+ const fakeBasket: Basket = {
+    "companyTypeId": "company-type-uuid",
+    "stateId": "state-uuid",
+    "companyName": "My Company Inc.",
+    "designator": "INC",
+    "pricingPlanId": "pricing-plan-uuid",  // Örneğin Gold Plan
+    "stateFeeId": "state-fee-uuid",
+    "expeditedFeeId": "expedited-fee-uuid",
+    "addons": [
+      {
+        "productId": "virtual-mailbox-uuid",
+        "selectedPriceId": "premium-price-uuid"
+      },
+      {
+        "productId": "ein-number-uuid",
+        "selectedPriceId": null   // Tek fiyatlı ise basePrice kullanılacak
+      }
+    ]
+  }
+  
+
+  interface Addon{
+    productId: string;
+    selectedPriceId: string | null;
+  }
+
+  interface Basket{
+    companyTypeId: string;
+    stateId: string;
+    companyName: string;
+    designator: string;
+    pricingPlanId: string;
+    stateFeeId: string;
+    expeditedFeeId: string;
+    addons: Addon[];
+  }
