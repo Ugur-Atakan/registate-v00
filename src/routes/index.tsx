@@ -23,9 +23,9 @@ export default function AppRoutes() {
       <Route
         path="/company-formation"
         element={
-          <ProtectedRoute>
+         
             <CompanyFormation />
-          </ProtectedRoute>
+        
         }
       />
       <Route

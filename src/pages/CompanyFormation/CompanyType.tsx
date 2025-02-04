@@ -1,35 +1,94 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, ArrowRight, HelpCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { FormationFormData } from "../../types/FormData";
+import { useAppDispatch} from "../../store/hooks";
+import { getCompanyTypes } from "../../http/requests/formation";
+import { setCompanyType } from "../../store/slices/checkoutSlice";
 
 interface CompanyTypeProps {
-  recommendation?: "LLC" | "C-CORP";
+  recommendation?: string;
   fromQuiz?: boolean;
-  formData: FormationFormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormationFormData>>;
   prevStep?: () => void;
   nextStep?: () => void;
 }
 
+// **Statik Şirket Tipi Özellikleri**
+const companyTypesFeatures = [
+  {
+    name: "LLC",
+    features: [
+      "Suitable for freelancers, startups, and small businesses",
+      "Limited liability protection & pass-through taxation",
+      "Less paperwork, easy to manage",
+    ],
+    bestFor: "Best for: Entrepreneurs who want flexibility & protection",
+  },
+  {
+    name: "C-Corp",
+    features: [
+      "Ideal for scaling businesses & attracting investors",
+      "Ability to issue shares & raise venture capital",
+      "More formal structure with taxation at the corporate level",
+    ],
+    bestFor: "Companies planning to raise funds & expand",
+  },
+];
+
+interface SelectedType{
+  id: string;
+  name: string;
+  features: string[];
+  bestFor: string;
+}
+
 
 export default function CompanyType({
-  formData,
-  setFormData,
   recommendation,
   fromQuiz,
   nextStep,
 }: CompanyTypeProps) {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<"LLC" | "C-CORP" | null>(
-    recommendation || null
-  );
+  const [selectedType, setSelectedType] = useState<SelectedType|null>();
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  
+  const [companyTypes, setCompanyTypes] = useState<{ id: string; name: string }[]
+  >([]);
+
+  // **Şirket tiplerini API’den al**
+  useEffect(() => {
+    const fetchCompanyTypes = async () => {
+      try {
+        const types = await getCompanyTypes();
+        console.log("Company types: ", types);
+        setCompanyTypes(types);
+      } catch (error) {
+        console.error("Error fetching company types: ", error);
+      }
+    };
+    fetchCompanyTypes();
+  }, []);
+
+  // **API’den gelen veriyi statik özelliklerle eşleştir**
+  const mergedCompanyTypes = companyTypes.map((type) => {
+    const matchingFeature = companyTypesFeatures.find(
+      (feature) => feature.name === type.name
+    );
+    return {
+      ...type,
+      features: matchingFeature?.features || [],
+      bestFor: matchingFeature?.bestFor || "",
+    };
+  });
 
   const updateFields = async () => {
     try {
-      setFormData({ ...formData, companyType: selectedType });
+      if (!selectedType) {
+        toast.error("Please select a company type");
+        return;
+      }
+      dispatch(setCompanyType({companyTypeId: selectedType.id, companyType: selectedType.name}));
       setLoading(true);
       if (nextStep) {
         nextStep();
@@ -66,114 +125,48 @@ export default function CompanyType({
 
           <div className="relative w-full">
             <div className="space-y-4 w-[115%] -ml-[7.5%]">
-              {/* LLC Option */}
-              <div
-                className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                  ${
-                    selectedType === "LLC"
-                      ? "border-[--primary] shadow-md"
-                      : "border-transparent hover:border-gray-200"
-                  }`}
-                onClick={() => setSelectedType("LLC")}
-              >
-                <div className="flex items-start gap-4">
-                  <Building2 className="text-[--primary] mt-1" size={24} />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold">LLC</h3>
-                      {recommendation === "LLC" && fromQuiz && (
-                        <span className="px-3 py-1 bg-[--primary]/10 text-[--primary] text-sm font-medium rounded-full">
-                          Recommended
-                        </span>
-                      )}
+              {mergedCompanyTypes.map((type) => (
+                <div
+                  key={type.id}
+                  className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
+                    ${
+                      selectedType?.id === type.id
+                        ? "border-[--primary] shadow-md"
+                        : "border-transparent hover:border-gray-200"
+                    }`}
+                  onClick={() => setSelectedType(type)}
+                >
+                  <div className="flex items-start gap-4">
+                    <Building2 className="text-[--primary] mt-1" size={24} />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-semibold">{type.name}</h3>
+                        {recommendation === type.name && fromQuiz && (
+                          <span className="px-3 py-1 bg-[--primary]/10 text-[--primary] text-sm font-medium rounded-full">
+                            Recommended
+                          </span>
+                        )}
+                      </div>
+                      <ul className="space-y-2">
+                        {type.features.map((feature, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <CheckCircle2 className="text-[--accent]" size={18} />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-3 text-[--primary] font-medium">{type.bestFor}</p>
                     </div>
-                    <ul className="space-y-2">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>
-                          Suitable for freelancers, startups, and small
-                          businesses
-                        </span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>
-                          Limited liability protection & pass-through taxation
-                        </span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>Less paperwork, easy to manage</span>
-                      </li>
-                    </ul>
-                    <p className="mt-3 text-[--primary] font-medium">
-                      Best for: Entrepreneurs who want flexibility & protection
-                    </p>
                   </div>
                 </div>
-              </div>
-
-              {/* C Corporation Option */}
-              <div
-                className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                  ${
-                    selectedType === "C-CORP"
-                      ? "border-[--primary]  shadow-md"
-                      : "border-transparent hover:border-gray-200"
-                  }`}
-                onClick={() => setSelectedType("C-CORP")}
-              >
-                <div className="flex items-start gap-4">
-                  <Building2 className="text-[--primary] mt-1" size={24} />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold">C Corporation</h3>
-                      {recommendation === "C-CORP" && fromQuiz && (
-                        <span className="px-3 py-1 bg-[--primary]/10 text-[--primary] text-sm font-medium rounded-full">
-                          Recommended
-                        </span>
-                      )}
-                    </div>
-                    <ul className="space-y-2">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>
-                          Ideal for scaling businesses & attracting investors
-                        </span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>
-                          Ability to issue shares & raise venture capital
-                        </span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="text-[--accent]" size={18} />
-                        <span>
-                          More formal structure with taxation at the corporate
-                          level
-                        </span>
-                      </li>
-                    </ul>
-                    <p className="mt-3 text-[--primary] font-medium">
-                      Best for: Companies planning to raise funds & expand
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
 
               <button
                 onClick={updateFields}
                 disabled={!selectedType || loading}
                 className="w-full btn-primary flex items-center justify-center gap-2 mt-6"
               >
-                {loading ? (
-                  "Saving..."
-                ) : (
-                  <>
-                    Continue <ArrowRight size={20} />
-                  </>
-                )}
+                {loading ? "Saving..." : <>Continue <ArrowRight size={20} /></>}
               </button>
 
               <div className="flex items-center justify-center gap-2 text-gray-600">

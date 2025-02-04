@@ -1,41 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "../../store/hooks";
+import { getStates } from "../../http/requests/formation";
 import {
   MapPin,
-  Building2,
   Shield,
   DollarSign,
+  Building2,
   Scale,
   ArrowRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { FormationFormData } from "../../types/FormData";
+import { setCompanyState } from "../../store/slices/checkoutSlice";
 
 interface CompanyStateProps {
-  formData: FormationFormData;
-  setFormData: any;
-  prevStep?: () => void;
   nextStep?: () => void;
+  prevStep?: () => void;
 }
 
+// **Statik eyalet özellikleri**
+const stateFeatures = [
+  {
+    name: "Delaware",
+    order: 2, // Delaware üstte olacak
+    features: [
+      {
+        icon: <Scale size={18} className="text-[--accent]" />,
+        text: "Business-friendly court system",
+      },
+      {
+        icon: <Building2 size={18} className="text-[--accent]" />,
+        text: "Preferred by investors & VCs",
+      },
+      {
+        icon: <Shield size={18} className="text-[--accent]" />,
+        text: "Strong corporate law precedents",
+      },
+    ],
+    recommendedFor: "Recommended for C-Corp",
+    recommendedColor: "bg-blue-100 text-blue-700",
+    bestFor: "Perfect for: Startups planning to raise capital",
+  },
+  {
+    name: "Wyoming",
+    order: 1, // Wyoming altta olacak
+    features: [
+      {
+        icon: <Shield size={18} className="text-[--accent]" />,
+        text: "Strong asset protection laws",
+      },
+      {
+        icon: <DollarSign size={18} className="text-[--accent]" />,
+        text: "No state income tax",
+      },
+      {
+        icon: <Building2 size={18} className="text-[--accent]" />,
+        text: "Low filing fees and annual costs",
+      },
+    ],
+    recommendedFor: "Recommended for LLC",
+    recommendedColor: "bg-green-100 text-green-700",
+    bestFor: "Perfect for: Small businesses seeking tax benefits & privacy",
+  },
+];
 
-export default function RegistrationState({
-  setFormData,
-  formData,
-  nextStep,
-}: CompanyStateProps) {
+interface SelectedState{
+  id: string;
+  name: string;
+}
+
+export default function RegistrationState({ nextStep }: CompanyStateProps) {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
-const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedState, setSelectedState] = useState<SelectedState|null>(null);
+  const [states, setStates] = useState<{ id: string; name: string }[]>([]);
+
+  // **Eyaletleri API’den al**
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const fetchedStates = await getStates();
+        setStates(fetchedStates);
+      } catch (error) {
+        console.error("Error fetching states: ", error);
+      }
+    };
+    fetchStates();
+  }, []);
+
+  // **API’den gelen eyaletleri statik özelliklerle birleştir**
+  const mergedStates = states.map((state) => {
+    const matchingFeature = stateFeatures.find(
+      (feature) => feature.name === state.name
+    );
+    return {
+      ...state,
+      order: matchingFeature?.order || 0,
+      features: matchingFeature?.features || [],
+      recommendedFor: matchingFeature?.recommendedFor || "",
+      bestFor: matchingFeature?.bestFor || "",
+      recommendedColor: matchingFeature?.recommendedColor || "",
+    };
+  });
 
   const handleContinue = async () => {
     if (!selectedState) return;
 
     setLoading(true);
     try {
-      setFormData({
-        ...formData,
-        registrationState: selectedState,
-      });
+      dispatch(
+        setCompanyState({ stateId: selectedState.id, stateName: selectedState.name })
+      );
       nextStep && nextStep();
+      toast.success("State selection saved successfully");
     } catch (error) {
       console.error("Error saving registration state:", error);
       toast.error("Failed to save your selection. Please try again.");
@@ -67,86 +143,53 @@ const [selectedState, setSelectedState] = useState<string | null>(null);
 
           <div className="relative w-full">
             <div className="space-y-4 w-[115%] -ml-[7.5%]">
-              {/* Wyoming Option */}
-              <div
-                className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                  ${
-                    selectedState === "Wyoming"
-                      ? "border-[--primary] shadow-md"
-                      : "border-transparent hover:border-gray-200"
-                  }`}
-                onClick={() => setSelectedState("Wyoming")}
-              >
-                <div className="flex items-start gap-4">
-                  <MapPin className="text-[--primary] mt-1" size={24} />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold">Wyoming</h3>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                        Recommended for LLC
-                      </span>
+              {mergedStates
+                .sort((a, b) => a.order - b.order) // Order'a göre sıralama
+                .map((state) => (
+                  <div
+                    key={state.id}
+                    className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
+                    ${
+                      selectedState?.id === state.id
+                        ? "border-[--primary] shadow-md"
+                        : "border-transparent hover:border-gray-200"
+                    }`}
+                    onClick={() => setSelectedState(state)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <MapPin className="text-[--primary] mt-1" size={24} />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-xl font-semibold">
+                            {state.name}
+                          </h3>
+                          {state.recommendedFor && (
+                            <span
+                              className={`px-3 py-1 text-sm font-medium rounded-full ${
+                                state.recommendedFor === "Recommended for LLC"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {state.recommendedFor}
+                            </span>
+                          )}
+                        </div>
+                        <ul className="space-y-3">
+                          {state.features.map((feature, index) => (
+                            <li key={index} className="flex items-center gap-2">
+                              {feature.icon}
+                              <span>{feature.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-3 text-[--primary] font-medium">
+                          {state.bestFor}
+                        </p>
+                      </div>
                     </div>
-                    <ul className="space-y-3">
-                      <li className="flex items-center gap-2">
-                        <Shield className="text-[--accent]" size={18} />
-                        <span>Strong asset protection laws</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <DollarSign className="text-[--accent]" size={18} />
-                        <span>No state income tax</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Building2 className="text-[--accent]" size={18} />
-                        <span>Low filing fees and annual costs</span>
-                      </li>
-                    </ul>
-                    <p className="mt-3 text-[--primary] font-medium">
-                      Perfect for: Small businesses seeking tax benefits &
-                      privacy
-                    </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Delaware Option */}
-              <div
-                className={`w-full bg-white p-6 rounded-lg shadow-sm border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                  ${
-                    selectedState === "Delaware"
-                      ? "border-[--primary] shadow-md"
-                      : "border-transparent hover:border-gray-200"
-                  }`}
-                onClick={() => setSelectedState("Delaware")}
-              >
-                <div className="flex items-start gap-4">
-                  <MapPin className="text-[--primary] mt-1" size={24} />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold">Delaware</h3>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                        Recommended for C-Corp
-                      </span>
-                    </div>
-                    <ul className="space-y-3">
-                      <li className="flex items-center gap-2">
-                        <Scale className="text-[--accent]" size={18} />
-                        <span>Business-friendly court system</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Building2 className="text-[--accent]" size={18} />
-                        <span>Preferred by investors & VCs</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Shield className="text-[--accent]" size={18} />
-                        <span>Strong corporate law precedents</span>
-                      </li>
-                    </ul>
-                    <p className="mt-3 text-[--primary] font-medium">
-                      Perfect for: Startups planning to raise capital
-                    </p>
-                  </div>
-                </div>
-              </div>
+                ))}
 
               <button
                 onClick={handleContinue}
@@ -203,20 +246,6 @@ const [selectedState, setSelectedState] = useState<string | null>(null);
                     <td className="py-4 px-6 font-medium">Investor Appeal</td>
                     <td className="py-4 px-6 text-center">Moderate</td>
                     <td className="py-4 px-6 text-center">Very High</td>
-                  </tr>
-                  <tr className="border-b border-gray-100 transition-colors hover:bg-blue-50/50">
-                    <td className="py-4 px-6 font-medium">Annual Fees</td>
-                    <td className="py-4 px-6 text-center">Low ($60)</td>
-                    <td className="py-4 px-6 text-center">Moderate ($300+)</td>
-                  </tr>
-                  <tr className="transition-colors hover:bg-blue-50/50">
-                    <td className="py-4 px-6 font-medium">Tax Structure</td>
-                    <td className="py-4 px-6 text-center">
-                      No state income tax
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      Corporate income tax
-                    </td>
                   </tr>
                 </tbody>
               </table>

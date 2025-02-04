@@ -13,13 +13,17 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AddonsProps } from '../../types/FormData';
+import { useAppDispatch } from '../../store/hooks';
+import { addAddon } from '../../store/slices/checkoutSlice';
 
-export default function EIN({ formData, setFormData, nextStep }: AddonsProps) {
+export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
   const { user } = useAuth();
   const [includeEIN, setIncludeEIN] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
   const EIN_FEE = 70;
+
+  const dispatch=useAppDispatch();
 
   const handleContinue = async () => {
     if (!user || includeEIN === null) return;
@@ -27,14 +31,7 @@ export default function EIN({ formData, setFormData, nextStep }: AddonsProps) {
     setLoading(true);
     try {
       // Yerel formData state'ini güncellemek için: mevcut upsellProducts dizisine yeni EIN ürünü ekleniyor.
-      setFormData({
-        ...formData,
-        upsellProducts: [
-          ...(formData.upsellProducts || []),
-          { type: 'EIN', includeEIN, einFee: includeEIN ? EIN_FEE : 0 }
-        ]
-      });
-
+      dispatch(addAddon({productId:addonData.productId,selectedPriceId:null,productName: addonData.productName,productTier:null,price:addonData.basePrice}));
       if (nextStep) nextStep();
 
     } catch (error) {

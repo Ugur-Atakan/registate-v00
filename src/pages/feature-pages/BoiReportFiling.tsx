@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { 
+import { useState } from "react";
+import {
   FileText,
   ArrowRight,
   Shield,
@@ -9,43 +8,35 @@ import {
   Clock,
   DollarSign,
   Info,
-  Users
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import { AddonsProps } from '../../types/FormData';
+  Users,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { AddonsProps } from "../../types/FormData";
+import { useAppDispatch } from "../../store/hooks";
+import { addAddon } from "../../store/slices/checkoutSlice";
 
-export default function BoiReportFiling({ formData, setFormData, prevStep, nextStep }: AddonsProps) {
-  const { user } = useAuth();
+export default function BoiReportFiling({addonData,nextStep }: AddonsProps) {
   const [includeService, setIncludeService] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
   const SERVICE_FEE = 199;
+  const dispatch = useAppDispatch();
 
   const handleContinue = async () => {
-    if (!user || includeService === null) return;
-
+    console.log("addonData", addonData);
+    if (includeService === null) return;
+    console.log("includeService", includeService);
     setLoading(true);
     try {
-      // Yerel formData state'ine de upsell ürünü ekliyoruz.
-      setFormData({
-        ...formData,
-        upsellProducts: [
-          ...(formData.upsellProducts || []),
-          { 
-            type: 'BOI', 
-            includeBoiService: includeService, 
-            boiServiceFee: includeService ? SERVICE_FEE : 0 
-          }
-        ]
-      });
-
-      if (nextStep) nextStep();
-
+      if (includeService) {
+        dispatch(
+          addAddon({ productId: addonData.productId, selectedPriceId: null ,productTier:null,productName:addonData.productName,price:addonData.basePrice})
+        );
+      }
+      nextStep();
     } catch (error) {
-      console.error('Error saving BOI report selection:', error);
-      toast.error('Failed to save your selection. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error("Error saving BOI report selection:", error);
+      toast.error("Failed to save your selection. Please try again.");
     }
   };
 
@@ -61,7 +52,9 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
               alt="Registate"
               className="h-8 mb-6"
             />
-            <h1 className="text-3xl font-bold mb-2">Beneficial Ownership Information Filing</h1>
+            <h1 className="text-3xl font-bold mb-2">
+              Beneficial Ownership Information Filing
+            </h1>
             <p className="text-gray-600">
               Comply with FinCEN's BOI reporting requirements effortlessly
             </p>
@@ -89,10 +82,13 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
             <div className="flex items-start gap-3">
               <Info className="text-amber-600 flex-shrink-0 mt-1" size={20} />
               <div>
-                <h3 className="font-semibold text-amber-800 mb-1">New Legal Requirement</h3>
+                <h3 className="font-semibold text-amber-800 mb-1">
+                  New Legal Requirement
+                </h3>
                 <p className="text-sm text-amber-700">
-                  Starting January 1, 2024, most companies must file BOI reports with FinCEN. 
-                  Failure to comply may result in civil and criminal penalties.
+                  Starting January 1, 2024, most companies must file BOI reports
+                  with FinCEN. Failure to comply may result in civil and
+                  criminal penalties.
                 </p>
               </div>
             </div>
@@ -104,16 +100,19 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
             <div
               onClick={() => setIncludeService(true)}
               className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300
-                ${includeService === true
-                  ? 'border-[--primary] bg-[--primary]/5 shadow-md'
-                  : 'border-gray-200 hover:border-[--primary]/30 hover:shadow-sm'
+                ${
+                  includeService === true
+                    ? "border-[--primary] bg-[--primary]/5 shadow-md"
+                    : "border-gray-200 hover:border-[--primary]/30 hover:shadow-sm"
                 }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                  ${includeService === true
-                    ? 'border-[--primary] bg-[--primary]'
-                    : 'border-gray-300'
+                <div
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                  ${
+                    includeService === true
+                      ? "border-[--primary] bg-[--primary]"
+                      : "border-gray-300"
                   }`}
                 >
                   {includeService === true && (
@@ -135,16 +134,19 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
             <div
               onClick={() => setIncludeService(false)}
               className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300
-                ${includeService === false
-                  ? 'border-[--primary] bg-[--primary]/5 shadow-md'
-                  : 'border-gray-200 hover:border-[--primary]/30 hover:shadow-sm'
+                ${
+                  includeService === false
+                    ? "border-[--primary] bg-[--primary]/5 shadow-md"
+                    : "border-gray-200 hover:border-[--primary]/30 hover:shadow-sm"
                 }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                  ${includeService === false
-                    ? 'border-[--primary] bg-[--primary]'
-                    : 'border-gray-300'
+                <div
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                  ${
+                    includeService === false
+                      ? "border-[--primary] bg-[--primary]"
+                      : "border-gray-300"
                   }`}
                 >
                   {includeService === false && (
@@ -163,9 +165,10 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
             <div className="flex items-start gap-3 bg-red-50 text-red-800 p-5 rounded-xl border border-red-100 mb-8">
               <AlertCircle className="flex-shrink-0 mt-0.5" size={20} />
               <p>
-                BOI reporting requires detailed information about company ownership and 
-                control. Incorrect or late filings can result in civil penalties up to 
-                $500 per day and criminal penalties up to $10,000.
+                BOI reporting requires detailed information about company
+                ownership and control. Incorrect or late filings can result in
+                civil penalties up to $500 per day and criminal penalties up to
+                $10,000.
               </p>
             </div>
           )}
@@ -178,7 +181,7 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
               transition-all duration-200 hover:bg-[--primary]/90 disabled:opacity-50 
               disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? 'Processing...' : 'Continue'} 
+            {loading ? "Processing..." : "Continue"}
             <ArrowRight size={20} />
           </button>
         </div>
@@ -196,7 +199,9 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
                   <FileText className="text-[--primary] mt-1" size={20} />
                   <div>
                     <p className="font-semibold">Complete Filing</p>
-                    <p className="text-sm text-gray-600">Full report preparation</p>
+                    <p className="text-sm text-gray-600">
+                      Full report preparation
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -233,8 +238,9 @@ export default function BoiReportFiling({ formData, setFormData, prevStep, nextS
               <div>
                 <h4 className="font-semibold text-[--primary] mb-1">Pro Tip</h4>
                 <p className="text-sm text-gray-600">
-                  Our service ensures accurate and timely filing, helping you avoid costly 
-                  penalties and maintain compliance with FinCEN requirements.
+                  Our service ensures accurate and timely filing, helping you
+                  avoid costly penalties and maintain compliance with FinCEN
+                  requirements.
                 </p>
               </div>
             </div>

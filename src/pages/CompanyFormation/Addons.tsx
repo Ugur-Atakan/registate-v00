@@ -1,88 +1,113 @@
-import { useEffect, useState } from 'react';
-import { FormationFormData } from '../../types/FormData';
-import { PlanFeature } from '../../utils/plans';
-
-import {
-  VirtualMailbox,
-  AnnualReportFiling,
-  BoiReportFiling,
-  EIN,
-  ExpeditedFiling
-} from '../feature-pages';
+import { useEffect, useState } from "react";
+import { VirtualMailbox, AnnualReportFiling, BoiReportFiling, EIN } from "../feature-pages";
+import { useAppSelector } from "../../store/hooks";
+import { getPlanAddons } from "../../http/requests/formation";
 
 interface AddonsProps {
-  formData: FormationFormData;
-  setFormData: any;
   prevStep?: () => void;
   nextStep?: () => void;
 }
 
-export default function Addons({ formData, setFormData,nextStep }: AddonsProps) {
-  const [availableAddons, setAvailableAddons] = useState<PlanFeature[]>([]);
+export default function Addons({ nextStep }: AddonsProps) {
+  const [availableAddons, setAvailableAddons] = useState<any[]>([]);  // API'den gelen addon verileri
   const [currentIndex, setCurrentIndex] = useState(0);
+  const selectedPricingPlan = useAppSelector((state) => state.checkout.pricingPlan);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if(formData.selectedPlan && formData.selectedPlan.addons ) {
-    const orderedAddons = formData.selectedPlan.addons.sort((a, b) => a.order! - b.order!);
-    setAvailableAddons(orderedAddons);
-    } else {
-      setAvailableAddons([]);
-    }
-    // Plan addons'larını al
-  }, [formData]);
+    const fetchAddons = async () => {
+      try {
+        const response = await getPlanAddons(selectedPricingPlan.id);
+        setAvailableAddons(response);  // Gelen addon verisini set ediyoruz
+      } catch (error) {
+        console.error("Error fetching addons:", error);
+      } finally {
+        setLoading(false); // Yükleme tamamlandığında loading durumu bitir
+      }
+    };
 
-  // Tüm addonlar işlendiğinde, sonraki aşamaya geçiş
+    if (selectedPricingPlan.id) {
+      fetchAddons();
+    }
+  }, [selectedPricingPlan.id]);
+
+  // Eğer addon yoksa direkt olarak bir sonraki adıma geç
+  useEffect(() => {
+    if (!loading && availableAddons.length === 0 && nextStep) {
+      nextStep();  // Addon yoksa bir sonraki adıma geçiş yap
+    }
+  }, [loading, availableAddons, nextStep]);
+
+  // Kullanıcının ilerlemesini sağlayan fonksiyon
   const goNextStep = () => {
     if (currentIndex < availableAddons.length - 1) {
       setCurrentIndex(currentIndex + 1);
-    }
-    if (currentIndex === availableAddons.length - 1) {
-      nextStep && nextStep();
+    } else {
+      if(nextStep) nextStep(); // Son addon'dan sonra "Review" sayfasına geçiş yapılır
     }
   };
 
   const goPrevStep = () => {
-    if (currentIndex < availableAddons.length - 1) {
+    if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   };
 
-  // Şu anki addon bileşenini render eden fonksiyon
+  // Mevcut addon'a göre ilgili bileşeni render et
   const renderCurrentAddon = (index: number) => {
-    if (
-      !availableAddons ||
-      availableAddons.length === 0 ||
-      !availableAddons[index]
-    ) {
-      return <div>No addons available</div>;
+    if (!availableAddons.length || !availableAddons[index]) {
+      if (nextStep) {
+        nextStep(); // Eğer addon yoksa, bir sonraki adıma geç
+      }
+      return null;
     }
-
     const currentAddon = availableAddons[index];
-    console.log('currentAddon', currentAddon);
-    console.log('aviale addons', availableAddons);
-    switch (currentAddon.id) {
-      case "ein":
-        return <EIN formData={formData} setFormData={setFormData} prevStep={goPrevStep} nextStep={goNextStep}  />;
-      case "virtual-mailbox":
-        return <VirtualMailbox formData={formData} setFormData={setFormData} prevStep={goPrevStep} nextStep={goNextStep}  />;
-      case "annual-report-filing":
-        return <AnnualReportFiling formData={formData} setFormData={setFormData} prevStep={goPrevStep} nextStep={goNextStep} />;
-      case "boi-report-filing":
-        return <BoiReportFiling formData={formData} setFormData={setFormData} prevStep={goPrevStep} nextStep={goNextStep}   />;
-      case "expedited-filing":
-        return <ExpeditedFiling formData={formData} setFormData={setFormData} prevStep={goPrevStep} nextStep={goNextStep}/>;
+
+    // **ID Bazlı Addon Seçimi**
+    switch (currentAddon.productId) {
+      case "6ec59714-9ce9-4c62-8c29-4e55a5bb2659": // EIN ID
+        return (
+          <EIN
+            prevStep={goPrevStep}
+            nextStep={goNextStep}
+            addonData={currentAddon}
+          />
+        );
+      case "6ab02e6b-9694-4820-bc92-df7d9d1a8846": // Virtual Mailbox ID
+        return (
+          <VirtualMailbox
+            prevStep={goPrevStep}
+            nextStep={goNextStep}
+            addonData={currentAddon}
+          />
+        );
+      case "747f5775-079e-4cb2-9025-d57cdea27376": // Annual Report Filing ID
+        return (
+          <AnnualReportFiling
+            prevStep={goPrevStep}
+            nextStep={goNextStep}
+            addonData={currentAddon}
+          />
+        );
+      case "d45c0c05-fe55-4dc5-9374-755b27d63cde": // BOI Report Filing ID
+        return (
+          <BoiReportFiling
+            prevStep={goPrevStep}
+            nextStep={goNextStep}
+            addonData={currentAddon}
+          />
+        );
       default:
-        return <div>No add-ons available for this package.</div>;
+        if (nextStep) {
+          nextStep(); // Eğer geçerli addon yoksa bir sonraki adıma geçiş yapılır
+        }
+        return null;
     }
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  return (
-    <main className="container mx-auto px-4">
-      {renderCurrentAddon(currentIndex)}
-    </main>
-  );
+  return renderCurrentAddon(currentIndex);
 }

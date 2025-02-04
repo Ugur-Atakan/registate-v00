@@ -13,28 +13,25 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AddonsProps } from '../../types/FormData';
+import { addAddon } from '../../store/slices/checkoutSlice';
+import { useAppDispatch } from '../../store/hooks';
 
-export default function AnnualReportFiling({ formData, setFormData, nextStep }: AddonsProps) {
-  const { user } = useAuth();
+export default function AnnualReportFiling({addonData,prevStep, nextStep }: AddonsProps) {
   const [includeService, setIncludeService] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
   const SERVICE_FEE = 150;
 
+  const dispatch = useAppDispatch();
+
   const handleContinue = async () => {
-    if (!user || includeService === null) return;
+    if (includeService === null) return;
 
     setLoading(true);
     try { 
-      // Yerel formData state'ine de ekleme yapıyoruz.
-      setFormData({
-        ...formData,
-        upsellProducts: [
-          ...(formData.upsellProducts || []),
-          { includeAnnualReportService: includeService }
-        ]
-      });
-
+      if(includeService){
+           dispatch(addAddon({ productId: addonData.productId, selectedPriceId:null ,productTier:null,productName:addonData.productName,price:addonData.basePrice}));
+      }
       if (nextStep) nextStep();
     } catch (error) {
       console.error('Error saving annual report selection:', error);

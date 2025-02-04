@@ -1,98 +1,89 @@
 import { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { 
-  Mail,
-  ArrowRight,
-  CheckCircle2,
-  Scan,
-  Package,
-  Shield,
-  Info
-} from 'lucide-react';
-import toast from 'react-hot-toast';
 import { AddonsProps } from '../../types/FormData';
-
-type MailboxPlan = 'basic' | 'standard' | 'premium';
+import { useAppDispatch } from '../../store/hooks';
+import { addAddon } from '../../store/slices/checkoutSlice';
+import { Mail, ArrowRight, CheckCircle2, Info, Scan, Package, Shield } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface MailboxPackage {
-  id: MailboxPlan;
+  id: string;
   name: string;
-  price: number;
+  amount: number;
+  currency: string;
+  frequency: string;
   features: string[];
   popular?: boolean;
 }
 
-export default function VirtualMailbox({ formData, setFormData, nextStep }: AddonsProps) {
-  const { user } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState<MailboxPlan | null>(null);
+const commonFeatures = [
+  'No deposit or setup fees',
+  'No additional commitments',
+  "Junk mail doesn't count",
+  'Free mail pick up'
+];
+
+const mailboxPlansFeatures = [
+  {
+    id: 'a8c9a931-2109-4146-853a-7636441d8dce',
+    features: [
+      '1 incoming item / month',
+      '1 scan / month',
+      '$1.20 / item for shredding'
+    ]
+  },
+  {
+    id: '2af10df3-4147-4d32-a7cd-3520808f59ea',
+    popular: true,
+    features: [
+      '30 incoming items / month',
+      '10 scan / month',
+      '10 item shreds / month'
+    ]
+  },
+  {
+    id: 'f7ccb61f-e9fe-47d3-870c-0552355d4cb2',
+    features: [
+      '100 incoming items / month',
+      '100 scans / month',
+      '100 item shreds / month'
+    ]
+  }
+];
+
+const getFrequency = (frequency: string) => {
+  switch (frequency) {
+    case 'ANNUALLY':
+      return '/year';
+    case 'MONTHLY':
+      return '/month';
+    default:
+      return '';
+  }
+}
+
+export default function VirtualMailbox({ addonData, prevStep, nextStep }: AddonsProps) {
+  const [selectedPlan, setSelectedPlan] = useState<MailboxPackage | null>(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
-  // Tüm mailbox paketleri
-  const packages: MailboxPackage[] = [
-    {
-      id: 'basic',
-      name: 'Basic',
-      price: 120,
-      features: [
-        '1 incoming item / month',
-        '1 scan / month',
-        '$1.20 / item for shredding'
-      ]
-    },
-    {
-      id: 'standard',
-      name: 'Standard',
-      price: 240,
-      popular: true,
-      features: [
-        '30 incoming items / month',
-        '10 scan / month',
-        '10 item shreds / month'
-      ]
-    },
-    {
-      id: 'premium',
-      name: 'Premium',
-      price: 750,
-      features: [
-        '100 incoming items / month',
-        '100 scans / month',
-        '100 item shreds / month'
-      ]
-    }
-  ];
-
-  // Eğer formation paketi platinum ise, "basic" planı gizle.
-  // (formData.selectedPlan!.id, formation paketinin id'si, platinum ise Virtual Mailbox için "basic" seçeneğini göstermiyoruz)
-  const filteredPackages = formData.selectedPlan!.id === "platinum"
-    ? packages.filter(pkg => pkg.id !== "basic")
-    : packages;
-
-  const commonFeatures = [
-    'No deposit or setup fees',
-    'No additional commitments',
-    "Junk mail doesn't count",
-    'Free mail pick up'
-  ];
+  // Gelen addon verisinin prices bilgilerini mailboxPlansFeatures ile eşleştir
+  const packages:MailboxPackage[] = addonData.prices.map((price: any) => {
+    const matchedFeatures = mailboxPlansFeatures.find(
+      (plan) => plan.id === price.id
+    );
+    return {
+      ...price,
+      features: matchedFeatures ? matchedFeatures.features : [],
+      popular: matchedFeatures?.popular
+    };
+  });
 
   const handleContinue = async () => {
-    if (!user || !selectedPlan) return;
-
+    if (!selectedPlan) return;
     setLoading(true);
     try {
-      const selectedPackage = filteredPackages.find(pkg => pkg.id === selectedPlan);
-
-      // Yerel formData state'ini güncelle
-      setFormData({
-        ...formData,
-        upsellProducts: [
-          ...(formData.upsellProducts || []),
-          { mailboxPlan: selectedPlan, mailboxFee: selectedPackage?.price || 0 }
-        ]
-      });
-
+      dispatch(addAddon({ productId: addonData.productId, selectedPriceId: selectedPlan.id ,productTier:selectedPlan.name,productName:addonData.productName,price:selectedPlan.amount}));
       if (nextStep) nextStep();
-
     } catch (error) {
       console.error('Error saving mailbox selection:', error);
       toast.error('Failed to save your selection. Please try again.');
@@ -100,6 +91,15 @@ export default function VirtualMailbox({ formData, setFormData, nextStep }: Addo
       setLoading(false);
     }
   };
+
+
+  const selectPlan=(pkg:MailboxPackage)=>{
+    if(selectedPlan?.id==pkg.id) {
+      setSelectedPlan(null);
+      return;
+    } 
+    setSelectedPlan(pkg);
+  }
 
   return (
     <div className="h-screen grid md:grid-cols-2 grid-cols-1">
@@ -114,7 +114,7 @@ export default function VirtualMailbox({ formData, setFormData, nextStep }: Addo
               className="h-8 mb-4"
             />
             <h1 className="text-2xl font-bold mb-2">
-              {formData.selectedPlan!.id === "platinum" ? "Upgrade Your Virtual Mailbox" : "Virtual Mailbox"}
+              {selectedPlan?.id === "platinum" ? "Upgrade Your Virtual Mailbox" : "Virtual Mailbox"}
             </h1>
             <p className="text-gray-600">
               Get a professional business address with mail handling services
@@ -139,12 +139,12 @@ export default function VirtualMailbox({ formData, setFormData, nextStep }: Addo
 
           {/* Package Cards */}
           <div className="space-y-4 mb-6">
-            {filteredPackages.map((pkg) => (
+            {packages.map((pkg) => (
               <div
                 key={pkg.id}
-                onClick={() => setSelectedPlan(pkg.id)}
+                onClick={() => selectPlan(pkg)}
                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
-                  ${selectedPlan === pkg.id
+                  ${selectedPlan?.id === pkg.id
                     ? 'border-[--primary] bg-[--primary]/5 shadow-md'
                     : 'border-gray-200 hover:border-[--primary]/30 hover:shadow-sm'
                   }`}
@@ -154,15 +154,14 @@ export default function VirtualMailbox({ formData, setFormData, nextStep }: Addo
                     Most Popular
                   </span>
                 )}
-
                 <div className="flex items-start gap-3">
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1
-                    ${selectedPlan === pkg.id
+                    ${selectedPlan?.id === pkg.id
                       ? 'border-[--primary] bg-[--primary]'
                       : 'border-gray-300'
                     }`}
                   >
-                    {selectedPlan === pkg.id && (
+                    {selectedPlan?.id === pkg.id && (
                       <CheckCircle2 className="text-white" size={12} />
                     )}
                   </div>
@@ -171,14 +170,14 @@ export default function VirtualMailbox({ formData, setFormData, nextStep }: Addo
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold">{pkg.name}</h3>
                       <div className="text-right">
-                        <span className="text-lg font-bold">${pkg.price}</span>
-                        <span className="text-sm text-gray-600">/year</span>
+                        <span className="text-lg font-bold">${pkg.amount}</span>
+                        <span className="text-sm text-gray-600">{getFrequency(pkg.frequency)}</span>
                       </div>
                     </div>
 
                     <ul className="space-y-1.5">
-                      {pkg.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm">
+                      {pkg.features.map((feature:string) => (
+                        <li key={feature} className="flex items-center gap-2 text-sm">
                           <CheckCircle2 className="text-[--accent]" size={16} />
                           <span>{feature}</span>
                         </li>

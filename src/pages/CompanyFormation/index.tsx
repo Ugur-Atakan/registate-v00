@@ -1,68 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { db } from '../../config/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import CompanyType from './CompanyType';
 import RegistrationState from './RegistrationState';
 import CompanyName from './CompanyName';
 import PlanSelection from './PlanSelection';
 import Review from './Review';
-import { FormationFormData } from '../../types/FormData';
 import Addons from './Addons';
+import ExpeditedFiling from './ExpeditedFiling';
+import { useAppSelector } from '../../store/hooks';
 
-
-// let payload = {
-//   customerName: ''
-//   companyName: '',
-//   companyType: ''
-//   companyState: ''
-//   companyContactEmail: '',
-//   companyContactAddress: '',
-//   companyZipCode: '',
-//   companyCity: '',
-//   companyCountry: '',
-//   selectedPackage: ''
-//   upsells: upsellIDs || [],
-//   subscriptionFlag: subscriptionFlag || false,
-//   totalPrice: 0,
-// }; 
-
-const INITIAL_DATA: FormationFormData = {
-  companyType: null,
-  registrationState: null,
-  companyName: '',
-  companyDesignator: null,
-  selectedPlan: null,
-  upsellProducts: [],
-};
 
 const steps = [
   {
-    id: 1,
-    title: 'Company Type',
-    description: 'Choose your business structure',
+    id: 1, title: 'Company Type', description: 'Choose your business structure',
   },
   { id: 2, title: 'Registration State', description: 'Select formation state' },
   { id: 3, title: 'Company Name', description: 'Name your company' },
   { id: 4, title: 'Select Plan', description: 'Choose your package' },
-  {
-    id: 5,
-    title: 'Upsells',
-    description: 'Upsell products for selectedPackage',
-  },
-  { id: 6, title: 'Review', description: 'Review your information' },
+  { id: 5,title: 'Expedited Filing', description: 'Choose your filing speed'},
+  { id: 6,title: 'Upsells', description: 'Upsell products for selectedPackage'},
+  { id: 7, title: 'Review', description: 'Review your information' },
 ];
 
 export default function CompanyFormation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormationFormData>(INITIAL_DATA);
   const [loading, setLoading] = useState(false);
 
   const next = () => {
@@ -83,21 +49,11 @@ export default function CompanyFormation() {
     console.log('Parametreler:', location.state || 'Yok');
   }, [location]);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const handleSubmit = async () => {
-    if (!user) return;
-
     setLoading(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        ...formData,
-        companySetupStarted: true,
-        companySetupStep: 'completed',
-        updatedAt: new Date().toISOString(),
-      });
+
 
       confetti({
         particleCount: 100,
@@ -116,13 +72,22 @@ export default function CompanyFormation() {
     }
   };
 
+  const checkout=useAppSelector(state=>state.checkout);
+
+
+  useEffect(() => {
+    console.log('checkout:', checkout);
+  }, [checkout]);
+
+  useEffect(() => {
+    console.log('currentStep:', currentStep);
+  }, [currentStep]);
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
           <CompanyType
-            formData={formData}
-            setFormData={setFormData}
             prevStep={back}
             nextStep={next}
             fromQuiz={location.state?.fromQuiz}
@@ -132,8 +97,6 @@ export default function CompanyFormation() {
       case 2:
         return (
           <RegistrationState
-            formData={formData}
-            setFormData={setFormData}
             prevStep={back}
             nextStep={next}
           />
@@ -141,8 +104,6 @@ export default function CompanyFormation() {
       case 3:
         return (
           <CompanyName
-            formData={formData}
-            setFormData={setFormData}
             prevStep={back}
             nextStep={next}
           />
@@ -150,26 +111,29 @@ export default function CompanyFormation() {
       case 4:
         return (
           <PlanSelection
-            formData={formData}
-            setFormData={setFormData}
             prevStep={back}
             nextStep={next}
           />
         );
-      case 5:
-        return (
-          <Addons
-            formData={formData}
-            setFormData={setFormData}
-            prevStep={back}
-            nextStep={next}
-          />
-        );
+
+        case 5:
+          return (
+            <ExpeditedFiling
+              prevStep={back}
+              nextStep={next}
+            />
+          );
+          
       case 6:
         return (
+          <Addons
+            prevStep={back}
+            nextStep={next}
+          />
+        );
+      case 7:
+        return (
           <Review
-            formData={formData}
-            setFormData={setFormData}
             prevStep={back}
             nextStep={next}
           />
@@ -183,7 +147,6 @@ export default function CompanyFormation() {
     <div className="mx-auto">
       <div className="bg-white shadow-lg rounded-xl p-6">
         {renderStep()}
-        {/* Navigation Buttons */}
         <div className="mt-6 flex justify-between">
           {currentStep !== 1 && (
             <button
@@ -196,26 +159,6 @@ export default function CompanyFormation() {
               Back
             </button>
           )}
-          <button
-            onClick={currentStep === steps.length ? handleSubmit : next}
-            disabled={loading}
-            className={`flex items-center gap-2 px-6 py-3 text-white bg-[--primary] 
-                  rounded-lg hover:bg-[--primary]/90 transition-colors duration-200
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${currentStep === 1 ? 'ml-auto' : ''}`}
-          >
-            {currentStep === steps.length ? (
-              loading ? (
-                'Processing...'
-              ) : (
-                'Complete'
-              )
-            ) : (
-              <>
-                Continue <ArrowRight size={20} />
-              </>
-            )}
-          </button>
         </div>
       </div>
     </div>

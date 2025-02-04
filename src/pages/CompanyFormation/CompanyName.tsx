@@ -1,40 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Building2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
-import { FormationFormData } from '../../types/FormData';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setCompanyInfo } from '../../store/slices/checkoutSlice';
 
 type Designator = string;
 
 interface CompanyNameProps {
-  formData: FormationFormData;
-  setFormData: any;
   prevStep?: () => void;
   nextStep?: () => void;
 }
 
-export default function CompanyName({formData, setFormData,nextStep }: CompanyNameProps) {
+const llcDesignators = ['LLC', 'L.L.C.', 'Limited Liability Company'];
+const corpDesignators = ['Inc.', 'Incorporated', 'Corp.', 'Corporation', 'Co.'];
+
+export default function CompanyName({nextStep }: CompanyNameProps) {
   const [companyName, setCompanyName] = useState('');
   const [selectedDesignator, setSelectedDesignator] = useState<Designator>('');
-  const [companyType, setCompanyType] = useState<'LLC' | 'C-CORP' | null>(null);
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const llcDesignators = ['LLC', 'L.L.C.', 'Limited Liability Company'];
-  const corpDesignators = ['Inc.', 'Incorporated', 'Corp.', 'Corporation', 'Co.'];
+  const selectedCompanyType = useAppSelector((state) => state.checkout.companyType);
 
-  useEffect(() => {
-    const fetchCompanyType = async () => {
-      setCompanyType(formData?.companyType || null);
-      // Set default designator based on company type
-      if (formData?.companyType === 'LLC') {
-        setSelectedDesignator('LLC');
-      } else if (formData?.companyType === 'C-CORP') {
-        setSelectedDesignator('Inc.');
-      }
-    };
-    fetchCompanyType();
-  }, [formData]);
+  const dispatch=useAppDispatch();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
@@ -54,11 +43,7 @@ export default function CompanyName({formData, setFormData,nextStep }: CompanyNa
     if (!companyName || !selectedDesignator) return;
     setLoading(true);
     try {
-      setFormData({
-        ...formData,
-        companyName,
-        companyDesignator: selectedDesignator
-      });
+      dispatch(setCompanyInfo({companyName,designator:selectedDesignator}));
 
       triggerConfetti();
       setTimeout(() => {
@@ -73,7 +58,7 @@ export default function CompanyName({formData, setFormData,nextStep }: CompanyNa
   };
 
   const getDesignators = () => {
-    return companyType === 'LLC' ? llcDesignators : corpDesignators;
+    return selectedCompanyType.name === 'LLC' ? llcDesignators : corpDesignators;
   };
 
   return (

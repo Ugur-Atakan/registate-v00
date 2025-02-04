@@ -10,21 +10,30 @@ import {
   Shield,
   Receipt,
 } from "lucide-react";
-import { FormationFormData } from "../../types/FormData";
-import { PlanFeature } from "../../utils/plans";
-
-//bu veriler backendden çekilecek
+import { useAppSelector } from "../../store/hooks";
 
 interface ReviewProps {
-  formData: FormationFormData;
-  setFormData: any;
   prevStep?: () => void;
   nextStep?: () => void;
 }
 
-export default function Review({ formData, nextStep }: ReviewProps) {
+export default function Review({nextStep }: ReviewProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const checkoutData=useAppSelector((state)=>state.checkout);
+
+  const upsellProducts =checkoutData.addons;
+
+  const calculateTotalPrice = () => {
+    let total = checkoutData.pricingPlan?.price || 0;
+
+    for (let i = 0; i < upsellProducts.length; i++) {
+      total += upsellProducts[i].price;
+    }
+
+    return total;
+  }
+  const totalPrice = calculateTotalPrice();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -41,20 +50,11 @@ export default function Review({ formData, nextStep }: ReviewProps) {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+
 
   if (loading) {
     return <div>Loading...</div>;
   }
-  // ✅ Kullanıcının seçtiği upsell ürünlerini al
-  const selectedUpsells: PlanFeature[] = formData.upsellProducts || [];
-
-  // ✅ Toplam fiyatı hesapla (Plan Fiyatı + Eklenen Upsell Ürünleri)
-  const totalPrice =
-    formData.selectedPlan!.price +
-    selectedUpsells.reduce((sum, upsell) => sum + (upsell.price || 0), 0);
 
   return (
     <div className="min-h-screen grid md:grid-cols-2 grid-cols-1">
@@ -106,7 +106,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
                   <h2 className="font-medium">Company Type</h2>
                 </div>
                 <p className="text-[--primary] font-medium">
-                  {formData.companyType}
+                  {checkoutData.companyType.name}
                 </p>
               </div>
 
@@ -119,7 +119,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
                   <h2 className="font-medium">State</h2>
                 </div>
                 <p className="text-[--primary] font-medium">
-                  {formData.registrationState}
+                  {checkoutData.state.name}
                 </p>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
                 <h2 className="font-medium">Company Name</h2>
               </div>
               <p className="text-lg font-medium text-[--primary]">
-                {formData.companyName} {formData.companyDesignator}
+                {checkoutData.companyInfo.name} {checkoutData.companyInfo.designator}
               </p>
               <div className="flex items-center gap-1.5 text-xs text-green-600 mt-2">
                 <CheckCircle2 size={14} />
@@ -150,14 +150,14 @@ export default function Review({ formData, nextStep }: ReviewProps) {
                 <div>
                   <h2 className="font-medium">Formation Package</h2>
                   <p className="text-sm text-[--primary] capitalize">
-                    {formData.selectedPlan?.name} Plan
+                    {checkoutData.pricingPlan?.name}
                   </p>
                 </div>
               </div>
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-600">Package Price</span>
                 <span className="text-lg font-bold">
-                  ${formData.selectedPlan?.price}
+                  ${checkoutData.pricingPlan?.price}
                 </span>
               </div>
               <div className="space-y-1.5 mt-3">
@@ -173,18 +173,18 @@ export default function Review({ formData, nextStep }: ReviewProps) {
             </div>
 
             {/* Upsell Products */}
-            {selectedUpsells.length > 0 && (
+            {upsellProducts.length > 0 && (
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-[--primary] transition-all duration-300 mt-4">
                 <h3 className="text-lg font-semibold mb-3">
                   Additional Features
                 </h3>
                 <ul className="space-y-2">
-                  {selectedUpsells.map((upsell) => (
+                  {upsellProducts.map((upsell) => (
                     <li
-                      key={upsell.id}
+                      key={upsell.productId}
                       className="flex justify-between items-center text-sm text-gray-600"
                     >
-                      <span>{upsell.name}</span>
+                      <span>{upsell.productName} {upsell?.productTier}</span>
                       <span className="font-medium">${upsell.price}</span>
                     </li>
                   ))}
@@ -221,7 +221,7 @@ export default function Review({ formData, nextStep }: ReviewProps) {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Formation Package</span>
                 <span className="font-medium">
-                  ${formData.selectedPlan?.price}
+                  ${checkoutData.pricingPlan?.price}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   ArrowRight,
@@ -10,30 +10,47 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { FormationFormData } from "../../types/FormData";
+import { getPricingPlans } from "../../http/requests/formation"; // API çağrısı
+import {PricingPlan } from "../../utils/plans"; // Statik özellik listesi
+import { useAppDispatch } from "../../store/hooks";
+import { setPricingPlan } from "../../store/slices/checkoutSlice";
+import { allFeatures, staticPricingplans } from "../../statics/pricingPlans";
 
-import { planFeatures,PricingPlan,pricingPlans  } from "../..//utils/plans";
 interface PlanSelectionProps {
-  formData: FormationFormData;
-  setFormData: any;
   nextStep?: () => void;
   prevStep?: () => void;
 }
 
-export default function PlanSelection({
-  formData,
-  setFormData,
-  nextStep,
-}: PlanSelectionProps) {
-  const [selectedPlan, setSelectedPlan] = useState<PricingPlan>();
+export default function PlanSelection({ nextStep }: PlanSelectionProps) {
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [pricingPlans, setPricingPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const fetchPricingPlans = async () => {
+      try {
+        const apiData = await getPricingPlans();
+        const mergedPlans = staticPricingplans.map((staticPlan) => {
+          const apiPlan = apiData.find((p: any) => p.name === staticPlan.name);
+          return {
+            ...staticPlan,
+            id: apiPlan?.id || staticPlan.id, // ID'yi API'den
+            stripeId: apiPlan?.stripeId || staticPlan.stripeId, // Stripe ID'yi API'den
+          };
+        });
 
+        setPricingPlans(mergedPlans);
+      } catch (error) {
+        console.error("Error fetching pricing plans:", error);
+      }
+    };
 
-  // Plan seçme işlemi
-  const handleSelectPlan = async (plan:PricingPlan) => {
+    fetchPricingPlans();
+  }, []);
+  const handleSelectPlan = async (plan:PricingPlan ) => {
     setLoading(true);
     try {
-     setFormData({ ...formData, selectedPlan: plan });
+      dispatch(setPricingPlan({ pricingPlanId: plan.id, pricingPlanName: plan.name,price:plan.price }));
       setSelectedPlan(plan);
       nextStep && nextStep();
     } catch (error) {
@@ -44,14 +61,13 @@ export default function PlanSelection({
     }
   };
 
-  // Plan ikonlarını belirle
-  const getPlanIcon = (planid:string) => {
-    switch (planid) {
-      case "silver":
+  const getPlanIcon = (planId: string) => {
+    switch (planId) {
+      case "e8ee0cbd-039e-4ade-a9cf-8c9cc3d91994":
         return <Zap size={24} className="text-gray-600" />;
-      case "gold":
+      case "f2f0bcca-d1bc-4ae5-ae3b-82974c2790d6":
         return <Star size={24} className="text-yellow-500" />;
-      case "platinum":
+      case "7d2a54f7-2d9a-452b-b6d7-1b90fca21f54":
         return <Crown size={24} className="text-purple-600" />;
       default:
         return null;
@@ -84,22 +100,21 @@ export default function PlanSelection({
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {Object.entries(pricingPlans).map(([key, plan]) => (
+          {pricingPlans.map((plan) => (
             <div
-              key={key}
+              key={plan.id}
               className={`relative bg-white rounded-2xl p-6 transition-all duration-300
                 ${
-                  selectedPlan?.id === key
+                  selectedPlan?.id === plan.id
                     ? "ring-2 ring-[--primary] shadow-lg transform scale-[1.02]"
                     : "hover:shadow-lg border border-gray-100"
                 }`}
             >
-              {/* Plan Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2 rounded-lg bg-gray-50">
-                  {getPlanIcon(key)}
+                  {getPlanIcon(plan.id)}
                 </div>
-                {key === "gold" && (
+                {plan.id === "f2f0bcca-d1bc-4ae5-ae3b-82974c2790d6" && (
                   <span className="absolute -top-3 right-6 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
                     Most Popular
                   </span>
@@ -119,12 +134,12 @@ export default function PlanSelection({
               <div>
                 <h4 className="font-medium mb-3">What's Included:</h4>
                 <ul className="space-y-3">
-                  {Object.values(planFeatures).map((feature) => {
+                  {allFeatures.map((feature) => {
                     const isIncluded = plan.features.some(
-                      (pf:any) => pf.id === feature.id
+                      (pf: any) => pf.name === feature.name
                     );
                     return (
-                      <li key={feature.id} className="flex items-start gap-2">
+                      <li key={feature.name} className="flex items-start gap-2">
                         {isIncluded ? (
                           <CheckCircle2
                             className="text-[--accent] flex-shrink-0 mt-1"
@@ -155,7 +170,7 @@ export default function PlanSelection({
                 className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 
     flex items-center justify-center gap-2 mt-6
     ${
-      key === "gold"
+      plan.id === "f2f0bcca-d1bc-4ae5-ae3b-82974c2790d6"
         ? "bg-[--primary] text-white hover:bg-[--primary]/90"
         : "border-2 border-[--primary] text-[--primary] hover:bg-[--primary]/10"
     } 
