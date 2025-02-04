@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, Lock, Check, X } from 'lucide-react';
-import { auth, db } from '../config/firebase';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { registerWithEmail } from '../http/requests';
 
 interface LocationState {
   email: string;
@@ -28,7 +26,7 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
+  
   const [requirements, setRequirements] = useState<PasswordRequirement[]>([
     {
       id: 'length',
@@ -90,21 +88,8 @@ export default function SignUp() {
 
     setLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(user, {
-        displayName: `${firstName} ${lastName}`
-      });
-
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email: email.toLowerCase(),
-        firstName,
-        lastName,
-        displayName: `${firstName} ${lastName}`,
-        createdAt: new Date().toISOString(),
-        companySetupStep: 'initial'
-      });
-
+    const register= await registerWithEmail({email, password, firstName, lastName});
+    console.log(register);
       navigate('/company-formation', { replace: true });
     } catch (error) {
       console.error('Signup error:', error);

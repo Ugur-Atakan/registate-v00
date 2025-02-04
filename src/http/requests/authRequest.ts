@@ -37,17 +37,26 @@ const forgotPassword = async (email: string): Promise<string> => {
 
 const loginWithEmail=async(email:string,password:string):Promise<string>=>{
   try {
-    const response = await baseApi.post('/auth/login', { email, password });
-    return response.data.token;
+    const response = await baseApi.post('/auth/sign-in', { email, password });
+    return response.data;
   } catch (error: any) {
     throw error;
   }
 }
 
-const registerWithEmail=async(email:string,password:string):Promise<string>=>{
+const registerWithEmail=async(data:{email:string,password:string,firstName:string,lastName:string}):Promise<string>=>{
   try {
-    const response = await baseApi.post('/auth/register', { email, password });
-    return response.data.token;
+    const response = await baseApi.post('/auth/sign-up', data);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+const isUserExist=async(email:string):Promise<boolean>=>{
+  try {
+    const response = await baseApi.post('/auth/check-email', { email });
+    return response.data.exists;
   } catch (error: any) {
     throw error;
   }
@@ -60,4 +69,5 @@ export {
   resetPassword,
   loginWithEmail,
   registerWithEmail,
+  isUserExist
 };

@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail } from 'lucide-react';
-import { db } from '../config/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { isUserExist } from '../http/requests/authRequest';
 
 export default function Welcome() {
   const { t } = useTranslation();
@@ -22,28 +21,23 @@ export default function Welcome() {
     setLoading(true);
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      
-      // Check if user exists in Firestore
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('email', '==', normalizedEmail));
-      const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        // User exists in Firestore, redirect to login with incomplete check flag
-        navigate('/login', { 
-          state: { 
-            email: normalizedEmail,
-            checkIncomplete: true 
-          },
-          replace: true 
-        });
-      } else {
-        // User doesn't exist, redirect to signup
-        navigate('/signup', { 
-          state: { email: normalizedEmail },
-          replace: true 
-        });
-      }
+    const isExist=  await isUserExist(normalizedEmail);
+
+    if(isExist){
+      navigate('/login', { 
+        state: { 
+          email: normalizedEmail,
+          checkIncomplete: true 
+        },
+        replace: true 
+      });
+    }else{
+      navigate('/signup', { 
+        state: { email: normalizedEmail },
+        replace: true 
+      });
+    }
     } catch (error) {
       console.error('Error checking email:', error);
       

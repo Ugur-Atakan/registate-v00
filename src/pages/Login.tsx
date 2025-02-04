@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock } from 'lucide-react';
-import { auth } from '../config/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import toast from 'react-hot-toast';
+import { loginWithEmail } from '../http/requests';
 
 interface LocationState {
   email: string;
@@ -24,7 +23,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+     const login= await loginWithEmail(email, password);
+     console.log(login);
       navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
