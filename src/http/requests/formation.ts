@@ -1,4 +1,5 @@
 import { baseApi } from "..";
+import { CompanyResponse } from "../../types/Company";
 
 const getPricingPlans = async () => {
   try {
@@ -53,6 +54,16 @@ const getStates = async () => {
 };
 
 
+const getCompanyDetails = async (companyId: string):Promise<CompanyResponse> =>
+{
+  try {
+    const response = await baseApi.get(`/company/${companyId}/details`);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
 
 export {
   getPricingPlans,
@@ -60,4 +71,5 @@ export {
   getStateFeesAndExpeditedFees,
   getCompanyTypes,
   getStates,
+  getCompanyDetails
 };

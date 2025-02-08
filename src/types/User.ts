@@ -13,6 +13,7 @@ export interface User {
   notifications: boolean;
   roles: string[];
   createdAt: string;
+  companies: UserCompany[];
 }
 
 export interface Tokens {
@@ -23,4 +24,18 @@ export interface Tokens {
 export interface UserInterface {
 user: User;
 tokens: Tokens;
+}
+
+export interface UserCompany {
+  companyId: string;
+  companyName: string;
+  role: string;
+  createdAt: string;
+  state: string;
+  status: string;
+}
+
+export interface SignInResponse {
+  user: User;
+  tokens: Tokens;
 }

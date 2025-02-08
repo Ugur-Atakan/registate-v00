@@ -1,4 +1,5 @@
 import {baseApi} from '..';
+import { SignInResponse } from '../../types/User';
 
 const requestPasswordReset = async (email: string): Promise<void> => {
   try {
@@ -35,7 +36,7 @@ const forgotPassword = async (email: string): Promise<string> => {
   }
 };
 
-const loginWithEmail=async(email:string,password:string):Promise<string>=>{
+const loginWithEmail=async(email:string,password:string):Promise<SignInResponse>=>{
   try {
     const response = await baseApi.post('/auth/sign-in', { email, password });
     return response.data;
@@ -44,7 +45,7 @@ const loginWithEmail=async(email:string,password:string):Promise<string>=>{
   }
 }
 
-const registerWithEmail=async(data:{email:string,password:string,firstName:string,lastName:string}):Promise<string>=>{
+const registerWithEmail=async(data:{email:string,password:string,firstName:string,lastName:string}):Promise<SignInResponse>=>{
   try {
     const response = await baseApi.post('/auth/sign-up', data);
     return response.data;

@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { loginWithEmail } from '../http/requests';
+import { useAppDispatch } from '../store/hooks';
+import { setUserData } from '../store/slices/userSlice';
+import { setActiveCompany, setCompanies } from '../store/slices/companySlice';
 
 interface LocationState {
   email: string;
@@ -16,6 +19,7 @@ export default function Login() {
   const { email } = (location.state as LocationState) || { email: '' };
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +29,13 @@ export default function Login() {
     try {
      const login= await loginWithEmail(email, password);
      console.log(login);
+     dispatch(setUserData(login.user));
+     if(login.user&&login.user.companies.length>0){
+      dispatch(setCompanies(login.user.companies));
       navigate('/dashboard', { replace: true });
+     } else {
+      navigate('/company-formation', { replace: true });
+     }
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Invalid email or password');

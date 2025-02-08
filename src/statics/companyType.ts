@@ -33,4 +33,3 @@ export const staticCompanyTypeFeatures=[
       bestFor: "Companies planning to raise funds & expand",
     },
   ];
-

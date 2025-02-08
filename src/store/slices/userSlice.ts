@@ -19,6 +19,7 @@ const initialState: UserState = {
     notifications: false,
     roles: [],
     createdAt: '',
+    companies: [],
   },
   tokens: {
     accessToken: '',
