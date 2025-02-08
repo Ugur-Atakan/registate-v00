@@ -29,23 +29,25 @@ export default function Dashboard() {
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [company, setCompany] = useState<CompanyResponse | null>(null);
+  const [formationSteps, setFormationSteps] = useState<FormationStep[]>([]);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const companies = useAppSelector((state) => state.company.companies);
   const user = useAppSelector((state) => state.user.userData);
 
+  console.log('Companies:', companies);
   useEffect(() => {
     const fetchCompanyDetails = async () => {
-      if (!companies || !companies.length) {
+      if (!companies) {
         setError('No companies available.');
         return;
       }
       setFetching(true);
       setError(null);
       try {
-        const companyDetails = await getCompanyDetails(companies[1].companyId);
-        console.log(companyDetails);
+        const companyDetails = await getCompanyDetails(companies[0].companyId);
+        console.log('Company details:', companyDetails);  
         setCompany(companyDetails);
         dispatch(setActiveCompany(companyDetails));
       } catch (err: any) {
@@ -57,7 +59,7 @@ export default function Dashboard() {
     };
 
     fetchCompanyDetails();
-  }, [companies, dispatch]);
+  }, []);
 
   if (fetching) {
     return (
@@ -140,6 +142,24 @@ export default function Dashboard() {
           </p>
         </div>
 
+        {
+          companies?.map((company) => (
+            <div key={company.companyId} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-[--primary]/10">
+                  <Building2 className="text-[--primary]" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Company Name</h3>
+                  <p className="text-gray-600">
+                    {company.companyName}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+
         {/* Eksik Bilgiler Card */}
         <div className="flex items-start px-6 py-4 border-b border-gray-200">
           <div className="p-3 rounded-full">
@@ -183,7 +203,7 @@ export default function Dashboard() {
 
           {/* Formation Steps */}
           <div className="divide-y divide-gray-200">
-            {company.formationSteps && company.formationSteps.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((step) => (
+            {company?.formationSteps && company?.formationSteps?.map((step) => (
               <div
                 key={step.id}
                 className={`p-6 transition-colors duration-200 ${

@@ -28,9 +28,8 @@ export default function Login() {
     setLoading(true);
     try {
      const login= await loginWithEmail(email, password);
-     console.log(login);
      dispatch(setUserData(login.user));
-     if(login.user&&login.user.companies.length>0){
+     if(login.user&&login.user.companies){
       dispatch(setCompanies(login.user.companies));
       navigate('/dashboard', { replace: true });
      } else {
