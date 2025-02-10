@@ -33,7 +33,8 @@ const initialState: CompanyState = {
       optionees: [],
       shareholders: [],
       technologyDevelopers: [],
-      companyUsers: []
+      companyUsers: [],
+      subscriptions:[]
     },
 };
 

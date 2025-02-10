@@ -32,6 +32,7 @@ export interface CompanyResponse {
   shareholders: Shareholder[];
   technologyDevelopers?: TechnologyDeveloper[];
   companyUsers: CompanyUserResponse[];
+  subscriptions: any[];
 }
 
 // Formation adımları

@@ -6,57 +6,67 @@ import {
   Package,
   Menu,
   X,
-  Folder,
-  PhoneCall,
-  Settings
+  User2,
+  Ticket,
+  ListTodo,
+  Receipt
 } from 'lucide-react';
-import CompanyChanger from '../CompanyChanger';
 
 interface Props {
   children: React.ReactNode;
 }
 
-export default function DashboardLayout({ children }: Props) {
+export default function AdminDashboardLayout({ children }: Props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navigation = [
     {
       name: 'Dashboard',
-      href: '/dashboard',
+      href: '/admin',
       icon: LayoutDashboard,
-      current: location.pathname === '/dashboard'
+      current: location.pathname === '/admin'
     },
     {
-      name: 'My Companies',
-      href: '/dashboard/companies',
+      name: 'Company Management',
+      href: '/admin/companies',
       icon: Building2,
-      current: location.pathname === '/dashboard/companies'
+      current: location.pathname === '/admin/companies'
     },
     {
-      name: 'Documents',
-      href: '/dashboard/documents',
-      icon: Folder,
-      current: location.pathname === '/dashboard/documents'
-    },
-    {
-      name: 'Services',
-      href: '/dashboard/services',
+      name: 'Product Management',
+      href: '/admin/products',
       icon: Package,
-      current: location.pathname === '/dashboard/services'
-    }  ,
-      {
-      name: 'Support',
-      href: '/dashboard/support',
-      icon: PhoneCall,
-      current: location.pathname === '/dashboard/support'
+      current: location.pathname === '/admin/products'
+    },{
+        name: 'User Management',
+        href: '/admin/users',
+        icon: User2,
+        current: location.pathname === '/admin/users'
     },
     {
-      name: 'Settings',
-      href: '/dashboard/settings',
-      icon: Settings,
-      current: location.pathname === '/dashboard/settings'
-    },
+        name: 'Ticket Management',
+        href: '/admin/support',
+        icon: Ticket,
+        current: location.pathname === '/admin/support'
+    },{
+        name: 'Task Management',
+        href: '/admin/task',
+        icon: ListTodo,
+        current: location.pathname === '/admin/task'
+
+    },{
+        name: 'Formation Management',
+        href: '/admin/formation',
+        icon: Building2,
+        current: location.pathname === '/admin/formation'
+    },{
+        name: 'Order Management',
+        href: '/admin/orders',
+        icon: Receipt,
+        current: location.pathname === '/admin/orders'
+    }
+
   ];
 
   // Close mobile menu on route change
@@ -67,7 +77,6 @@ export default function DashboardLayout({ children }: Props) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
-      <CompanyChanger />
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
