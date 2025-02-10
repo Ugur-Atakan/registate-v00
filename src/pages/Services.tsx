@@ -38,26 +38,42 @@ export default function Services() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Available Services</h1>
-        <p className="text-gray-600">
-          Additional services will be available after company formation.
-        </p>
-        {services.length > 0 ? (
-          services.map((service: any) => (
-            <div
-              key={service.id}
-              className="bg-white shadow-md rounded-lg p-4 mt-4"
-            >
-              <h2 className="text-xl font-bold">{service.name}</h2>
-              <p>{service.description}</p>
-              <p className="text-gray-600">${service.price}</p>
-            </div>
-          ))
-        ) : (
-          <p>Aviable Service Not Found</p>
-        )}
-      </div>
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2">
+        {JSON.stringify(services)}
+      
+        {services.map((product) => (
+          <ServiceCard key={product.id} product={product} />
+        ))}
+       
+      </main>
     </DashboardLayout>
   );
 }
+
+
+
+
+const ServiceCard = ({product}) => {
+  return(
+    <div className="bg-white p-6 rounded-lg border border-neutral-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
+                  <i className="fa-solid fa-user-tie text-white"></i>
+                </div>
+                <h3 className="font-semibold">{product.name}</h3>
+              </div>
+              <span className="px-3 py-1 text-xs bg-neutral-100 rounded-full">Active</span>
+            </div>
+            <p className="text-sm text-neutral-600 mb-4">
+              {product.description}
+            </p>
+            <button className="w-full px-4 py-2 bg-neutral-200 text-neutral-600 rounded-lg text-sm">
+              Already Purchased
+            </button>
+          </div>
+  )
+  };
+
+
+  
