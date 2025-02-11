@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import DashboardLayout from "../../components/layout/DashboardLayout";
 
 export default function Documents(){
 const [documents, setDocuments] = useState([]);
@@ -16,6 +16,22 @@ const [documents, setDocuments] = useState([]);
 const DocumentsPage = () => {
   return (
     <div className="bg-neutral-50">
+       <header id="header" className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold">Documents</h1>
+            <p className="text-sm text-neutral-500">Manage your company documents</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg">
+              <i className="fa-regular fa-bell w-5 h-5" />
+            </button>
+            <img
+              src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=123"
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full"
+            />
+          </div>
+        </header>
         <div id="documents-content" className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Company Documents</h2>
@@ -126,60 +142,3 @@ const DocumentsPage = () => {
     </div>
   );
 };
-
-
-
-const DocumentsASide = () => {
-  return(<aside id="sidebar" className="fixed inset-y-0 left-0 w-64 bg-white border-r border-neutral-200 flex flex-col">
-    <nav className="flex-1 p-4 space-y-1">
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-        <i className="fa-solid fa-house w-5 h-5 mr-3"></i>
-        Dashboard
-      </a>
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-900 bg-neutral-100 rounded-lg">
-        <i className="fa-regular fa-folder w-5 h-5 mr-3"></i>
-        Documents
-      </a>
-      <div className="pl-6 space-y-1 mt-2">
-        <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-          <i className="fa-regular fa-file w-4 h-4 mr-3"></i>
-          Company Documents
-        </a>
-        <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-          <i className="fa-solid fa-hashtag w-4 h-4 mr-3"></i>
-          Ein Number
-        </a>
-        <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-          <i className="fa-regular fa-file-lines w-4 h-4 mr-3"></i>
-          Annual Report Filing
-        </a>
-        <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-          <i className="fa-regular fa-file-lines w-4 h-4 mr-3"></i>
-          BOI Report Filing
-        </a>
-        <a href="#" className="flex items-center px-4 py-2 text-neutral-500 hover:bg-neutral-50 rounded-lg mt-4">
-          <i className="fa-solid fa-plus w-4 h-4 mr-3"></i>
-          Add New Service
-        </a>
-      </div>
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-        <i className="fa-solid fa-briefcase w-5 h-5 mr-3"></i>
-        Services
-      </a>
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-        <i className="fa-solid fa-headset w-5 h-5 mr-3"></i>
-        Support
-      </a>
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-        <i className="fa-solid fa-cog w-5 h-5 mr-3"></i>
-        Settings
-      </a>
-    </nav>
-    <div className="p-4 border-t border-neutral-200">
-      <a href="#" className="flex items-center px-4 py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg">
-        <i className="fa-solid fa-sign-out-alt w-5 h-5 mr-3"></i>
-        Logout
-      </a>
-    </div>
-  </aside>)
-}

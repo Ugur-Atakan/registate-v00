@@ -51,9 +51,9 @@ export default function AdminDashboardLayout({ children }: Props) {
         current: location.pathname === '/admin/support'
     },{
         name: 'Task Management',
-        href: '/admin/task',
+        href: '/admin/tasks',
         icon: ListTodo,
-        current: location.pathname === '/admin/task'
+        current: location.pathname === '/admin/tasks'
 
     },{
         name: 'Formation Management',

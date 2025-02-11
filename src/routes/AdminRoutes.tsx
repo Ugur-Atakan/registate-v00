@@ -8,6 +8,7 @@ import AdminProducts from "../pages/admin/Products";
 import AdminTasks from "../pages/admin/Tasks";
 import AdminFormationDashboard from "../pages/admin/Formation";
 import AdminOrderDashboard from "../pages/admin/Orders";
+import AdminTicketDetailsPage from "../pages/admin/support/TicketDetails";
 
 export default function AdminRoutes() {
   return (
@@ -16,9 +17,10 @@ export default function AdminRoutes() {
         <Route path="/" element={<AdminDashboard />} />
         <Route path="/users" element={<AdminUsers />} />
         <Route path="/support" element={<AdminSupport />} />
+        <Route path="/support/details" element={<AdminTicketDetailsPage />} />
         <Route path="/companies" element={<AdminCompanies />} />
         <Route path="/products" element={<AdminProducts />} />
-        <Route path="/task" element={<AdminTasks />} />
+        <Route path="/tasks" element={<AdminTasks />} />
         <Route path="/formation" element={<AdminFormationDashboard/>} />
         <Route path="/orders" element={<AdminOrderDashboard />} />
       </Routes>

@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Building2, 
+import {
+  LayoutDashboard,
+  Building2,
   Package,
   Menu,
   X,
   Folder,
   PhoneCall,
-  Settings
+  Settings,
+  FileText,
+  Hash,
+  File,
+  FileCheck,
+  PlusCircle,
+  ListTodo
 } from 'lucide-react';
 import CompanyChanger from '../CompanyChanger';
 
@@ -37,15 +43,54 @@ export default function DashboardLayout({ children }: Props) {
       name: 'Documents',
       href: '/dashboard/documents',
       icon: Folder,
-      current: location.pathname === '/dashboard/documents'
+      current: location.pathname.startsWith('/dashboard/documents'),
+      children: [
+        {
+          name: 'Company Documents',
+          href: '/dashboard/documents/#company',
+          current: location.pathname === '/dashboard/documents/#company',
+          icon: FileText
+        },
+        {
+          name: 'Ein Number',
+          href: '/dashboard/documents/#ein',
+          current: location.pathname === '/dashboard/documents/#ein',
+          icon: Hash
+        },
+        {
+          name: 'Annual Report Filing',
+          href: '/dashboard/documents/#annual',
+          current: location.pathname === '/dashboard/documents/#annual',
+          icon: File
+        },
+        {
+          name: 'BOI Report Filing',
+          href: '/dashboard/documents/#boi',
+          current: location.pathname === '/dashboard/documents/#boi',
+          icon: FileCheck
+        },
+        {
+          name: 'Add New Service',
+          href: '/dashboard/documents/#add-new-service',
+          current: location.pathname === '/dashboard/documents/#add-new-service',
+          icon: PlusCircle,
+          action: true
+        }
+      ]
     },
     {
       name: 'Services',
       href: '/dashboard/services',
       icon: Package,
       current: location.pathname === '/dashboard/services'
-    }  ,
-      {
+    },
+    {
+      name: 'Tasks',
+      href: '/dashboard/tasks',
+      icon: ListTodo,
+      current: location.pathname === '/dashboard/tasks'
+  },
+    {
       name: 'Support',
       href: '/dashboard/support',
       icon: PhoneCall,
@@ -56,10 +101,10 @@ export default function DashboardLayout({ children }: Props) {
       href: '/dashboard/settings',
       icon: Settings,
       current: location.pathname === '/dashboard/settings'
-    },
+    }
   ];
 
-  // Close mobile menu on route change
+  // Route değiştiğinde mobil menüyü kapat
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
@@ -80,22 +125,55 @@ export default function DashboardLayout({ children }: Props) {
             </div>
             <nav className="mt-8 flex-1 space-y-1 px-2">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
-                    item.current
-                      ? 'bg-[--primary] text-white'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <item.icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      item.current ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'
+                <div key={item.name}>
+                  <Link
+                    to={item.href}
+                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                      item.current
+                        ? 'bg-[--primary] text-white'
+                        : 'text-gray-700 hover:bg-gray-50'
                     }`}
-                  />
-                  {item.name}
-                </Link>
+                  >
+                    {item.icon && (
+                      <item.icon
+                        className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                          item.current
+                            ? 'text-white'
+                            : 'text-gray-400 group-hover:text-gray-500'
+                        }`}
+                      />
+                    )}
+                    {item.name}
+                  </Link>
+                  {item.children && item.children.length > 0 && (
+                    <div className="pl-6 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          className={`group flex items-center px-4 py-2 text-sm rounded-lg ${
+                            child.current
+                              ? child.action
+                                ? 'text-neutral-500'
+                                : 'text-[--primary] font-medium'
+                              : 'text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          {child.icon && (
+                            <child.icon
+                              className={`mr-3 h-4 w-4 flex-shrink-0 ${
+                                child.current
+                                  ? 'text-[--primary]'
+                                  : 'text-gray-400 group-hover:text-gray-500'
+                              }`}
+                            />
+                          )}
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </nav>
           </div>
@@ -123,22 +201,51 @@ export default function DashboardLayout({ children }: Props) {
         {isMobileMenuOpen && (
           <div className="border-t border-gray-200 bg-white py-2">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`flex items-center px-4 py-3 text-sm font-medium ${
-                  item.current
-                    ? 'bg-[--primary]/10 text-[--primary]'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <item.icon
-                  className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                    item.current ? 'text-[--primary]' : 'text-gray-400'
+              <div key={item.name}>
+                <Link
+                  to={item.href}
+                  className={`flex items-center px-4 py-3 text-sm font-medium ${
+                    item.current
+                      ? 'bg-[--primary]/10 text-[--primary]'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
-                />
-                {item.name}
-              </Link>
+                >
+                  {item.icon && (
+                    <item.icon
+                      className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                        item.current ? 'text-[--primary]' : 'text-gray-400'
+                      }`}
+                    />
+                  )}
+                  {item.name}
+                </Link>
+                {item.children && item.children.length > 0 && (
+                  <div className="pl-6">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.name}
+                        to={child.href}
+                        className={`flex items-center px-4 py-2 text-sm ${
+                          child.current
+                            ? child.action
+                              ? 'text-neutral-500'
+                              : 'text-[--primary] font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        {child.icon && (
+                          <child.icon
+                            className={`mr-3 h-4 w-4 flex-shrink-0 ${
+                              child.current ? 'text-[--primary]' : 'text-gray-400'
+                            }`}
+                          />
+                        )}
+                        {child.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
@@ -157,7 +264,7 @@ export default function DashboardLayout({ children }: Props) {
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <item.icon className="h-6 w-6" />
+              {item.icon && <item.icon className="h-6 w-6" />}
               <span className="text-xs mt-1">{item.name}</span>
             </Link>
           ))}
