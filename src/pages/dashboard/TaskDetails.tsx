@@ -1,5 +1,33 @@
+import { useState } from "react";
+import FileUploadComponent from "../../components/FileUpload";
 import DashboardLayout from "../../components/layout/DashboardLayout";
+import supabase from "../../config/supabaseClient";
 const TaskDetails = () => {
+  const [file, setFile] = useState<File | null>(null);
+
+const uploadFile = async () => {
+if (!file) return;
+  const { data, error } = await supabase.storage
+    .from('company-documents')
+    .upload(`task-attachments/${file.name}`, file);
+  if (error) {
+    console.error('Yükleme hatası:', error);
+  } else {
+    console.log('Dosya yüklendi:', data);
+  }
+};
+
+const handleComplete = async () => {
+  await uploadFile();
+  // Diğer işlemler...
+};
+
+
+const handleSubmitQuestion = async () => {
+  // Soru gönderme işlemleri...
+};
+
+
   return (
 <DashboardLayout>
       <main id="main-content">
@@ -108,19 +136,7 @@ const TaskDetails = () => {
             >
               <h2 className="text-lg font-semibold mb-4">Attachments</h2>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <i className="fa-regular fa-file-pdf text-neutral-400"></i>
-                    <span className="text-sm">Articles_Draft.pdf</span>
-                  </div>
-                  <button className="text-neutral-400 hover:text-neutral-600">
-                    <i className="fa-solid fa-download"></i>
-                  </button>
-                </div>
-                <button className="w-full flex items-center justify-center space-x-2 p-3 border border-dashed border-neutral-300 rounded-lg text-neutral-500 hover:bg-neutral-50">
-                  <i className="fa-solid fa-plus"></i>
-                  <span>Add Attachment</span>
-                </button>
+                <FileUploadComponent setFile={setFile} file={file} fileUrl="" label="Attchement"/>
               </div>
             </div>
 
