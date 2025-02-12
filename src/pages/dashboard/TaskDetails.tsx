@@ -1,35 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FileUploadComponent from "../../components/FileUpload";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import supabase from "../../config/supabaseClient";
+import { useLocation } from "react-router-dom";
+import instance from "../../http/instance";
+
 const TaskDetails = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [loading,setLoading]=useState<boolean>(false);
+  const [taskDetails, setTaskDetails] = useState<any>(null);
+  const { state } = useLocation();
+  const taskId = state?.taskId;
 
-const uploadFile = async () => {
-if (!file) return;
-  const { data, error } = await supabase.storage
-    .from('company-documents')
-    .upload(`task-attachments/${file.name}`, file);
-  if (error) {
-    console.error('Yükleme hatası:', error);
-  } else {
-    console.log('Dosya yüklendi:', data);
+  const fetchTaskDetails = async () => {
+    setLoading(true);
+    const res = await instance.get(`/tasks/${taskId}`);
+    setTaskDetails(res.data);
+    console.log(res.data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTaskDetails();
+  }, []);
+
+  const uploadFile = async () => {
+    if (!file) return;
+    const { data, error } = await supabase.storage
+      .from("company-documents")
+      .upload(`task-attachments/${file.name}`, file);
+    if (error) {
+      console.error("Yükleme hatası:", error);
+    } else {
+      console.log("Dosya yüklendi:", data);
+    }
+  };
+
+  const handleComplete = async () => {
+    await uploadFile();
+    // Diğer işlemler...
+  };
+
+  const handleSubmitQuestion = async () => {
+    // Soru gönderme işlemleri...
+  };
+
+  if(loading){
+    return <div>Loading...</div>
   }
-};
-
-const handleComplete = async () => {
-  await uploadFile();
-  // Diğer işlemler...
-};
-
-
-const handleSubmitQuestion = async () => {
-  // Soru gönderme işlemleri...
-};
-
 
   return (
-<DashboardLayout>
+    <DashboardLayout>
       <main id="main-content">
         <header id="header" className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
@@ -38,7 +59,7 @@ const handleSubmitQuestion = async () => {
             </button>
             <div>
               <h1 className="text-2xl font-semibold">
-                Complete Company Registration
+               {taskDetails?.title}
               </h1>
               <p className="text-sm text-neutral-500">Due by Mar 15, 2025</p>
             </div>
@@ -65,8 +86,7 @@ const handleSubmitQuestion = async () => {
             >
               <h2 className="text-lg font-semibold mb-4">Description</h2>
               <p className="text-neutral-600 mb-4">
-                Complete all necessary steps for company registration including
-                document submission, fee payment, and EIN number acquisition.
+               {taskDetails?.description}
               </p>
               <div className="flex items-center space-x-4 text-sm text-neutral-500">
                 <span className="flex items-center">
@@ -88,7 +108,8 @@ const handleSubmitQuestion = async () => {
               <h2 className="text-lg font-semibold mb-4">Ask a Question</h2>
               <div className="space-y-4">
                 <textarea
-                  className="w-full p-3 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-400" rows={4}
+                  className="w-full p-3 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-400"
+                  rows={4}
                   placeholder="Type your question about the registration process..."
                 ></textarea>
                 <button className="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800">
@@ -136,7 +157,12 @@ const handleSubmitQuestion = async () => {
             >
               <h2 className="text-lg font-semibold mb-4">Attachments</h2>
               <div className="space-y-3">
-                <FileUploadComponent setFile={setFile} file={file} fileUrl="" label="Attchement"/>
+                <FileUploadComponent
+                  setFile={setFile}
+                  file={file}
+                  fileUrl=""
+                  label="Attchement"
+                />
               </div>
             </div>
 
@@ -151,7 +177,7 @@ const handleSubmitQuestion = async () => {
           </div>
         </div>
       </main>
-</DashboardLayout>
+    </DashboardLayout>
   );
 };
 

@@ -1,6 +1,13 @@
-const TaskCard=({task})=>{
+import { Task } from "../types/types";
+
+interface TaskCardProps {
+  task:Task;
+  onclick:(id:string)=>void; 
+}
+
+const TaskCard=({task,onclick}:TaskCardProps)=>{
     return (
-      <div className="bg-white p-6 rounded-lg border border-neutral-200">
+      <div className="bg-white p-6 rounded-lg border border-neutral-200" onClick={()=>onclick(task.id)}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-neutral-900 rounded-lg flex items-center justify-center">
@@ -12,7 +19,7 @@ const TaskCard=({task})=>{
           </div>
         </div>
         <span className="px-3 py-1 text-xs bg-neutral-700 text-white rounded-full">
-          Medium Priority
+        {task.priority}
         </span>
       </div>
       <div className="space-y-3">
@@ -25,7 +32,7 @@ const TaskCard=({task})=>{
         <div className="flex items-center space-x-2">
           <i className="fa-regular fa-circle text-neutral-400"></i>
           <span className="text-sm text-neutral-600">
-            Submit Lease Agreement
+            {task.description}
           </span>
         </div>
       </div>
