@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
 import { 
   ArrowRight,
   Shield,
@@ -17,7 +16,6 @@ import { useAppDispatch } from '../../store/hooks';
 import { addAddon } from '../../store/slices/checkoutSlice';
 
 export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
-  const { user } = useAuth();
   const [includeEIN, setIncludeEIN] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +24,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
   const dispatch=useAppDispatch();
 
   const handleContinue = async () => {
-    if (!user || includeEIN === null) return;
+    if (includeEIN === null) return;
 
     setLoading(true);
     try {
