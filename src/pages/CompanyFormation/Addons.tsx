@@ -65,7 +65,7 @@ export default function Addons({ nextStep }: AddonsProps) {
 
     // **ID Bazlı Addon Seçimi**
     switch (currentAddon.productId) {
-      case "6ec59714-9ce9-4c62-8c29-4e55a5bb2659": // EIN ID
+      case "96460413-500e-4f50-83e0-d4efb1eb0fea": // EIN ID
         return (
           <EIN
             prevStep={goPrevStep}
@@ -73,7 +73,7 @@ export default function Addons({ nextStep }: AddonsProps) {
             addonData={currentAddon}
           />
         );
-      case "6ab02e6b-9694-4820-bc92-df7d9d1a8846": // Virtual Mailbox ID
+      case "143afae6-69ae-43ee-9bae-fbfe2187b322": // Virtual Mailbox ID
         return (
           <VirtualMailbox
             prevStep={goPrevStep}
@@ -81,7 +81,7 @@ export default function Addons({ nextStep }: AddonsProps) {
             addonData={currentAddon}
           />
         );
-      case "747f5775-079e-4cb2-9025-d57cdea27376": // Annual Report Filing ID
+      case "4c9b73cc-60a1-460d-ac29-1cda37ba7a8e": // Annual Report Filing ID
         return (
           <AnnualReportFiling
             prevStep={goPrevStep}
@@ -89,7 +89,7 @@ export default function Addons({ nextStep }: AddonsProps) {
             addonData={currentAddon}
           />
         );
-      case "d45c0c05-fe55-4dc5-9374-755b27d63cde": // BOI Report Filing ID
+      case "c50ac514-f2b3-49ca-8412-17caf0218b81": // BOI Report Filing ID
         return (
           <BoiReportFiling
             prevStep={goPrevStep}
