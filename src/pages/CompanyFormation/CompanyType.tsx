@@ -49,7 +49,7 @@ export default function CompanyType({
   nextStep,
 }: CompanyTypeProps) {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<SelectedType|null>();
+  const [selectedType, setSelectedType] = useState<SelectedType|null>(recommendation ? companyTypesFeatures.find((type) => type.name === recommendation) as SelectedType : null);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   

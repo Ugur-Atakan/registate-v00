@@ -185,7 +185,7 @@ export default function Review({nextStep }: ReviewProps) {
                       className="flex justify-between items-center text-sm text-gray-600"
                     >
                       <span>{upsell.productName} {upsell?.productTier}</span>
-                      <span className="font-medium">${upsell.price}</span>
+                      <span className="font-medium">${upsell.price/100}</span>
                     </li>
                   ))}
                 </ul>

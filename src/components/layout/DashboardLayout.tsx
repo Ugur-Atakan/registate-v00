@@ -91,7 +91,7 @@ export default function DashboardLayout({ children }: Props) {
           icon: FileText
         },
         {
-          name: 'Ein Number',
+          name: 'EIN Number',
           href: '/dashboard/documents/#ein',
           current: location.pathname === '/dashboard/documents/#ein',
           icon: Hash

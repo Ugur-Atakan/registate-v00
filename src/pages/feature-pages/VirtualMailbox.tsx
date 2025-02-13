@@ -170,7 +170,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold">{pkg.name}</h3>
                       <div className="text-right">
-                        <span className="text-lg font-bold">${pkg.amount}</span>
+                        <span className="text-lg font-bold">${pkg.amount/100}</span>
                         <span className="text-sm text-gray-600">{getFrequency(pkg.frequency)}</span>
                       </div>
                     </div>
