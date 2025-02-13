@@ -7,6 +7,7 @@ import { loginWithEmail } from '../http/requests';
 import { useAppDispatch } from '../store/hooks';
 import { setUserData } from '../store/slices/userSlice';
 import { setActiveCompany, setCompanies } from '../store/slices/companySlice';
+import { saveUserTokens } from '../utils/storage';
 
 interface LocationState {
   email: string;
@@ -28,10 +29,11 @@ export default function Login() {
     setLoading(true);
     try {
      const login= await loginWithEmail(email, password);
-     dispatch(setUserData(login.user));
-     if(login.user&&login.user.companies){
+      dispatch(setUserData(login.user));
+      if(login.user&&login.user.companies){
       dispatch(setCompanies(login.user.companies));
       navigate('/dashboard', { replace: true });
+      saveUserTokens(login.tokens);
      } else {
       navigate('/company-formation', { replace: true });
      }

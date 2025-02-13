@@ -54,15 +54,6 @@ const getStates = async () => {
 };
 
 
-const getCompanyDetails = async (companyId: string):Promise<CompanyResponse> =>
-{
-  try {
-    const response = await baseApi.get(`/company/${companyId}/details`);
-    return response.data;
-  } catch (error: any) {
-    throw error;
-  }
-}
 
 
 export {
@@ -71,5 +62,4 @@ export {
   getStateFeesAndExpeditedFees,
   getCompanyTypes,
   getStates,
-  getCompanyDetails
 };

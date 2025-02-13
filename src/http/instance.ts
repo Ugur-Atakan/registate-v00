@@ -10,6 +10,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   async config => {
     const tokens = getUserTokens();
+    console.log('tokens',tokens);
+
     if (tokens) {
       config.headers.Authorization = `Bearer ${tokens.accessToken}`;
     }
@@ -32,7 +34,8 @@ instance.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-      const tokens = await getUserTokens();
+      const tokens =  getUserTokens();
+      console.log('tokens',tokens);
       if (!tokens) {
         console.log('No tokens found');
         return Promise.reject(

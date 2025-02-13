@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { User, Lock, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { registerWithEmail } from '../http/requests';
+import { saveUserTokens } from '../utils/storage';
 
 interface LocationState {
   email: string;
@@ -90,6 +91,7 @@ export default function SignUp() {
     try {
     const register= await registerWithEmail({email, password, firstName, lastName});
     console.log(register);
+    saveUserTokens(register.tokens);
       navigate('/company-formation', { replace: true });
     } catch (error) {
       console.error('Signup error:', error);

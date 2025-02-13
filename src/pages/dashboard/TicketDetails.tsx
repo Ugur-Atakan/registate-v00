@@ -1,22 +1,82 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { getTicketDetails } from '../../http/requests/companyRequests';
+import toast from 'react-hot-toast';
 
 const TicketDetailsPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const ticketId = location.state?.ticketId;
+  
+  const [ticketDetails, setTicketDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchTicketDetails = async () => {
+      if (!ticketId) {
+        toast.error("Ticket ID is missing");
+        return;
+      }
+      setLoading(true);
+      try {
+        const ticket = await getTicketDetails(ticketId);
+        setTicketDetails(ticket);
+        console.log("Fetched ticket:", ticket);
+      } catch (error) {
+        console.error("Error fetching ticket details:", error);
+        toast.error("Failed to load ticket details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTicketDetails();
+  }, [ticketId]);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-pulse text-gray-500">Loading ticket details...</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!ticketDetails) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-gray-500">Ticket not found</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      <main id="main-content">
-        <header id="header" className="flex items-center justify-between mb-8">
+      <main id="main-content" className="p-4">
+        <header className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-neutral-100 rounded-lg">
+            <button 
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-neutral-100 rounded-lg"
+            >
               <i className="fa-solid fa-arrow-left w-5 h-5"></i>
             </button>
             <div>
-              <h1 className="text-2xl font-semibold">Ticket #1234</h1>
-              <p className="text-sm text-neutral-500">Issue with Virtual Mailbox Service</p>
+              <h1 className="text-2xl font-semibold">{ticketDetails.subject}</h1>
+              <p className="text-sm text-neutral-500">{ticketDetails.category}</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="px-3 py-1 text-xs bg-neutral-900 text-white rounded-full">High Priority</span>
-            <span className="px-3 py-1 text-xs bg-neutral-100 rounded-full">Open</span>
+            <span className="px-3 py-1 text-xs bg-neutral-900 text-white rounded-full">
+              {ticketDetails.priority}
+            </span>
+            <span className="px-3 py-1 text-xs bg-neutral-100 rounded-full">
+              {ticketDetails.status}
+            </span>
             <button className="px-4 py-2 border border-neutral-200 rounded-lg hover:bg-neutral-50">
               <i className="fa-solid fa-ellipsis-h"></i>
             </button>
@@ -26,57 +86,20 @@ const TicketDetailsPage = () => {
         <div id="ticket-details" className="grid grid-cols-3 gap-6">
           {/* Conversation and Reply Section */}
           <div className="col-span-2">
-            <div id="conversation" className="bg-white rounded-lg border border-neutral-200 p-6 mb-6">
+            <section id="conversation" className="bg-white rounded-lg border border-neutral-200 p-6 mb-6">
               <div className="space-y-6">
-                {/* Conversation Item 1 */}
-                <div className="flex space-x-4">
-                  <img
-                    src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=456"
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <span className="font-medium">John Doe</span>
-                        <span className="text-neutral-500 text-sm ml-2">Customer</span>
-                      </div>
-                      <span className="text-sm text-neutral-500">Jan 15, 2025 10:30 AM</span>
-                    </div>
-                    <div className="bg-neutral-50 rounded-lg p-4">
-                      <p>
-                        Unable to access the virtual mailbox dashboard. Getting error 404 when trying to log in. I've tried clearing my cache and using different browsers but the issue persists.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                {/* Conversation Item 2 */}
-                <div className="flex space-x-4">
-                  <img
-                    src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=789"
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <span className="font-medium">Sarah Wilson</span>
-                        <span className="text-neutral-500 text-sm ml-2">Support Agent</span>
-                      </div>
-                      <span className="text-sm text-neutral-500">Jan 15, 2025 11:15 AM</span>
-                    </div>
-                    <div className="bg-neutral-50 rounded-lg p-4">
-                      <p>
-                        Hi John, I'm sorry you're experiencing this issue. Could you please provide your account email address and confirm when this issue started? Also, could you share a screenshot of the error message you're seeing?
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                {ticketDetails.messages && ticketDetails.messages.length > 0 ? (
+                  ticketDetails.messages.map((msg) => (
+                    <ConversationItem key={msg.id} message={msg} />
+                  ))
+                ) : (
+                  <p className="text-neutral-500">No messages yet.</p>
+                )}
               </div>
-            </div>
+            </section>
 
             {/* Reply Box */}
-            <div id="reply-box" className="bg-white rounded-lg border border-neutral-200 p-6">
+            <section id="reply-box" className="bg-white rounded-lg border border-neutral-200 p-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Reply to ticket</label>
                 <textarea
@@ -97,30 +120,29 @@ const TicketDetailsPage = () => {
                   Send Reply
                 </button>
               </div>
-            </div>
+            </section>
           </div>
 
           {/* Ticket Sidebar */}
-          <div id="ticket-sidebar" className="space-y-6">        
-            {/* Ticket Information */}
+          <aside id="ticket-sidebar" className="space-y-6">
             <div className="bg-white rounded-lg border border-neutral-200 p-6">
               <h3 className="text-lg font-semibold mb-4">Ticket Information</h3>
               <div className="space-y-4">
                 <div className="pt-4 border-t border-neutral-200">
                   <p className="text-sm text-neutral-500 mb-1">Created</p>
-                  <p>Jan 15, 2025 10:30 AM</p>
+                  <p>{new Date(ticketDetails.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="pt-4 border-t border-neutral-200">
                   <p className="text-sm text-neutral-500 mb-1">Last Updated</p>
-                  <p>Jan 15, 2025 11:15 AM</p>
+                  <p>{new Date(ticketDetails.updatedAt).toLocaleString()}</p>
                 </div>
                 <div className="pt-4 border-t border-neutral-200">
                   <p className="text-sm text-neutral-500 mb-1">Category</p>
-                  <p>Technical Support</p>
+                  <p>{ticketDetails.category}</p>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </main>
     </DashboardLayout>
@@ -128,3 +150,31 @@ const TicketDetailsPage = () => {
 };
 
 export default TicketDetailsPage;
+
+const ConversationItem = ({ message }) => {
+  return (
+    <div className="flex space-x-4">
+      <img
+        src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=456"
+        alt="User Avatar"
+        className="w-10 h-10 rounded-full"
+      />
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <span className="font-medium">John Doe</span>
+            <span className="text-neutral-500 text-sm ml-2">
+              {message.isStaff ? 'Registate' : 'You'}
+            </span>
+          </div>
+          <span className="text-sm text-neutral-500">
+            {new Date(message.createdAt).toLocaleString()}
+          </span>
+        </div>
+        <div className="bg-neutral-50 rounded-lg p-4">
+          <p>{message.message}</p>
+        </div>
+      </div>
+    </div>
+  );
+};

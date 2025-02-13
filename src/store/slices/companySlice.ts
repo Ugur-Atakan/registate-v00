@@ -1,6 +1,7 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import { CompanyResponse, CompanyStatus } from '../../types/Company';
 import { UserCompany } from '../../types/User';
+import { setActiveCompanyId } from '../../utils/storage';
 
 interface CompanyState {
   selectedCompany: CompanyResponse;
@@ -47,6 +48,7 @@ export const companySlice = createSlice({
     },
     setActiveCompany: (state, action: PayloadAction<CompanyResponse>) => {
       state.selectedCompany = action.payload
+      setActiveCompanyId(action.payload.id)
   },
   },
 });

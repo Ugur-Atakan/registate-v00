@@ -14,3 +14,15 @@ export const saveUserTokens = (tokens: Tokens): void => {
 export const removeTokens = (): void => {
   localStorage.removeItem(TOKEN_KEY);
 };
+
+export const clearStorage = (): void => {
+  localStorage.clear();
+};
+
+export const setActiveCompanyId = (companyId: string): void => {
+  localStorage.setItem('activeCompany', companyId);
+};
+
+export const getActiveCompanyId = (): string | null => {
+  return localStorage.getItem('activeCompany');
+};
