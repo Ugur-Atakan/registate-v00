@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const demoCompanies = [
   {
     id: "269eef1d-5af2-4e67-a2e2-0cde8884eb65",
-    companyName: "Çözüm Üreteneler A.Ş",
+    companyName: "Better 360 Company",
     state: {
       name: "Delaware",
       abbreviation: "DE"

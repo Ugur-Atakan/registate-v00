@@ -144,24 +144,8 @@ export default function CompanyFormation() {
   };
 
   return (
-    <div className="mx-auto">
-      <div className="bg-white shadow-lg rounded-xl p-6">
-        {renderStep()}
-        <div className="mt-6 flex justify-between">
-          {currentStep !== 1 && (
-            <button
-              type="button"
-              onClick={back}
-              className="flex items-center gap-2 px-6 py-3 text-gray-600 bg-gray-100 
-                    rounded-lg hover:bg-gray-200 transition-colors duration-200"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+   
+       renderStep()
   );
 }
 
