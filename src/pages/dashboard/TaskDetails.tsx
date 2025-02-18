@@ -66,20 +66,21 @@ interface Task {
 }
 
 const TaskDetails = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTaskDetails = async () => {
       setLoading(true);
       try {
-        const task=await getTaskDetails(location.state?.taskId);
+        const task = await getTaskDetails(location.state?.taskId);
         setTask(task);
+        console.log("Task details:", task);
       } catch (error) {
         console.error("Error fetching task details:", error);
         toast.error("Failed to load task details");
@@ -107,7 +108,7 @@ const TaskDetails = () => {
 
     setSubmitting(true);
     try {
-      // In production, this would be an API call
+      // In production, this would be an API call  this will be connect supabase
       const messageData = {
         message: newMessage,
         attachments: attachments.map(file => ({
@@ -120,12 +121,12 @@ const TaskDetails = () => {
         isStaff: false
       };
 
-      const res= await instance.post("/tasks/add-message", messageData);
+      const res = await instance.post("/tasks/add-message", messageData);
       console.log("Submitting message:", messageData);
-      if(res){
+      if (res) {
         toast.success("Message sent successfully");
       }
-      
+
       // Clear form
       setNewMessage("");
       setAttachments([]);
@@ -134,17 +135,6 @@ const TaskDetails = () => {
       toast.error("Failed to send message");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleCompleteTask = async () => {
-    try {
-      // In production, this would be an API call
-      toast.success("Task marked as completed");
-      navigate("/dashboard/tasks");
-    } catch (error) {
-      console.error("Error completing task:", error);
-      toast.error("Failed to complete task");
     }
   };
 
@@ -206,24 +196,26 @@ const TaskDetails = () => {
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => navigate("/dashboard/tasks")}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">{task.title}</h1>
-            <div className="flex items-center gap-3 mt-1">
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(task.status)}`}>
-                <Clock size={16} />
-                {task.status}
-              </span>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(task.priority)}`}>
-                <AlertCircle size={16} />
-                {task.priority} Priority
-              </span>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/dashboard/tasks")}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">{task.title}</h1>
+              <div className="flex items-center gap-3 mt-1">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(task.status)}`}>
+                  <Clock size={16} />
+                  {task.status}
+                </span>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(task.priority)}`}>
+                  <AlertCircle size={16} />
+                  {task.priority} Priority
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -394,27 +386,6 @@ const TaskDetails = () => {
                   </span>
                 </div>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <button
-                onClick={handleCompleteTask}
-                disabled={task.status === "COMPLETED"}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 
-                  text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 
-                  disabled:cursor-not-allowed mb-3"
-              >
-                <CheckCircle2 size={18} />
-                {task.status === "COMPLETED" ? "Task Completed" : "Complete Task"}
-              </button>
-
-              {task.status !== "COMPLETED" && (
-                <p className="text-sm text-gray-500 flex items-start gap-2">
-                  <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-                  Complete this task when you have finished all requirements
-                </p>
-              )}
             </div>
           </div>
         </div>

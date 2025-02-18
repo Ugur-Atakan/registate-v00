@@ -71,12 +71,6 @@ export default function DashboardLayout({ children }: Props) {
       current: location.pathname === '/dashboard'
     },
     {
-      name: 'My Companies',
-      href: '/dashboard/companies',
-      icon: Building2,
-      current: location.pathname === '/dashboard/companies'
-    },
-    {
       name: 'Documents',
       href: '#',
       icon: Folder,

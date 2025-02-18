@@ -24,31 +24,47 @@ const commonFeatures = [
 
 const mailboxPlansFeatures = [
   {
-    id: 'a8c9a931-2109-4146-853a-7636441d8dce',
+    id: '625d1ad1-d2c2-47c9-aa97-c6b0a05a6c90',
+    name: 'Basic Plan',
     features: [
+      'No deposit or setup fees',
+      'No additional commitments',
       '1 incoming item / month',
       '1 scan / month',
-      '$1.20 / item for shredding'
+      '$1.20 / item for shredding',
+      'Junk mail doesn\'t count',
+      'Free mail pick up'
     ]
   },
   {
-    id: '2af10df3-4147-4d32-a7cd-3520808f59ea',
+    id: '0ac48ec1-06f6-4892-94d6-27cd35a1e1d8',
     popular: true,
+    name: 'Standart Plan',
     features: [
       '30 incoming items / month',
       '10 scan / month',
-      '10 item shreds / month'
+      '10 item shreds / month',
+      'No deposit or setup fees',
+      'No additional commitments',
+      'Junk mail doesn\'t count',
+      'Free mail pick up'
     ]
   },
   {
-    id: 'f7ccb61f-e9fe-47d3-870c-0552355d4cb2',
+    id: '2ee0e790-bf75-4f4c-a88b-53b354dd9ea2',
+    name: "Premium Plan",
     features: [
       '100 incoming items / month',
       '100 scans / month',
-      '100 item shreds / month'
+      '100 item shreds / month',
+      'No deposit or setup fees',
+      'No additional commitments',
+      'Junk mail doesn\'t count',
+      'Free mail pick up'
     ]
   }
 ];
+
 
 const getFrequency = (frequency: string) => {
   switch (frequency) {
