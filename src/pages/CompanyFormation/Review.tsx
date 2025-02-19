@@ -28,7 +28,7 @@ export default function Review({nextStep }: ReviewProps) {
     let total = checkoutData.pricingPlan?.price || 0;
 
     for (let i = 0; i < upsellProducts.length; i++) {
-      total += upsellProducts[i].price;
+      total += upsellProducts[i].amount/100;
     }
 
     return total;
@@ -64,7 +64,7 @@ export default function Review({nextStep }: ReviewProps) {
           {/* Header */}
           <div className="flex-shrink-0">
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-4"
             />
@@ -184,8 +184,8 @@ export default function Review({nextStep }: ReviewProps) {
                       key={upsell.productId}
                       className="flex justify-between items-center text-sm text-gray-600"
                     >
-                      <span>{upsell.productName} {upsell?.productTier}</span>
-                      <span className="font-medium">${upsell.price/100}</span>
+                      <span>{upsell.productName} {upsell?.priceName}</span>
+                      <span className="font-medium">${upsell.amount/100}</span>
                     </li>
                   ))}
                 </ul>

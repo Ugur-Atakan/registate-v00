@@ -1,23 +1,12 @@
-export interface Addon {
-    id: string;
-    productId: string;
-    productName: string;
-    description?: string;
-    features: string[];
-    basePrice?: number | null;
-    baseCurrency?: string | null;
-    baseFrequency?: 'MONTHLY' | 'ANNUALLY' | 'ONETIME' | 'FREE' | null;
-    basePriceStripeId?: string | null;
-    prices: AddonPrice[];
+import { Price, Product } from "./Product";
+
+export interface Addon extends Product {
     order: number;
+    productId: string;
+    prices:AddonPrice[];
   }
   
-  export interface AddonPrice {
-    id: string;
-    name?: string;
-    amount: number;
-    currency: string;
-    frequency: 'MONTHLY' | 'ANNUALLY' | 'ONETIME' | 'FREE';
-    stripePriceId: string;
-  }
-  
+
+export interface AddonPrice extends Price {
+  amount: number;
+}

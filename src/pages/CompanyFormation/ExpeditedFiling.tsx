@@ -123,7 +123,7 @@ export default function ExpeditedFiling({
           {/* Header */}
           <div className="flex-shrink-0">
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-6"
             />

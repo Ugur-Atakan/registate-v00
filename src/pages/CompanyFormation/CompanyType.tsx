@@ -108,7 +108,7 @@ export default function CompanyType({
         <div className="auth-form-container">
           <div>
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-12 mb-8"
             />

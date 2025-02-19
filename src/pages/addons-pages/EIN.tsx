@@ -19,8 +19,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
   const [includeEIN, setIncludeEIN] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const EIN_FEE = 70;
-
+  console.log("addonData", addonData);
   const dispatch=useAppDispatch();
 
   const handleContinue = async () => {
@@ -28,10 +27,8 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
 
     setLoading(true);
     try {
-      // Yerel formData state'ini güncellemek için: mevcut upsellProducts dizisine yeni EIN ürünü ekleniyor.
-      dispatch(addAddon({productId:addonData.productId,selectedPriceId:null,productName: addonData.productName,productTier:null,price:addonData.basePrice}));
+      dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.name,amount:addonData.prices[0].amount}));
       if (nextStep) nextStep();
-
     } catch (error) {
       console.error('Error saving EIN selection:', error);
       toast.error('Failed to save your selection. Please try again.');
@@ -48,7 +45,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
           {/* Header */}
           <div>
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-8"
             />
@@ -84,7 +81,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
                       )}
                     </div>
                     <p className="font-medium text-lg">
-                      Yes, I would like Registate to obtain my EIN electronically for ${EIN_FEE}
+                      Yes, I would like Registate to obtain my EIN electronically for ${addonData.prices[0].amount/100}
                     </p>
                   </div>
                 </div>

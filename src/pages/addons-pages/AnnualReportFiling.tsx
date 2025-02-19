@@ -19,8 +19,6 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
   const [includeService, setIncludeService] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const SERVICE_FEE = 150;
-
   const dispatch = useAppDispatch();
 
   const handleContinue = async () => {
@@ -29,7 +27,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
     setLoading(true);
     try { 
       if(includeService){
-           dispatch(addAddon({ productId: addonData.productId, selectedPriceId:null ,productTier:null,productName:addonData.productName,price:addonData.basePrice}));
+           dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.name,amount:addonData.prices[0].amount}));
       }
       if (nextStep) nextStep();
     } catch (error) {
@@ -48,7 +46,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
           {/* Header */}
           <div className="mb-8">
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-6"
             />
@@ -65,7 +63,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
                 <DollarSign size={24} className="text-[--primary]" />
                 <div>
                   <p className="text-sm text-gray-600">Annual Service Fee</p>
-                  <p className="text-2xl font-bold">${SERVICE_FEE}</p>
+                  <p className="text-2xl font-bold">${addonData.prices[0].amount}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-[--primary]">

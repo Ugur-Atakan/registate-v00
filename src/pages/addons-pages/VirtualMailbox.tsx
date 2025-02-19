@@ -4,16 +4,12 @@ import { useAppDispatch } from '../../store/hooks';
 import { addAddon } from '../../store/slices/checkoutSlice';
 import { Mail, ArrowRight, CheckCircle2, Info, Scan, Package, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { AddonPrice } from '../../types/Addons';
 
-interface MailboxPackage {
-  id: string;
-  name: string;
-  amount: number;
-  currency: string;
-  frequency: string;
-  features: string[];
+interface MailboxPrice extends AddonPrice {
   popular?: boolean;
 }
+
 
 const commonFeatures = [
   'No deposit or setup fees',
@@ -68,9 +64,9 @@ const mailboxPlansFeatures = [
 
 const getFrequency = (frequency: string) => {
   switch (frequency) {
-    case 'ANNUALLY':
+    case 'year':
       return '/year';
-    case 'MONTHLY':
+    case 'month':
       return '/month';
     default:
       return '';
@@ -78,12 +74,12 @@ const getFrequency = (frequency: string) => {
 }
 
 export default function VirtualMailbox({ addonData, prevStep, nextStep }: AddonsProps) {
-  const [selectedPlan, setSelectedPlan] = useState<MailboxPackage | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<MailboxPrice | null>(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
 
   // Gelen addon verisinin prices bilgilerini mailboxPlansFeatures ile eşleştir
-  const packages:MailboxPackage[] = addonData.prices.map((price: any) => {
+  const packages:MailboxPrice[] = addonData.prices.map((price: AddonPrice) => {
     const matchedFeatures = mailboxPlansFeatures.find(
       (plan) => plan.id === price.id
     );
@@ -98,7 +94,8 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
     if (!selectedPlan) return;
     setLoading(true);
     try {
-      dispatch(addAddon({ productId: addonData.productId, selectedPriceId: selectedPlan.id ,productTier:selectedPlan.name,productName:addonData.productName,price:selectedPlan.amount}));
+      dispatch(addAddon({ productId: addonData.id, selectedPriceId:selectedPlan.id ,priceName:selectedPlan.name,productName:addonData.name,amount:selectedPlan.amount}));
+
       if (nextStep) nextStep();
     } catch (error) {
       console.error('Error saving mailbox selection:', error);
@@ -109,7 +106,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
   };
 
 
-  const selectPlan=(pkg:MailboxPackage)=>{
+  const selectPlan=(pkg:MailboxPrice)=>{
     if(selectedPlan?.id==pkg.id) {
       setSelectedPlan(null);
       return;
@@ -125,7 +122,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
           {/* Header */}
           <div className="mb-6">
             <img
-              src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+              src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
               alt="Registate"
               className="h-8 mb-4"
             />
@@ -187,7 +184,9 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
                       <h3 className="font-bold">{pkg.name}</h3>
                       <div className="text-right">
                         <span className="text-lg font-bold">${pkg.amount/100}</span>
-                        <span className="text-sm text-gray-600">{getFrequency(pkg.frequency)}</span>
+                        {pkg.type !== 'one_time' && (
+                          <span className="text-sm text-gray-600">{getFrequency(pkg.recurring?.interval!)}</span>
+                        )}
                       </div>
                     </div>
 

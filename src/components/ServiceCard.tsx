@@ -2,12 +2,13 @@ import {
   ArrowRight,
   Info,
   Clock,
+  Package,
 } from 'lucide-react';
 import { Product } from '../types/Product';
 
-interface Service extends Product {
-    badge?: string;
-    icon: JSX.Element;
+interface DynamicProduct extends Product {
+  icon?: JSX.Element;
+  badge?: string;
 }
 
 const ServiceCard = ({ 
@@ -15,7 +16,7 @@ const ServiceCard = ({
   onLearnMore,
   onBuyNow 
 }: { 
-    product: Service;
+    product: DynamicProduct;
   onLearnMore: () => void;
   onBuyNow: () => void;
 }) => (
@@ -24,19 +25,11 @@ const ServiceCard = ({
       hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
   >
     <div className="flex flex-col h-full">
-      {/* Service Badge */}
-      {product.badge && (
-        <span className="absolute -top-3 right-6 px-3 py-1 bg-[--accent] text-white text-xs 
-          font-medium rounded-full shadow-sm">
-          {product.badge}
-        </span>
-      )}
-
       {/* Icon & Title Section */}
       <div className="flex items-start gap-4 mb-4">
         <div className="p-3.5 bg-[--primary]/10 rounded-xl group-hover:bg-[--primary]/20 
           transition-colors duration-300">
-          {product.icon}
+          {product?.icon ?? <Package size={24} className="text-[--primary]" />}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -44,7 +37,7 @@ const ServiceCard = ({
               transition-colors duration-300">
               {product.name}
             </h3>
-            {product.prices.length>0 && (
+            {product.prices.length>1 && (
               <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium 
                 rounded-full">
                 Multiple Plans
@@ -68,13 +61,13 @@ const ServiceCard = ({
       {/* Price & Actions Section */}
       <div className="mt-auto">
         <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-3xl font-bold text-[--primary]">${product.prices[0].unit_amount}</span>
+          <span className="text-3xl font-bold text-[--primary]">${product.prices[0].unit_amount/100}</span>
           <span className="text-gray-500">
             {product.prices[0].type !== 'one_time' ? `/${product.prices[0].recurring?.interval}` : ''}
           </span>
-          {Number.parseInt(product.additionalFees!)>1 &&(
+          {product.additionalFees!>0 &&(
             <span className="text-sm text-amber-600 font-medium ml-1">
-              + {product.additionalFees} state fee
+              + {Number(product.additionalFees)/100} state fee
             </span>
           )}
         </div>

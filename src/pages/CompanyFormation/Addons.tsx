@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { VirtualMailbox, AnnualReportFiling, BoiReportFiling, EIN } from "../feature-pages";
+import { VirtualMailbox, AnnualReportFiling, BoiReportFiling, EIN } from "../addons-pages";
 import { useAppSelector } from "../../store/hooks";
 import { getPlanAddons } from "../../http/requests/formation";
+import { Addon } from "../../types/Addons";
 
 interface AddonsProps {
   prevStep?: () => void;
@@ -9,7 +10,7 @@ interface AddonsProps {
 }
 
 export default function Addons({ nextStep }: AddonsProps) {
-  const [availableAddons, setAvailableAddons] = useState<any[]>([]);  // API'den gelen addon verileri
+  const [availableAddons, setAvailableAddons] = useState<Addon[]>([]);  // API'den gelen addon verileri
   const [currentIndex, setCurrentIndex] = useState(0);
   const selectedPricingPlan = useAppSelector((state) => state.checkout.pricingPlan);
   const [loading, setLoading] = useState(true);

@@ -39,7 +39,7 @@ export interface Product {
     processingTime?: string;
     requirements?: string[];
     benefits?: string[];
-    additionalFees?: string;
+    additionalFees?: number;
     prices: Price[];
   }
   

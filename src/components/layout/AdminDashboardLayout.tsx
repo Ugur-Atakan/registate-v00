@@ -82,7 +82,7 @@ export default function AdminDashboardLayout({ children }: Props) {
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
             <div className="flex flex-shrink-0 items-center px-4">
               <img
-                src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+                src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
                 alt="Registate"
                 className="h-8"
               />
@@ -115,7 +115,7 @@ export default function AdminDashboardLayout({ children }: Props) {
       <div className="md:hidden border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between px-4 py-2">
           <img
-            src="https://registate.betterwp.site/wp-content/uploads/2025/01/registate-logo.webp"
+            src="https://registate.betterdemo.com.tr/wp-content/uploads/2025/01/registate-logo.webp"
             alt="Registate"
             className="h-8"
           />

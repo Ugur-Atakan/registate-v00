@@ -1,3 +1,5 @@
+import { Addon } from "./Addons";
+
 export type CompanyType = "LLC" | "C-CORP" | null;
 export type StateType = "Wyoming" | "Delaware" | null;
 export type CompanyDesignator =
@@ -22,7 +24,7 @@ export interface FormationFormData {
 
 
 export interface AddonsProps {
-  addonData: any;
+  addonData: Addon;
   prevStep: () => void;
   nextStep: () => void;
 }

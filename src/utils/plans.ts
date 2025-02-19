@@ -2,8 +2,8 @@
     productId: string;
     selectedPriceId: string | null;
     productName: string|null;
-    productTier: string|null;
-    price: number;
+    priceName: string|null;
+    amount: number;
   }
 
   export interface CompanyInfo{
