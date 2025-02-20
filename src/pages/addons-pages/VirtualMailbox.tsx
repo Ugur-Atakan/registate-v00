@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AddonsProps } from '../../types/FormData';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addAddon } from '../../store/slices/checkoutSlice';
 import { Mail, ArrowRight, CheckCircle2, Info, Scan, Package, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -77,6 +77,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
   const [selectedPlan, setSelectedPlan] = useState<MailboxPrice | null>(null);
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const checkoutData = useAppSelector((state) => state.checkout);
 
   // Gelen addon verisinin prices bilgilerini mailboxPlansFeatures ile eşleştir
   const packages:MailboxPrice[] = addonData.prices.map((price: AddonPrice) => {
@@ -91,18 +92,19 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
   });
 
   const handleContinue = async () => {
-    if (!selectedPlan) return;
-    setLoading(true);
+  setLoading(true);
+   if(selectedPlan){
     try {
-      dispatch(addAddon({ productId: addonData.id, selectedPriceId:selectedPlan.id ,priceName:selectedPlan.name,productName:addonData.productName,amount:selectedPlan.unit_amount}));
-
+      dispatch(addAddon({ productId: addonData.productId, selectedPriceId:selectedPlan.id ,priceName:selectedPlan.name,productName:addonData.productName,amount:selectedPlan.unit_amount}));
       if (nextStep) nextStep();
     } catch (error) {
       console.error('Error saving mailbox selection:', error);
       toast.error('Failed to save your selection. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    } 
+   }else {
+     nextStep&&nextStep();
+   }
+   setLoading(false);
   };
 
 
@@ -127,7 +129,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
               className="h-8 mb-4"
             />
             <h1 className="text-2xl font-bold mb-2">
-              {selectedPlan?.id === "platinum" ? "Upgrade Your Virtual Mailbox" : "Virtual Mailbox"}
+              {checkoutData.pricingPlan.name === "Platinum Plan" ? "Upgrade Your Virtual Mailbox" : "Virtual Mailbox"}
             </h1>
             <p className="text-gray-600">
               Get a professional business address with mail handling services
@@ -207,12 +209,20 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
           {/* Continue Button */}
           <button
             onClick={handleContinue}
-            disabled={loading || !selectedPlan}
+            disabled={loading}
             className="w-full bg-[--primary] text-white py-3 px-6 rounded-xl font-medium
               transition-all duration-200 hover:bg-[--primary]/90 disabled:opacity-50 
               disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? 'Processing...' : 'Continue'} 
+{
+  loading
+    ? "Processing..."
+    : selectedPlan === null
+      ? "No Thanks"
+      : checkoutData.pricingPlan.name === "Platinum Plan"
+        ? "Upgrade"
+        : "Continue"
+}
             <ArrowRight size={20} />
           </button>
         </div>

@@ -143,7 +143,7 @@ export default function ExpeditedFiling({
                 <DollarSign size={24} className="text-[--primary]" />
                 <div>
                   <p className="text-sm text-gray-600">State Filing Fee</p>
-                  <p className="text-2xl font-bold">${stateFees?.amount}</p>
+                  <p className="text-2xl font-bold">${stateFees&&stateFees.amount/100}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-[--primary]">
@@ -196,7 +196,7 @@ export default function ExpeditedFiling({
                       <div className="text-right">
                         {option.additionalFee > 0 ? (
                           <div className="text-lg font-bold text-[--primary]">
-                            +${option.additionalFee}
+                            +${option.additionalFee/100}
                           </div>
                         ) : (
                           <span className="text-sm text-green-600 font-medium">

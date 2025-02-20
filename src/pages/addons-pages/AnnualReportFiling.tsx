@@ -27,7 +27,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
     setLoading(true);
     try { 
       if(includeService){
-           dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));
+           dispatch(addAddon({ productId: addonData.productId, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));
       }
       if (nextStep) nextStep();
     } catch (error) {

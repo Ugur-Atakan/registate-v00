@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import toast from "react-hot-toast";
-import confetti from "canvas-confetti";
 import CompanyType from "./CompanyType";
 import RegistrationState from "./RegistrationState";
 import CompanyName from "./CompanyName";
@@ -9,7 +7,6 @@ import PlanSelection from "./PlanSelection";
 import Review from "./Review";
 import Addons from "./Addons";
 import ExpeditedFiling from "./ExpeditedFiling";
-import { useAppSelector } from "../../store/hooks";
 
 const steps = [
   {
@@ -30,10 +27,8 @@ const steps = [
 ];
 
 export default function CompanyFormation() {
-  const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [loading, setLoading] = useState(false);
 
   const next = () => {
     if (currentStep < steps.length) {
@@ -53,25 +48,6 @@ export default function CompanyFormation() {
     console.log("Parametreler:", location.state || "Yok");
   }, [location]);
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-
-      setTimeout(() => {
-        navigate("/payment", { replace: true });
-      }, 1000);
-    } catch (error) {
-      console.error("Error saving company formation:", error);
-      toast.error("Failed to save your information. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -97,7 +73,7 @@ export default function CompanyFormation() {
       case 6:
         return <Addons prevStep={back} nextStep={next} />;
       case 7:
-        return <Review prevStep={back} nextStep={next} />;
+        return <Review />;
       default:
         return null;
     }

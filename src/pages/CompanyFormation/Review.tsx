@@ -11,36 +11,37 @@ import {
   Receipt,
 } from "lucide-react";
 import { useAppSelector } from "../../store/hooks";
+import instance from "../../http/instance";
 
 interface ReviewProps {
   prevStep?: () => void;
   nextStep?: () => void;
 }
 
-export default function Review({nextStep }: ReviewProps) {
+export default function Review() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const checkoutData=useAppSelector((state)=>state.checkout);
-
-  const upsellProducts =checkoutData.addons;
-
+  const checkoutData = useAppSelector((state) => state.checkout);
+  const upsellProducts = checkoutData.addons;
+  console.log("checkout data", checkoutData);
+  const { stateFee, expeditedFee } = checkoutData;
   const calculateTotalPrice = () => {
     let total = checkoutData.pricingPlan?.price || 0;
-    const {stateFee,expeditedFee}=checkoutData;
 
     for (let i = 0; i < upsellProducts.length; i++) {
-      total += upsellProducts[i].amount/100;
+      total += upsellProducts[i].amount / 100;
     }
 
-    return total +stateFee.amount/100+expeditedFee.price/100;
-  }
+    total += stateFee.amount / 100 + expeditedFee.price / 100;
+
+    return total;
+  };
   const totalPrice = calculateTotalPrice();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         //burada ödeme sayfasına geçmemiz gerekecek
-        nextStep && nextStep();
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -52,6 +53,13 @@ export default function Review({nextStep }: ReviewProps) {
   }, []);
 
 
+  const submit = async() => {
+    const response= await instance.post("/formation/start-my-company", checkoutData);
+    console.log('response', response);  
+
+    if (response.status === 200) {
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -134,7 +142,8 @@ export default function Review({nextStep }: ReviewProps) {
                 <h2 className="font-medium">Company Name</h2>
               </div>
               <p className="text-lg font-medium text-[--primary]">
-                {checkoutData.companyInfo.name} {checkoutData.companyInfo.designator}
+                {checkoutData.companyInfo.name}{" "}
+                {checkoutData.companyInfo.designator}
               </p>
               <div className="flex items-center gap-1.5 text-xs text-green-600 mt-2">
                 <CheckCircle2 size={14} />
@@ -185,8 +194,12 @@ export default function Review({nextStep }: ReviewProps) {
                       key={upsell.productId}
                       className="flex justify-between items-center text-sm text-gray-600"
                     >
-                      <span>{upsell.productName} {upsell?.priceName}</span>
-                      <span className="font-medium">${upsell.amount/100}</span>
+                      <span>
+                        {upsell.productName} {upsell?.priceName}
+                      </span>
+                      <span className="font-medium">
+                        ${upsell.amount / 100}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -197,7 +210,7 @@ export default function Review({nextStep }: ReviewProps) {
           {/* Footer - Fixed at bottom */}
           <div className="flex-shrink-0 pt-4">
             <button
-              onClick={() => navigate("/payment")}
+              onClick={() => submit()}
               className="w-full bg-[--primary] text-white py-3 px-6 rounded-lg font-medium 
                 transition-all duration-200 hover:bg-[--primary]/90 flex items-center justify-center gap-2
                 shadow-sm hover:shadow-md"
@@ -227,8 +240,16 @@ export default function Review({nextStep }: ReviewProps) {
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">State Filing Fees</span>
-                <span className="font-medium">Included</span>
+                <span className="font-medium">{stateFee.amount / 100}</span>
               </div>
+              {expeditedFee.price > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Expedited Filing</span>
+                  <span className="font-medium">
+                    {expeditedFee.price / 100}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Registered Agent (1 Year)</span>
                 <span className="font-medium">Included</span>

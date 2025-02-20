@@ -25,7 +25,7 @@ export default function BoiReportFiling({addonData,nextStep }: AddonsProps) {
     setLoading(true);
     try {
       if (includeService) {
-        dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));      }
+        dispatch(addAddon({ productId: addonData.productId, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));      }
       nextStep();
     } catch (error) {
       console.error("Error saving BOI report selection:", error);
