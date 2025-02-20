@@ -42,7 +42,6 @@ export default function Support() {
     try {
       setLoading(false);
       const tickets= await getCompanyTickets();
-      console.log('tickets',tickets);
       setTickets(tickets);
       setLoading(false);
     } catch (error:any) {

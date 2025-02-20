@@ -64,7 +64,6 @@ const TicketDetails = () => {
       try {
         const response = await getTicketDetails(location.state.ticketId);
         setTicket(response);
-        console.log('Ticket details:', response);
       } catch (error) {
         console.error('Error fetching ticket details:', error);
         toast.error('Failed to load ticket details');

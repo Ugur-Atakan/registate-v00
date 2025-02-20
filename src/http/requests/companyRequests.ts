@@ -47,7 +47,6 @@ const createCheckout = async (data:CheckoutData) => {
   {
     try {
       const companyId=getActiveCompanyId();
-      console.log(companyId);
       const response = await instance.get(`/company/${companyId}/tasks`);
       return response.data;
     } catch (error: any) {
@@ -68,7 +67,6 @@ const createCheckout = async (data:CheckoutData) => {
   const getTaskDetails = async (taskId: string) =>
   {
     try {
-      console.log(taskId);
       const response = await instance.get(`/tasks/${taskId}`);
       return response.data;
     } catch (error: any) {

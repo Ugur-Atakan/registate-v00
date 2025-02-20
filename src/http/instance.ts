@@ -10,8 +10,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   async config => {
     const tokens = getUserTokens();
-    console.log('tokens',tokens);
-
     if (tokens) {
       config.headers.Authorization = `Bearer ${tokens.accessToken}`;
     }
@@ -35,9 +33,8 @@ instance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       const tokens =  getUserTokens();
-      console.log('tokens',tokens);
       if (!tokens) {
-        console.log('No tokens found');
+        console.error('No tokens found');
         return Promise.reject(
           new Error('Session expired. Please log in again.'),
         );
@@ -55,8 +52,6 @@ instance.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${refreshToken}`;
 
           saveUserTokens({accessToken, refreshToken});
-          console.log('Token refreshed');
-
           return instance(originalRequest);
         }
       } catch (refreshError) {

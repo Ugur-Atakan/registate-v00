@@ -61,7 +61,6 @@ export default function CompanyType({
     const fetchCompanyTypes = async () => {
       try {
         const types = await getCompanyTypes();
-        console.log("Company types: ", types);
         setCompanyTypes(types);
       } catch (error) {
         console.error("Error fetching company types: ", error);

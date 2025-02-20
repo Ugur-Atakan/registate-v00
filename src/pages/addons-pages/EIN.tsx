@@ -19,7 +19,6 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
   const [includeEIN, setIncludeEIN] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
 
-  console.log("addonData", addonData);
   const dispatch=useAppDispatch();
 
   const handleContinue = async () => {
@@ -27,7 +26,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
 
     setLoading(true);
     try {
-      dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.name,amount:addonData.prices[0].amount}));
+      dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));
       if (nextStep) nextStep();
     } catch (error) {
       console.error('Error saving EIN selection:', error);
@@ -81,7 +80,7 @@ export default function EIN({addonData,prevStep,nextStep }: AddonsProps) {
                       )}
                     </div>
                     <p className="font-medium text-lg">
-                      Yes, I would like Registate to obtain my EIN electronically for ${addonData.prices[0].amount/100}
+                      Yes, I would like Registate to obtain my EIN electronically for ${addonData.prices[0].unit_amount/100}
                     </p>
                   </div>
                 </div>

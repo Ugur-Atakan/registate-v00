@@ -1,12 +1,29 @@
-import { Price, Product } from "./Product";
+export interface Recurring {
+  id: string;
+  interval: string;
+  interval_count: number;
+}
 
-export interface Addon extends Product {
-    order: number;
-    productId: string;
-    prices:AddonPrice[];
-  }
-  
+export interface AddonPrice {
+  id: string;
+  name: string;
+  unit_amount: number;
+  currency: string;
+  recurring: Recurring | null;
+  stripePriceId: string;
+  features: string[];
+  type: string;
+}
 
-export interface AddonPrice extends Price {
-  amount: number;
+export interface Addon {
+  id: string;
+  productId: string;
+  productName: string;
+  description: string;
+  features: string[];
+  stripeProductId: string;
+  isFeatured: boolean;
+  defaultPriceId:string;
+  prices: AddonPrice[];
+  order: number;
 }

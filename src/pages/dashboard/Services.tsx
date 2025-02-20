@@ -138,7 +138,6 @@ export default function Services() {
     const response = await instance.get('/product/products');
     const dynamicProducts = response.data;
     const mergedProducts = mergeById(staticServices, dynamicProducts);
-    console.log('merged',mergedProducts);
     setProducts(mergedProducts);
     setLoading(false);
   }

@@ -27,7 +27,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
     setLoading(true);
     try { 
       if(includeService){
-           dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.name,amount:addonData.prices[0].amount}));
+           dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));
       }
       if (nextStep) nextStep();
     } catch (error) {
@@ -63,7 +63,7 @@ export default function AnnualReportFiling({addonData,prevStep, nextStep }: Addo
                 <DollarSign size={24} className="text-[--primary]" />
                 <div>
                   <p className="text-sm text-gray-600">Annual Service Fee</p>
-                  <p className="text-2xl font-bold">${addonData.prices[0].amount}</p>
+                  <p className="text-2xl font-bold">${addonData.prices[0].unit_amount/100}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-[--primary]">

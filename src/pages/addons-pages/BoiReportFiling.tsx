@@ -21,14 +21,11 @@ export default function BoiReportFiling({addonData,nextStep }: AddonsProps) {
   const dispatch = useAppDispatch();
 
   const handleContinue = async () => {
-    console.log("addonData", addonData);
     if (includeService === null) return;
-    console.log("includeService", includeService);
     setLoading(true);
     try {
       if (includeService) {
-        dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.name,amount:addonData.prices[0].unit_amount}));
-      }
+        dispatch(addAddon({ productId: addonData.id, selectedPriceId:addonData.defaultPriceId ,priceName:addonData.prices[0].name,productName:addonData.productName,amount:addonData.prices[0].unit_amount}));      }
       nextStep();
     } catch (error) {
       console.error("Error saving BOI report selection:", error);
@@ -63,7 +60,7 @@ export default function BoiReportFiling({addonData,nextStep }: AddonsProps) {
                 <DollarSign size={24} className="text-[--primary]" />
                 <div>
                   <p className="text-sm text-gray-600">One-Time Service Fee</p>
-                  <p className="text-2xl font-bold">${addonData.prices[0].amount/100}</p>
+                  <p className="text-2xl font-bold">${addonData.prices[0].unit_amount/100}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-[--primary]">

@@ -12,9 +12,6 @@ const CompanyChanger = () => {
   const selectedCompany = useAppSelector((state) => state.company.selectedCompany);
   const companies = useAppSelector((state) => state.company.companies);
 
-  console.log("selectedCompany", selectedCompany);
-  console.log("companies", companies);
-
   const handleCompanySelect = async (company: any) => {
     try {
       const companyDetails = await getCompanyDetails(company.companyId);

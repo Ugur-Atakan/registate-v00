@@ -80,7 +80,6 @@ const TaskDetails = () => {
       try {
         const task = await getTaskDetails(location.state?.taskId);
         setTask(task);
-        console.log("Task details:", task);
       } catch (error) {
         console.error("Error fetching task details:", error);
         toast.error("Failed to load task details");

@@ -26,12 +26,13 @@ export default function Review({nextStep }: ReviewProps) {
 
   const calculateTotalPrice = () => {
     let total = checkoutData.pricingPlan?.price || 0;
+    const {stateFee,expeditedFee}=checkoutData;
 
     for (let i = 0; i < upsellProducts.length; i++) {
       total += upsellProducts[i].amount/100;
     }
 
-    return total;
+    return total +stateFee.amount/100+expeditedFee.price/100;
   }
   const totalPrice = calculateTotalPrice();
 

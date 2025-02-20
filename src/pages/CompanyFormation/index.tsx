@@ -73,16 +73,6 @@ export default function CompanyFormation() {
     }
   };
 
-  const checkout = useAppSelector((state) => state.checkout);
-
-  useEffect(() => {
-    console.log("checkout:", checkout);
-  }, [checkout]);
-
-  useEffect(() => {
-    console.log("currentStep:", currentStep);
-  }, [currentStep]);
-
   const renderStep = () => {
     switch (currentStep) {
       case 1:

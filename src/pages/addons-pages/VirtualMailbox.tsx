@@ -94,7 +94,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
     if (!selectedPlan) return;
     setLoading(true);
     try {
-      dispatch(addAddon({ productId: addonData.id, selectedPriceId:selectedPlan.id ,priceName:selectedPlan.name,productName:addonData.name,amount:selectedPlan.amount}));
+      dispatch(addAddon({ productId: addonData.id, selectedPriceId:selectedPlan.id ,priceName:selectedPlan.name,productName:addonData.productName,amount:selectedPlan.unit_amount}));
 
       if (nextStep) nextStep();
     } catch (error) {
@@ -183,7 +183,7 @@ export default function VirtualMailbox({ addonData, prevStep, nextStep }: Addons
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold">{pkg.name}</h3>
                       <div className="text-right">
-                        <span className="text-lg font-bold">${pkg.amount/100}</span>
+                        <span className="text-lg font-bold">${pkg.unit_amount/100}</span>
                         {pkg.type !== 'one_time' && (
                           <span className="text-sm text-gray-600">{getFrequency(pkg.recurring?.interval!)}</span>
                         )}

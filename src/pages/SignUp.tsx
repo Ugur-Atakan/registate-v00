@@ -90,7 +90,6 @@ export default function SignUp() {
     setLoading(true);
     try {
     const register= await registerWithEmail({email, password, firstName, lastName});
-    console.log(register);
     saveUserTokens(register.tokens);
       navigate('/company-formation', { replace: true });
     } catch (error) {

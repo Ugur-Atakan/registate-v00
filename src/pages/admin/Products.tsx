@@ -80,13 +80,12 @@ export default function AdminProducts() {
         "http://localhost:5001/api/product/create-priced-product",
         submissionData
       );
-      console.log("Product created successfully.");
       fetchProducts();
       setIsModalOpen(false);
     } catch (error) {
       alert("Error: " + error.message);
       setIsModalOpen(false);
-      console.log(error);
+      console.error(error);
     }
   };
 
