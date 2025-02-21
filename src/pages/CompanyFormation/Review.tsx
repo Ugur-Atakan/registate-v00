@@ -226,7 +226,7 @@ export default function Review() {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Formation Package</span>
                 <span className="font-medium">
-                  ${checkoutData.pricingPlan?.price}
+                  ${checkoutData.pricingPlan?.price/100}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">

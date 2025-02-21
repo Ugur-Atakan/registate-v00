@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { ChevronDown, Building2, CheckCircle, PlusCircle } from "lucide-react";
+import { ChevronDown, Building2, CheckCircle, PlusCircle, Rocket } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { setActiveCompany } from "../store/slices/companySlice";
+import { changeActiveCompany } from "../store/slices/companySlice";
 import { useNavigate } from "react-router-dom";
-import { getCompanyDetails } from "../http/requests/companyRequests";
 
 const CompanyChanger = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,15 +13,35 @@ const CompanyChanger = () => {
 
   const handleCompanySelect = async (company: any) => {
     try {
-      const companyDetails = await getCompanyDetails(company.companyId);
-      dispatch(setActiveCompany(companyDetails));
+      dispatch(changeActiveCompany(company.companyId));
+      console.log('Selected company:', company);
     } catch (err: any) {
       console.error('Error fetching company details:', err);
     } 
     setIsOpen(false);
   };
 
-
+  // If there are no companies, show a special button to create one
+  if (!companies || companies.length === 0) {
+    return (
+      <div className="relative px-3 py-4">
+        <button
+          onClick={() => navigate('/company-formation')}
+          className="w-full flex items-center gap-3 px-4 py-3 bg-[--primary]/5 text-[--primary] 
+            rounded-xl hover:bg-[--primary]/10 transition-all duration-200 group"
+        >
+          <div className="w-10 h-10 bg-[--primary]/10 rounded-xl flex items-center justify-center 
+            group-hover:scale-110 transition-transform duration-200">
+            <Rocket className="w-5 h-5" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-medium">Create Your First Company</p>
+          </div>
+          <PlusCircle className="w-5 h-5 transform group-hover:rotate-90 transition-transform duration-200" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative px-3 py-4">

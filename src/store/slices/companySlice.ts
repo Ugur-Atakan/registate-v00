@@ -6,10 +6,12 @@ import { setActiveCompanyId } from '../../utils/storage';
 interface CompanyState {
   selectedCompany: CompanyResponse;
   companies?: UserCompany[];
+  activeCompanyId: string;
 }
 
 const initialState: CompanyState = {
    companies: [],
+   activeCompanyId: "",
     selectedCompany: {
       id: "",
       companyName: "",
@@ -48,10 +50,14 @@ export const companySlice = createSlice({
     },
     setActiveCompany: (state, action: PayloadAction<CompanyResponse>) => {
       state.selectedCompany = action.payload
-      setActiveCompanyId(action.payload.id)
+          },
+  changeActiveCompany: (state, action: PayloadAction<string>) => {
+    console.log('Active company changed:', action.payload);
+    state.activeCompanyId = action.payload;
+    setActiveCompanyId(action.payload);
   },
   },
 });
-export const {setActiveCompany,setCompanies} = companySlice.actions;
+export const {setActiveCompany,setCompanies,changeActiveCompany} = companySlice.actions;
 export const workspaceActions = companySlice.actions;
 export default companySlice.reducer;

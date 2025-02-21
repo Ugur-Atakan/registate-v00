@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setCompanyInfo } from '../../store/slices/checkoutSlice';
+import { useNavigate } from 'react-router-dom';
 
 type Designator = string;
 
@@ -20,10 +21,15 @@ export default function CompanyName({nextStep }: CompanyNameProps) {
   const [selectedDesignator, setSelectedDesignator] = useState<Designator>('');
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const navigate = useNavigate();
 
   const selectedCompanyType = useAppSelector((state) => state.checkout.companyType);
 
   const dispatch=useAppDispatch();
+
+  const handleHelpNameChoice = () => {
+    navigate('/name-guide');
+  };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
@@ -136,7 +142,7 @@ export default function CompanyName({nextStep }: CompanyNameProps) {
             <div className="flex items-center justify-center gap-2 text-gray-600">
               <AlertCircle size={18} />
               <span>Need help choosing a name?</span>
-              <button className="text-[--primary] font-medium hover:underline">
+              <button className="text-[--primary] font-medium hover:underline" onClick={handleHelpNameChoice}>
                 View our guide
               </button>
             </div>

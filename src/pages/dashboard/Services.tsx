@@ -27,16 +27,14 @@ interface StaticService {
   badge?: string;
 }
 
-
 interface DynamicProduct extends Product {
   icon?: JSX.Element;
   badge?: string;
 }
 
-
-const staticServices:StaticService[] =[
+const staticServices: StaticService[] = [
   {
-    id:' 2d5126bb-e312-4005-b12a-4427254a620b',
+    id: '2d5126bb-e312-4005-b12a-4427254a620b',
     icon: <FileSignature className="w-6 h-6 text-[--primary]" />,
     name: 'Apostille',
   },
@@ -99,139 +97,133 @@ const staticServices:StaticService[] =[
   }
 ];
 
-
 function mergeById(
   staticServices: StaticService[],
   dynamicProducts: Product[],
 ): DynamicProduct[] {
-  // Statik servis verilerini id bazında bir haritaya ekliyoruz.
   const staticMap = new Map<string, StaticService>();
   staticServices.forEach(service => {
     staticMap.set(service.id, service);
   });
 
-  // Dinamik ürünler üzerinde dolaşıp, eğer eşleşen bir statik servis varsa icon ekliyoruz.
   return dynamicProducts.map(product => {
-    // Eşleştirme: eğer dinamik ürünün id'si, statik servis id'siyle eşleşiyorsa.
     const matchingStatic = staticMap.get(product.id);
     if (matchingStatic) {
-      return { ...product, icon: matchingStatic.icon ,badge:matchingStatic.badge};
+      return { ...product, icon: matchingStatic.icon, badge: matchingStatic.badge };
     }
     return product;
   });
 }
 
-
-
 export default function Services() {
   const navigate = useNavigate();
-  const [selectedProduct, setSelectedProduct] = useState<DynamicProduct|null>();
+  const [selectedProduct, setSelectedProduct] = useState<DynamicProduct | null>(null);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
   const [showServiceDetails, setShowServiceDetails] = useState(false);
-  const [products,setProducts] = useState<DynamicProduct[]>();
-  const [loading,setLoading] = useState(false);
-  const [checkOut,setCheckOut] = useState({});
+  const [products, setProducts] = useState<DynamicProduct[]>();
+  const [loading, setLoading] = useState(false);
 
-
-  const fetchServices= async () => {
+  const fetchServices = async () => {
     setLoading(true);
-    const response = await instance.get('/product/products');
-    const dynamicProducts = response.data;
-    const mergedProducts = mergeById(staticServices, dynamicProducts);
-    setProducts(mergedProducts);
-    setLoading(false);
-  }
-
+    try {
+      const response = await instance.get('/product/products');
+      const dynamicProducts = response.data;
+      const mergedProducts = mergeById(staticServices, dynamicProducts);
+      setProducts(mergedProducts);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchServices();
-  }
-  ,[]);
+  }, []);
 
-
-  const handlePlanSelection = (price:Price) => {
+  const handlePlanSelection = (price: Price) => {
     setShowPlanSelection(false);
     handleBuy(price);
   };
 
-
   const handleBuyNow = (product: DynamicProduct) => {
     setLoading(true);
     setSelectedProduct(product);
-    if(product.defaultPriceId){
+    if (product.defaultPriceId) {
       const defaultPrice = product.prices.find((price) => price.id === product.defaultPriceId);
       handleBuy(defaultPrice!);
     } else {
       setShowPlanSelection(true);
     }
-setLoading(false);
+    setLoading(false);
+  };
+
+  const handleBuy = (price: Price) => {
+    if (selectedProduct) {
+      navigate('/dashboard/checkout', { 
+        state: { 
+          product: selectedProduct,
+          selectedPrice: price 
+        }
+      });
+    }
+  };
+
+  const handleLearnMore = (product: DynamicProduct) => {
+    setSelectedProduct(product);
+    setShowServiceDetails(true);
+  };
+
+  const handleClose = () => {
+    setShowServiceDetails(false);
+    setSelectedProduct(null);
+    setShowPlanSelection(false);
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-7xl mx-auto flex justify-center items-center h-96">
+          <div className="loader"></div>
+        </div>
+      </DashboardLayout>
+    );
   }
-
-
-const handleBuy = (price:Price) => {
-  setLoading(true);
-  if(selectedProduct){
-    setCheckOut(selectedProduct);
-    navigate('/dashboard/checkout');
-    setCheckOut({...price});
-  }
-  setLoading(false);
-}
-
-
-const handleLearnMore = (product:DynamicProduct) => {
-  setSelectedProduct(product);
-  setShowServiceDetails(true);
-}
-
-
-const handleClose=()=>{
-  setShowServiceDetails(false);
-  setSelectedProduct(null);
-  setShowPlanSelection(false);
-}
-
-if(loading){
-  return <DashboardLayout>
-    <div className="max-w-7xl mx-auto flex justify-center items-center h-96">
-      <div className="loader"></div>
-    </div>
-  </DashboardLayout>
-}
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-2xl font-bold mb-6">Business Services</h1>
-        <div className="grid md:grid-cols-2 gap-6">
-          {products&&products?.length>0&&products.map((product, index) => (
+        
+        {/* Services List - Single Column */}
+        <div className="space-y-4">
+          {products && products.length > 0 && products.map((product) => (
             <ServiceCard
-              key={index}
+              key={product.id}
               product={product}
               onLearnMore={() => handleLearnMore(product)}
               onBuyNow={() => handleBuyNow(product)}
             />
           ))}
         </div>
+
+        {/* Popups */}
+        {selectedProduct && !showPlanSelection && showServiceDetails && (
+          <ServiceDetailsPopup
+            product={selectedProduct}
+            onClose={() => handleClose()}
+            onBuyNow={() => handleBuyNow(selectedProduct)}
+          />
+        )}
+
+        {showPlanSelection && selectedProduct && (
+          <PlanSelectionPopup
+            product={selectedProduct}
+            onClose={() => handleClose()}
+            onSelectPlan={handlePlanSelection}
+          />
+        )}
       </div>
-
-      {/* Service Details Popup */}
-      {selectedProduct && !showPlanSelection && showServiceDetails&&(
-        <ServiceDetailsPopup
-          product={selectedProduct}
-          onClose={() => handleClose()}
-          onBuyNow={() => handleBuyNow(selectedProduct)}
-        />
-      )}
-
-      {/* Plan Selection Popup */}
-      {showPlanSelection && selectedProduct && (
-        <PlanSelectionPopup
-        product={selectedProduct}
-        onClose={() => handleClose()}
-          onSelectPlan={handlePlanSelection}
-        />
-      )}
     </DashboardLayout>
   );
 }
