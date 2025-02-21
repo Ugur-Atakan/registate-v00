@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Building2,
   Package,
   Menu,
   X,
@@ -19,6 +18,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import CompanyChanger from '../CompanyChanger';
+import { getCompanyTasks } from '../../http/requests/companyRequests';
 
 interface Props {
   children: React.ReactNode;
@@ -34,23 +34,8 @@ export default function DashboardLayout({ children }: Props) {
   useEffect(() => {
     const fetchIncompleteTasks = async () => {
       try {
-        // This is demo data - in production, you would fetch from your API
-        const demoTasks = [
-          {
-            id: "077bb32b-9825-4610-8d7e-c62b0fa84a1e",
-            status: "OPEN"
-          },
-          {
-            id: "177bb32b-9825-4610-8d7e-c62b0fa84a1f",
-            status: "IN_PROGRESS"
-          },
-          {
-            id: "277bb32b-9825-4610-8d7e-c62b0fa84a2g",
-            status: "COMPLETED"
-          }
-        ];
-
-        const incompleteCount = demoTasks.filter(
+        const tasks:any[]= await getCompanyTasks();
+        const incompleteCount = tasks.filter(
           task => task.status === "OPEN" || task.status === "IN_PROGRESS"
         ).length;
 

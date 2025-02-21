@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { FileText, Download, Calendar, Info, Search, Filter, ExternalLink } from 'lucide-react';
+import { FileText, Download, Calendar, Info, Search, ExternalLink } from 'lucide-react';
+import { getCompanyDocuments } from '../../http/requests/companyRequests';
 
 interface Document {
   id: string;
@@ -19,75 +20,23 @@ interface Document {
   description?: string;
 }
 
-// Demo data
-const demoDocuments: Document[] = [
-  {
-    id: "56b3f5d7-ddd5-4b5a-8d80-399d6f0f7d2a",
-    companyId: "269eef1d-5af2-4e67-a2e2-0cde8884eb65",
-    uploadedById: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-    name: "Certificate of Formation",
-    key: "documents/company-profile.pdf",
-    bucketName: "company-documents",
-    link: "https://example.com/company-profile.pdf",
-    fromStaff: true,
-    createdAt: "2025-02-12T17:33:44.436Z",
-    updatedAt: "2025-02-12T17:33:44.436Z",
-    documentType: "COMPANY",
-    fileType: "pdf",
-    description: "Official company formation document issued by the state"
-  },
-  {
-    id: "66b3f5d7-ddd5-4b5a-8d80-399d6f0f7d2b",
-    companyId: "269eef1d-5af2-4e67-a2e2-0cde8884eb65",
-    uploadedById: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-    name: "EIN Certificate",
-    key: "documents/ein-certificate.pdf",
-    bucketName: "company-documents",
-    link: "https://example.com/ein-certificate.pdf",
-    fromStaff: true,
-    createdAt: "2025-02-11T14:22:31.436Z",
-    updatedAt: "2025-02-11T14:22:31.436Z",
-    documentType: "EIN",
-    fileType: "pdf",
-    description: "Federal Employer Identification Number certificate"
-  },
-  {
-    id: "76b3f5d7-ddd5-4b5a-8d80-399d6f0f7d2c",
-    companyId: "269eef1d-5af2-4e67-a2e2-0cde8884eb65",
-    uploadedById: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-    name: "Annual Report 2024",
-    key: "documents/annual-report-2024.pdf",
-    bucketName: "company-documents",
-    link: "https://example.com/annual-report-2024.pdf",
-    fromStaff: true,
-    createdAt: "2025-01-15T10:00:00.436Z",
-    updatedAt: "2025-01-15T10:00:00.436Z",
-    documentType: "ANNUAL",
-    fileType: "pdf",
-    description: "Annual report filing for the year 2024"
-  },
-  {
-    id: "86b3f5d7-ddd5-4b5a-8d80-399d6f0f7d2d",
-    companyId: "269eef1d-5af2-4e67-a2e2-0cde8884eb65",
-    uploadedById: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-    name: "BOI Report",
-    key: "documents/boi-report.pdf",
-    bucketName: "company-documents",
-    link: "https://example.com/boi-report.pdf",
-    fromStaff: true,
-    createdAt: "2025-01-20T15:30:00.436Z",
-    updatedAt: "2025-01-20T15:30:00.436Z",
-    documentType: "BOI",
-    fileType: "pdf",
-    description: "Beneficial Ownership Information report"
-  }
-];
-
 export default function Documents() {
-  const [documents, setDocuments] = useState<Document[]>(demoDocuments);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [activeType, setActiveType] = useState<string>('COMPANY');
   const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+         const docs = await getCompanyDocuments();
+         setDocuments(docs);
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+      }
+    }
+    fetchDocuments();
+  }, []);
 
   useEffect(() => {
     const hash = location.hash.replace('#', '').toUpperCase();

@@ -7,6 +7,7 @@ export default function PostOrder() {
   const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string>("");
   const navigate=useNavigate();
+  const [type, setType] = useState<"singleItemPurchase"|"companyFormation"|"">("");
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -21,7 +22,7 @@ export default function PostOrder() {
     const fetchPaymentStatus = async () => {
       try {
         const response = await baseApi.get(
-          `/checkout/stripe-success?session_id=${sessionId}`
+          `/checkout/checkout-completed?session_id=${sessionId}`
         );
         if (response.data.success == true) {
           setMessage("Payment verified successfully.");
@@ -32,6 +33,11 @@ export default function PostOrder() {
         } else {
           setMessage("Payment failed.");
         }
+
+        response.data.paymentType=="singleItemPurchase" && setType("singleItemPurchase");
+        response.data.paymentType=="companyFormation" && setType("companyFormation");
+
+
         setLoading(false);
       } catch (error) {
         console.error("Error verifying payment:", error);

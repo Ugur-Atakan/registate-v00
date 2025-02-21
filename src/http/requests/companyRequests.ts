@@ -1,27 +1,19 @@
 import { CompanyResponse } from "../../types/Company";
-import { CheckoutData } from "../../utils/plans";
 import instance from "../instance"
 import { getActiveCompanyId } from "../../utils/storage";
 
-const createCheckout = async (data:CheckoutData) => {
-    try {
-      const response = await instance.post(`/company/create`,data);
-      return response.data;
-    } catch (error: any) {
-      throw error;
-    }
-    };
 
-  const getCompanyDetails = async (companyId: string):Promise<CompanyResponse> =>
-        {
-          try {
-            const response = await instance.get(`/company/${companyId}/details`);
-            return response.data;
-          } catch (error: any) {
-            throw error;
-          }
-        }
-        
+const getCompanyDetails = async (companyId?: string): Promise<CompanyResponse> => {
+  try {
+    // companyId parametresi varsa onu, yoksa localStorage'dan alınan değeri kullanın.
+    const currentId = companyId || getActiveCompanyId();
+    const response = await instance.get(`/company/${currentId}/details`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching company details:", error);
+    throw error;
+  }
+};
   const getCompanyDocuments = async () =>
   {
     try {
@@ -88,7 +80,6 @@ const createCheckout = async (data:CheckoutData) => {
 
   export { 
     getCompanyDetails,
-    createCheckout,
     getCompanyDocuments,
     getCompanyTickets,
     getCompanyTasks,

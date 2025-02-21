@@ -195,51 +195,41 @@ const getStatusText = (status: string) => {
     );
   }
 
-  const fetchDocs = async () => {
-    try {
-      const docs = await getCompanyDocuments();
-      setDocuments(docs);
-    } catch (error: any) {
-      console.error('Error fetching company documents:', error);
-      setError(error.message || 'Failed to fetch company documents.');
-    }
-  }
-
-  const fetchTasks = async () => {
-    try {
-      const tasks = await getCompanyTasks();
-      setTasks(tasks);
-    } catch (error: any) {
-      console.error('Error fetching company tasks:', error);
-      setError(error.message || 'Failed to fetch company tasks.');
-    }
-  }
-
+  // Tüm verileri paralel fetch eden useEffect
   useEffect(() => {
-    const fetchCompanyDetails = async () => {
-      if (!companies?.length) {
+    const fetchData = async () => {
+      if (!companies || companies.length === 0) {
         setError('No companies available.');
         return;
       }
       setLoading(true);
       setError(null);
       try {
-        const companyDetails = await getCompanyDetails(activeCompanyId);
+        // Eğer activeCompanyId yoksa, ilk şirketi aktif yap
+        const currentCompanyId = activeCompanyId || companies[0].companyId;
+        setActiveCompanyId(currentCompanyId);
+
+        // Paralel veri çekimi: şirket detayları, belgeler ve görevler
+        const [companyDetails, docs, tasksData] = await Promise.all([
+          getCompanyDetails(currentCompanyId),
+          getCompanyDocuments(),
+          getCompanyTasks(),
+        ]);
+
         dispatch(setActiveCompany(companyDetails));
         setCompany(companyDetails);
-        setActiveCompanyId(activeCompanyId);
+        setDocuments(docs);
+        setTasks(tasksData);
       } catch (err: any) {
-        console.error('Error fetching company details:', err);
-        setError(err.message || 'Failed to fetch company details.');
+        console.error('Error fetching company data:', err);
+        setError(err.message || 'Failed to fetch company data.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCompanyDetails();
-    fetchDocs();
-    fetchTasks();
-  }, [companies,activeCompanyId]);
+    fetchData();
+  }, [companies, activeCompanyId, dispatch]);
 
   if (loading) {
     return (
