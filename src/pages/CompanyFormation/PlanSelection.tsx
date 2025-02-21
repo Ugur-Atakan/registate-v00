@@ -36,6 +36,7 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
             ...staticPlan,
             id: apiPlan?.id || staticPlan.id, // ID'yi API'den
             stripeId: apiPlan?.stripeId || staticPlan.stripeId, // Stripe ID'yi API'den
+            price:apiPlan.price
           };
         });
 
@@ -127,7 +128,7 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
               </div>
 
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-3xl font-bold">${plan.price}</span>
+                <span className="text-3xl font-bold">${plan.price/100}</span>
                 <span className="text-gray-600">/year</span>
               </div>
 

@@ -13,20 +13,14 @@ import {
 import { useAppSelector } from "../../store/hooks";
 import instance from "../../http/instance";
 
-interface ReviewProps {
-  prevStep?: () => void;
-  nextStep?: () => void;
-}
-
 export default function Review() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const checkoutData = useAppSelector((state) => state.checkout);
   const upsellProducts = checkoutData.addons;
   console.log("checkout data", checkoutData);
   const { stateFee, expeditedFee } = checkoutData;
   const calculateTotalPrice = () => {
-    let total = checkoutData.pricingPlan?.price || 0;
+    let total = checkoutData.pricingPlan?.price/100 || 0;
 
     for (let i = 0; i < upsellProducts.length; i++) {
       total += upsellProducts[i].amount / 100;
@@ -54,11 +48,8 @@ export default function Review() {
 
 
   const submit = async() => {
-    const response= await instance.post("/formation/start-my-company", checkoutData);
-    console.log('response', response);  
-
-    if (response.status === 200) {
-    }
+    const response= await instance.post("/checkout/company-formation", checkoutData);
+    window.location.href = response.data.url;
   };
 
   if (loading) {
@@ -167,7 +158,7 @@ export default function Review() {
               <div className="flex items-center justify-between py-2 border-t border-gray-100">
                 <span className="text-sm text-gray-600">Package Price</span>
                 <span className="text-lg font-bold">
-                  ${checkoutData.pricingPlan?.price}
+                  ${checkoutData.pricingPlan?.price/100}
                 </span>
               </div>
               <div className="space-y-1.5 mt-3">

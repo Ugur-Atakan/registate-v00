@@ -60,7 +60,7 @@ export const allFeatures=[
     export const staticPricingplans=[
       {
         "id": "e8ee0cbd-039e-4ade-a9cf-8c9cc3d91994",
-        "stripeId": "price_1JXXWW...",
+        "stripeId": "price_1QuF5CJuNLcMU2PodEVRWfiG",
         "name": "Silver Plan",
         "price": 147,
         "subtitle": "Basic Formation Package",
@@ -94,7 +94,7 @@ export const allFeatures=[
       },
       {
         "id": "f2f0bcca-d1bc-4ae5-ae3b-82974c2790d6",
-        "stripeId": "price_1JXXWW...",
+        "stripeId": "price_1QutdVJuNLcMU2PoiEPbZDQa",
         "name": "Gold Plan",
         "price": 287,
         "subtitle": "Essentials for a Bank Account",
@@ -144,7 +144,7 @@ export const allFeatures=[
       },
       {
         "id": "7d2a54f7-2d9a-452b-b6d7-1b90fca21f54",
-        "stripeId": "price_1JXXWWa..",
+        "stripeId": "price_1QuteNJuNLcMU2PoDU7NsNSE..",
         "name": "Platinum Plan",
         "price": 623,
         "subtitle": "Full Compliance",
