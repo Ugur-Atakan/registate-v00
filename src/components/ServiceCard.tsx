@@ -22,11 +22,11 @@ const ServiceCard = ({
 }) => (
   <div 
     className="group bg-white rounded-xl border border-gray-200 hover:border-[--primary]/30 
-      hover:shadow-lg transition-all duration-300"
+      hover:shadow-lg transition-all duration-300 h-full flex flex-col"
   >
-    <div className="flex items-center p-6">
-      {/* Left Section - Icon and Info */}
-      <div className="flex items-start gap-4 flex-1">
+    <div className="p-6 flex-1">
+      {/* Header Section */}
+      <div className="flex items-start gap-4 mb-4">
         <div className="p-3.5 bg-[--primary]/10 rounded-xl group-hover:bg-[--primary]/20 
           transition-colors duration-300 flex-shrink-0">
           {product?.icon ?? <Package size={24} className="text-[--primary]" />}
@@ -50,55 +50,58 @@ const ServiceCard = ({
               <span>{product.processingTime}</span>
             </div>
           )}
-          <p className="text-gray-600 text-sm mt-2 line-clamp-2">
-            {product.description}
-          </p>
         </div>
       </div>
 
-      {/* Right Section - Price and Actions */}
-      <div className="flex items-center gap-8 pl-8 ml-8 border-l border-gray-100">
-        {/* Price */}
-        <div className="text-right">
-          <div className="flex items-baseline gap-1 whitespace-nowrap">
-            <span className="text-2xl font-bold text-[--primary]">
-              ${product.prices[0].unit_amount/100}
-            </span>
-            <span className="text-gray-500">
-              {product.prices[0].type !== 'one_time' ? 
-                `/${product.prices[0].recurring?.interval}` : ''}
-            </span>
-          </div>
-          {product.additionalFees! > 0 && (
-            <span className="text-sm text-amber-600 font-medium block mt-1 whitespace-nowrap">
-              + ${Number(product.additionalFees)/100} state fee
-            </span>
-          )}
-        </div>
+      {/* Description */}
+      <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+        {product.description}
+      </p>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2 min-w-[140px]">
-          <button
-            onClick={onBuyNow}
-            className="w-full px-4 py-2.5 bg-[--primary] text-white rounded-lg 
-              hover:bg-[--primary]/90 transition-all duration-200 text-sm font-medium 
-              flex items-center justify-center gap-2 group shadow-sm hover:shadow-md"
-          >
-            Buy Now
-            <ArrowRight size={16} className="transition-transform duration-200 
-              group-hover:translate-x-0.5" />
-          </button>
-          <button
-            onClick={onLearnMore}
-            className="w-full px-4 py-2.5 border border-[--primary] text-[--primary] rounded-lg 
-              hover:bg-[--primary]/5 transition-all duration-200 text-sm font-medium 
-              flex items-center justify-center gap-2 group"
-          >
-            Learn More
-            <Info size={16} className="transition-transform duration-200 
-              group-hover:translate-x-0.5" />
-          </button>
+      {/* Price Section */}
+      <div className="flex items-baseline gap-1 mb-4">
+        <span className="text-2xl font-bold text-[--primary]">
+          ${product.prices[0].unit_amount/100}
+        </span>
+        <span className="text-gray-500">
+          {product.prices[0].type !== 'one_time' ? 
+            `/${product.prices[0].recurring?.interval}` : ''}
+        </span>
+      </div>
+
+      {/* Additional Fees */}
+      {product.additionalFees! > 0 && (
+        <div className="mb-4">
+          <span className="text-sm text-amber-600 font-medium block">
+            + ${Number(product.additionalFees)/100} state fee
+          </span>
         </div>
+      )}
+    </div>
+
+    {/* Action Buttons - Fixed at bottom */}
+    <div className="p-6 pt-0 mt-auto">
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={onBuyNow}
+          className="w-full px-4 py-2.5 bg-[--primary] text-white rounded-lg 
+            hover:bg-[--primary]/90 transition-all duration-200 text-sm font-medium 
+            flex items-center justify-center gap-2 group shadow-sm hover:shadow-md"
+        >
+          Buy Now
+          <ArrowRight size={16} className="transition-transform duration-200 
+            group-hover:translate-x-0.5" />
+        </button>
+        <button
+          onClick={onLearnMore}
+          className="w-full px-4 py-2.5 border border-[--primary] text-[--primary] rounded-lg 
+            hover:bg-[--primary]/5 transition-all duration-200 text-sm font-medium 
+            flex items-center justify-center gap-2 group"
+        >
+          Learn More
+          <Info size={16} className="transition-transform duration-200 
+            group-hover:translate-x-0.5" />
+        </button>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Building2, FileText, Clock, ArrowRight, AlertCircle, File, AArrowDown as Pdf, ExternalLink, BarChart3, Plus, Rocket, ArrowUpRight, Check, Info } from 'lucide-react';
+import { Building2, FileText, Clock, ArrowRight, AlertCircle, File, AArrowDown as Pdf, ExternalLink, BarChart3, Plus, Rocket, ArrowUpRight, Check, Info, ListTodo, CheckCircle2, CreditCard } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -244,6 +244,41 @@ const getStatusText = (status: string) => {
   return (
     <DashboardLayout>
       <div>
+        {/* Payment Pending Banner */}
+        {company?.status === 'PAYMENT_PENDING' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 rounded-lg">
+                  <CreditCard className="w-6 h-6 text-amber-700" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-amber-900">Payment Required</h3>
+                  <p className="text-amber-700 mt-1">
+                    Please complete your payment to begin the company formation process.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => navigate('/checkout')}
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Complete Payment
+                  <ArrowRight size={18} />
+                </button>
+                <button
+                  onClick={() => navigate('/dashboard/support')}
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 border border-amber-600 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors"
+                >
+                  Get Help
+                  <ArrowRight size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-[--primary] to-blue-600 rounded-xl p-6 mb-6 text-white">
           <div className="flex items-center justify-between">
@@ -315,35 +350,53 @@ const getStatusText = (status: string) => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {tasks.map((task: any) => (
-                <div 
-                  key={task.id}
-                  className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/dashboard/tasks/details`, { state: { taskId: task.id } })}
-                >
-                  <div className={`p-2 rounded-lg ${getPriorityColor(task.priority)}`}>
-                    {task.priority === 'HIGH' ? (
-                      <AlertCircle className="w-5 h-5" />
-                    ) : (
-                      <Clock className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate">{task.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{task.description}</p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                        {task.priority}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Due {formatDate(task.dueDate)}
-                      </span>
+            {tasks.length > 0 ? (
+              <div className="space-y-4">
+                {tasks.map((task: any) => (
+                  <div 
+                    key={task.id}
+                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/dashboard/tasks/details`, { state: { taskId: task.id } })}
+                  >
+                    <div className={`p-2 rounded-lg ${getPriorityColor(task.priority)}`}>
+                      {task.priority === 'HIGH' ? (
+                        <AlertCircle className="w-5 h-5" />
+                      ) : (
+                        <Clock className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">{task.title}</h3>
+                      <p className="text-sm text-gray-500 mt-1">{task.description}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                          {task.priority}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Due {formatDate(task.dueDate)}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 px-4">
+                <div className="w-16 h-16 bg-[--primary]/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ListTodo className="w-8 h-8 text-[--primary]" />
                 </div>
-              ))}
-            </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No Upcoming Tasks
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                  You're all caught up! When you have tasks to complete, they'll appear here. We'll notify you when new tasks are assigned.
+                </p>
+                <div className="inline-flex items-center gap-2 text-[--primary] hover:text-[--primary]/80 transition-colors">
+                  <CheckCircle2 size={18} />
+                  <span className="text-sm font-medium">All tasks completed</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Recent Documents */}
@@ -363,36 +416,54 @@ const getStatusText = (status: string) => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {documents.map((doc: any) => (
-                <div 
-                  key={doc.id}
-                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                    {doc.fileType === 'pdf' ? (
-                      <Pdf className="w-5 h-5" />
-                    ) : (
-                      <File className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate">{doc.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Updated {formatDate(doc.updatedAt)}
-                    </p>
-                  </div>
-                  <a 
-                    href={doc.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 text-gray-400 hover:text-[--primary] transition-colors"
+            {documents.length > 0 ? (
+              <div className="space-y-4">
+                {documents.map((doc: any) => (
+                  <div 
+                    key={doc.id}
+                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <ExternalLink className="w-5 h-5" />
-                  </a>
+                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                      {doc.fileType === 'pdf' ? (
+                        <Pdf className="w-5 h-5" />
+                      ) : (
+                        <File className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">{doc.name}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Updated {formatDate(doc.updatedAt)}
+                      </p>
+                    </div>
+                    <a 
+                      href={doc.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-gray-400 hover:text-[--primary] transition-colors"
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 px-4">
+                <div className="w-16 h-16 bg-[--primary]/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-8 h-8 text-[--primary]" />
                 </div>
-              ))}
-            </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No Documents Yet
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                  Your important documents will appear here once they're ready. We'll notify you when new documents are available for review.
+                </p>
+                <div className="inline-flex items-center gap-2 text-[--primary] hover:text-[--primary]/80 transition-colors">
+                  <Info size={18} />
+                  <span className="text-sm font-medium">Documents will be added soon</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
