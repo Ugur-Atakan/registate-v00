@@ -44,3 +44,28 @@ export interface Product {
   }
   
   
+
+  export interface ServicePriceInput {
+    name: string;
+    isDefault: boolean;
+    stripePriceId: string;
+    type: 'one_time' | 'recurring';
+    recurring?: {
+      interval: 'day' | 'week' | 'month' | 'year';
+      interval_count: number;
+    };
+    unit_amount: number;
+    currency: string;
+    lookup_key?: string;
+    description: string;
+  }
+  
+  export interface ServiceInput {
+    stripeProductId?: string;
+    name: string;
+    description: string;
+    features: string[];
+    isFeatured: boolean;
+    productType: 'PRODUCT' | 'SERVICE';
+    prices: ServicePriceInput[];
+  }

@@ -8,7 +8,7 @@ import AdminProducts from "../pages/admin/Products";
 import AdminTasks from "../pages/admin/Tasks";
 import AdminFormationDashboard from "../pages/admin/Formation";
 import AdminOrderDashboard from "../pages/admin/Orders";
-import AdminTicketDetailsPage from "../pages/admin/support/TicketDetails";
+import AdminTicketDetailsPage from "../pages/admin/TicketDetails";
 
 export default function AdminRoutes() {
   return (
