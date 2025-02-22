@@ -3,6 +3,23 @@ import instance from "../instance"
 import { getActiveCompanyId } from "../../utils/storage";
 
 
+
+const buySingleItem = async ({productId,priceId}:{productId:string,priceId:string}):Promise<string> => {
+  try {
+    const companyId=getActiveCompanyId();
+    let data={
+      productId,
+      priceId,
+      companyId
+    }
+    console.log(data);
+    const response = await instance.post('/checkout/create-checkout-session',data);
+    return response.data.url;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 const getCompanyDetails = async (companyId?: string): Promise<CompanyResponse> => {
   try {
     // companyId parametresi varsa onu, yoksa localStorage'dan alınan değeri kullanın.
@@ -85,5 +102,6 @@ const getCompanyDetails = async (companyId?: string): Promise<CompanyResponse> =
     getCompanyTasks,
     getCompanyInvoices,
     getTaskDetails,
-    getTicketDetails
+    getTicketDetails,
+    buySingleItem,
   };

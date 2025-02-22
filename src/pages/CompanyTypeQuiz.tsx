@@ -36,8 +36,8 @@ export default function CompanyTypeQuiz() {
     }
   };
 
-  const getRecommendation = (): 'LLC' | 'C-CORP' => {
-    return questions.some(q => q.answer === 'Yes') ? 'C-CORP' : 'LLC';
+  const getRecommendation = (): 'LLC' | 'C-Corp' => {
+    return questions.some(q => q.answer === 'Yes') ? 'C-Corp' : 'LLC';
   };
 
   const handleComplete = () => {

@@ -138,14 +138,6 @@ export default function CompanyName({nextStep }: CompanyNameProps) {
                 </>
               )}
             </button>
-
-            <div className="flex items-center justify-center gap-2 text-gray-600">
-              <AlertCircle size={18} />
-              <span>Need help choosing a name?</span>
-              <button className="text-[--primary] font-medium hover:underline" onClick={handleHelpNameChoice}>
-                View our guide
-              </button>
-            </div>
           </div>
         </div>
       </div>

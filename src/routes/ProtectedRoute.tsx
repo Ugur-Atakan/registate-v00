@@ -34,7 +34,7 @@ export default function ProtectedRoute({ children, requiredRoles }: ProtectedRou
     } catch (error: any) {
       removeTokens();
       dispatch(logOut());
-      toast.error("Kullanıcı bilgileri alınamadı. Lütfen tekrar giriş yapın.");
+      toast.error("Could not retrieve user information. Please log back in.");
       navigate('/');
       console.error('Error fetching user data:', error);
       setLoading(false);

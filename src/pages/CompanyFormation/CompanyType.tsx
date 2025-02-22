@@ -49,10 +49,9 @@ export default function CompanyType({
   nextStep,
 }: CompanyTypeProps) {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<SelectedType|null>(recommendation ? companyTypesFeatures.find((type) => type.name === recommendation) as SelectedType : null);
-  const [loading, setLoading] = useState(false);
+  const [selectedType, setSelectedType] = useState<SelectedType | null>();
+const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-  
   const [companyTypes, setCompanyTypes] = useState<{ id: string; name: string }[]
   >([]);
 
@@ -61,7 +60,11 @@ export default function CompanyType({
     const fetchCompanyTypes = async () => {
       try {
         const types = await getCompanyTypes();
+        console.log("Company types:", types);
         setCompanyTypes(types);
+        if(recommendation && fromQuiz){
+          setSelectedType(types.find((type:any) => type.name == recommendation));
+        }
       } catch (error) {
         console.error("Error fetching company types: ", error);
       }
@@ -141,9 +144,10 @@ export default function CompanyType({
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xl font-semibold">{type.name}</h3>
                         {recommendation === type.name && fromQuiz && (
-                          <span className="px-3 py-1 bg-[--primary]/10 text-[--primary] text-sm font-medium rounded-full">
-                            Recommended
-                          </span>
+                          <span className="px-4 py-1.5 bg-[--primary]/40 text-[--primary] text-sm font-bold rounded-lg border border-[--primary]/50 shadow-sm">
+  Recommended
+</span>
+
                         )}
                       </div>
                       <ul className="space-y-2">

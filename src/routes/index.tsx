@@ -10,6 +10,7 @@ import AdminRoutes from "./AdminRoutes";
 import DashboardRoutes from "./DashoardRoutes";
 import NameGuide from "../pages/NameGuide";
 import PostOrder from "../pages/PostOrder";
+import CancelOrder from "../pages/CancelOrder";
 
 
 export default function AppRoutes() {
@@ -26,6 +27,7 @@ export default function AppRoutes() {
       <Route path="/company-type-quiz" element={<CompanyTypeQuiz />}/>
       <Route path="/name-guide" element={<NameGuide />} />
       <Route path="/post-order" element={<PostOrder />} />
+      <Route path="/cancel-order" element={<CancelOrder />} />
     </Routes>
   );
 }

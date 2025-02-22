@@ -7,6 +7,7 @@ import { CompanyResponse } from '../../types/Company';
 import { setActiveCompany } from '../../store/slices/companySlice';
 import { setActiveCompanyId } from '../../utils/storage';
 import { getCompanyDetails, getCompanyDocuments, getCompanyTasks } from '../../http/requests/companyRequests';
+import instance from '../../http/instance';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -65,6 +66,9 @@ const getStatusText = (status: string) => {
         return 'text-gray-600 bg-gray-50';
     }
   };
+
+
+
 
   // If no companies exist, show the enhanced no-company section
   if (!companies || companies.length === 0) {
@@ -195,6 +199,8 @@ const getStatusText = (status: string) => {
     );
   }
 
+
+
   // Tüm verileri paralel fetch eden useEffect
   useEffect(() => {
     const fetchData = async () => {
@@ -231,6 +237,18 @@ const getStatusText = (status: string) => {
     fetchData();
   }, [companies, activeCompanyId, dispatch]);
 
+  const handleRetryIncompleteFormation=async()=>{
+    try {
+      console.log('Retrying formation...');
+      console.log('Active Company ID:', activeCompanyId);
+      const response = await instance.post(`/checkout/retry-incomplete-formation`,{companyId:activeCompanyId});
+      window.location.href=response.data.url;
+    } catch (error: any) {
+      console.error('Error retrying formation:', error);
+      setError(error.message || 'Failed to retry formation.');
+    }
+  }
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -261,7 +279,7 @@ const getStatusText = (status: string) => {
               </div>
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
-                  onClick={() => navigate('/checkout')}
+                  onClick={handleRetryIncompleteFormation}
                   className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Complete Payment

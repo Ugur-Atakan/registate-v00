@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
-import instance from "../../http/instance";
 import { Plus, Bell, X, Menu, Search, Eye, Trash } from "lucide-react";
 import UserDetailPage from "./UserDetails";
+import { User } from "../../types/User";
+import { getAllUsers } from "../../http/requests/admin/user";
 
 export default function AdminUsers() {
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<User[]>([]);
    
     const fetchUsers = async () => {
-        const response = await instance.get("admin/users");
-        setUsers(response.data.users);
+        const users = await getAllUsers();
+        setUsers(users);
     };
 
     useEffect(() => {

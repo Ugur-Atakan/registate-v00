@@ -7,11 +7,10 @@ import {
   ArrowRight, 
   MessageSquare, 
   ListTodo,
-  XCircle,
   ShieldAlert
 } from 'lucide-react';
 
-type OrderStatus = 'success' | 'cancelled' | 'error' | 'invalid' | 'loading';
+type OrderStatus = 'success' | 'error' | 'invalid' | 'loading';
 type PaymentType = 'companyFormation' | 'singleItemPurchase' | '';
 
 export default function PostOrder() {
@@ -48,8 +47,6 @@ export default function PostOrder() {
           setTimeout(() => {
             navigate("/dashboard");
           }, 10000);
-        } else {
-          setStatus('cancelled');
         }
       } catch (error) {
         console.error("Error verifying payment:", error);
@@ -110,27 +107,6 @@ export default function PostOrder() {
                 </button>
               </div>
             </div>
-          </div>
-        );
-
-      case 'cancelled':
-        return (
-          <div className="text-center space-y-6">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <XCircle className="w-8 h-8 text-yellow-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">Order Cancelled</h1>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Your order has been cancelled. If this was unintentional or you have any questions,
-              our support team is here to help.
-            </p>
-            <button
-              onClick={() => navigate('/dashboard/support')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[--primary] text-white rounded-lg 
-                hover:bg-[--primary]/90 transition-colors"
-            >
-              Contact Support <ArrowRight size={20} />
-            </button>
           </div>
         );
 

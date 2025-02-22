@@ -87,7 +87,6 @@ export interface Shareholder {
   companyId: string;
 }
 
-// Technology Developer (Teknoloji Geliştirici)
 export interface TechnologyDeveloper {
   id: string;
   name: string;
@@ -95,7 +94,6 @@ export interface TechnologyDeveloper {
   companyId: string;
 }
 
-// Şirkete ait kullanıcı bilgileri (CompanyUser)
 export interface CompanyUserResponse {
   id: string;
   email: string;

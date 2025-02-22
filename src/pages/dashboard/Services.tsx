@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Price, Product } from '../../types/Product';
 import ServiceCard from '../../components/ServiceCard';
 import instance from '../../http/instance';
+import { buySingleItem } from '../../http/requests/companyRequests';
 
 interface DynamicProduct extends Product {
   icon?: JSX.Element;
@@ -54,15 +55,16 @@ export default function Services() {
     setLoading(false);
   };
 
-  const handleBuy = (price: Price) => {
+
+
+  const handleBuy = async (price: Price) => {
+    console.log('Selected Product:', selectedProduct);
+    console.log('Selected Price:', price);
     if (selectedProduct) {
-      navigate('/dashboard/checkout', { 
-        state: { 
-          product: selectedProduct,
-          selectedPrice: price 
-        }
-      });
+      const checkoutLink= await buySingleItem({productId: selectedProduct.id, priceId: price.id});
+      window.location.href = checkoutLink;
     }
+
   };
 
   const handleLearnMore = (product: DynamicProduct) => {
