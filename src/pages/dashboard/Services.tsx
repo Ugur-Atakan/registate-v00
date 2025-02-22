@@ -43,18 +43,29 @@ export default function Services() {
     handleBuy(price);
   };
 
-  const handleBuyNow = (product: DynamicProduct) => {
+  const handleBuyNow = async (product: DynamicProduct) => {
     setLoading(true);
     setSelectedProduct(product);
-    if (product.defaultPriceId) {
+    console.log("Selected Product:", product);
+  
+    if (product.prices.length === 1) {
+      // ✅ Tek fiyatlı ürünlerde ilk fiyatı al
+      await handleBuy(product.prices[0]);
+    } else if (product.defaultPriceId) {
+      // ✅ Çok fiyatlı ürünlerde defaultPriceId'yi bul
       const defaultPrice = product.prices.find((price) => price.id === product.defaultPriceId);
-      handleBuy(defaultPrice!);
+      if (defaultPrice) {
+        await handleBuy(defaultPrice);
+      } else {
+        setShowPlanSelection(true);
+      }
     } else {
       setShowPlanSelection(true);
     }
+  
     setLoading(false);
   };
-
+  
 
 
   const handleBuy = async (price: Price) => {
@@ -64,7 +75,6 @@ export default function Services() {
       const checkoutLink= await buySingleItem({productId: selectedProduct.id, priceId: price.id});
       window.location.href = checkoutLink;
     }
-
   };
 
   const handleLearnMore = (product: DynamicProduct) => {
