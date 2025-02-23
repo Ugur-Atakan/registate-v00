@@ -130,8 +130,8 @@ const TaskDetails = () => {
         taskId: task?.id,
         isStaff: false
       };
-
       const res = await instance.post("/tasks/add-message", messageData);
+      navigate("/dashboard/tasks/details", { state: { taskId: task?.id } });
       console.log("Submitting message:", messageData);
       if (res) {
         toast.success("Message sent successfully");

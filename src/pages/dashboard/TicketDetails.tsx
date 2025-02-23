@@ -109,6 +109,7 @@ const TicketDetails = () => {
       console.log("Message data:", messageData);
       await instance.post(`/support/add-message-to-ticket`, messageData);
       toast.success("Message sent successfully");
+      navigate(`/dashboard/ticket/details`, { state: { ticketId: ticket?.id } })
       setNewMessage("");
       setAttachments([]);
     } catch (error) {
