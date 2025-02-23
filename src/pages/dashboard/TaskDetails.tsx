@@ -17,6 +17,13 @@ import {
 import toast from "react-hot-toast";
 import { getTaskDetails } from "../../http/requests/companyRequests";
 import instance from "../../http/instance";
+import { uploadMessageAttachment } from "../../utils/fileUpload";
+
+interface Attachment {
+  name: string;
+  url: string;
+  type: string;
+}
 
 interface Message {
   id: string;
@@ -108,14 +115,18 @@ const TaskDetails = () => {
     setSubmitting(true);
     try {
       // In production, this would be an API call  this will be connect supabase
+
+      const attachment: Attachment[] = await Promise.all(
+              attachments.map(async (file) => ({
+                name: file.name,
+                url: await uploadMessageAttachment(file, "task"),
+                type: "TaskAttachment",
+              }))
+            );
+      
       const messageData = {
         message: newMessage,
-        attachments: attachments.map(file => ({
-          name: file.name,
-          url: URL.createObjectURL(file),
-          type: file.type,
-          taskId: task?.id
-        })),
+        attachments: attachment,
         taskId: task?.id,
         isStaff: false
       };

@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { 
   ArrowLeft,
-  AlertCircle,
-  MessageSquare,
   Paperclip,
   Send,
   Info,
@@ -14,6 +12,7 @@ import {
 import toast from 'react-hot-toast';
 import { getActiveCompanyId } from '../../utils/storage';
 import instance from '../../http/instance';
+import { uploadMessageAttachment } from '../../utils/fileUpload';
 
 interface Attachment {
   name: string;
@@ -71,12 +70,13 @@ export default function NewSupportTicket() {
     setLoading(true);
     try {
       // In production, you would first upload the files and get their URLs
-      const attachments: Attachment[] = files.map(file => ({
-        name: file.name,
-        url: URL.createObjectURL(file),
-        type: file.type.split('/')[1]
-      }));
-
+      const attachments: Attachment[] = await Promise.all(
+        files.map(async (file) => ({
+          name: file.name,
+          url: await uploadMessageAttachment(file, "ticket"),
+          type: "TicketAttachment",
+        }))
+      );
       const finalTicketData = {
         ...ticketData,
         message: [{

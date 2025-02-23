@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Bell, Building2, Calendar, Clock, Paperclip, Send, X, Bold, Italic, List, Link } from 'lucide-react';
+import { uploadMessageAttachment } from '../../utils/fileUpload';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -82,10 +83,17 @@ export default function TaskDetailPage() {
     // Here you would make an API call to update the task priority
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
+          const xnewAttachments= await Promise.all(
+                  newAttachments.map(async (file) => ({
+                    name: file.name,
+                    url: await uploadMessageAttachment(file, "task"),
+                    type: "TaskAttachment",
+                  }))
+                );
     const newMessageObj = {
       id: Math.random().toString(),
       taskId: task?.id,
@@ -99,7 +107,7 @@ export default function TaskDetailPage() {
         lastName: "Doe",
         email: "user@example.com"
       },
-      attachments: []
+      attachments:xnewAttachments
     };
 
     setTask(prev => ({

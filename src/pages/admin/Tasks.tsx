@@ -92,7 +92,7 @@ export default function AdminTasks() {
   }
 
   if (selectedTaskId) {
-    return <TaskDetailPage onBack={() => setSelectedTaskId(null)} />;
+    return <TaskDetailPage/>;
   }
 
   const filteredTasks = tasks

@@ -22,10 +22,8 @@ function generateFileName(userId: string | null, file: File, isProfileImage = fa
 
   if (isProfileImage && userId) {
     return `${userId}.${extension}`; // Kullanıcı ID bazlı sabit dosya adı
-  } else{
+  } 
     return `${crypto.randomUUID()}_${Date.now()}.${extension}`; // Rastgele dosya adı
-  }
-
 }
 
 /**
@@ -60,6 +58,7 @@ export async function uploadFileToSupabase(
 
     // Public URL al
     const { publicUrl } = supabase.storage.from(bucketName).getPublicUrl(filePath).data
+    console.log("Public URL:", publicUrl);
     return publicUrl;
   } catch (error) {
     console.error("File upload error:", error);

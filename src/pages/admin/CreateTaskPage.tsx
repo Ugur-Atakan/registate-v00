@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Bell, Upload, X, Calendar, Clock, Search, Building2, Check } from 'lucide-react';
 import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
+import { uploadMessageAttachment } from '../../utils/fileUpload';
+import instance from '../../http/instance';
 
 interface CreateTaskPageProps {
   onBack: () => void;
@@ -25,29 +27,39 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
   const [type, setType] = useState('GENERAL');
   const [dueDate, setDueDate] = useState('');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [files, setFiles] = useState([] as File[]);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [companySearchQuery, setCompanySearchQuery] = useState('');
+  const [companies, setCompanies] = useState<Company[]>([]);
 
-  // Demo companies data - replace with actual data from API
-  const companies: Company[] = [
-    { id: '269eef1d-5af2-4e67-a2e2-0cde8884eb65', companyName: 'Better LLC' },
-    { id: '369eef1d-5af2-4e67-a2e2-0cde8884eb66', companyName: 'Tech Solutions LLC' },
-    { id: '469eef1d-5af2-4e67-a2e2-0cde8884eb67', companyName: 'Digital Ventures Corp' },
-    { id: '569eef1d-5af2-4e67-a2e2-0cde8884eb68', companyName: 'Innovation Labs Inc' },
-    { id: '669eef1d-5af2-4e67-a2e2-0cde8884eb69', companyName: 'Future Systems Ltd' },
-  ];
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      const res=await instance.get('/admin/company/all');
+      setCompanies(res.data);
+    };
+    fetchCompanies();
+  }, []);
 
   const filteredCompanies = companies.filter(company =>
     company.companyName.toLowerCase().includes(companySearchQuery.toLowerCase())
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCompany) {
       alert('Please select a company');
       return;
     }
     
+      const ticketAttachments: Attachment[] = await Promise.all(
+                  files.map(async (file) => ({
+                    name: file.name,
+                    url: await uploadMessageAttachment(file, "task"),
+                    type: "TaskAttachment",
+                  }))
+                );
+
     const taskData = {
       title,
       description,
@@ -57,11 +69,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
       type,
       companyId: selectedCompany.id,
       dueDate: new Date(dueDate).toISOString(),
-      attachments: attachments.map(attachment => ({
-        ...attachment,
-        taskId: 'task-uuid' // This will be handled by the backend
-      }))
+      attachments: ticketAttachments,
     };
+
+
 
     console.log('Task Data:', taskData);
     // Here you would make the API call to create the task
@@ -239,9 +250,9 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                     </label>
                   </div>
                 </div>
-                {attachments.length > 0 && (
+                {files.length > 0 && (
                   <div className="space-y-2">
-                    {attachments.map((file, index) => (
+                    {files.map((file, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center">
                           <Clock className="w-5 h-5 text-gray-400 mr-2" />

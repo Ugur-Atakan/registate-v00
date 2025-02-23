@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../components/layout/DashboardLayout';
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import DashboardLayout from "../../components/layout/DashboardLayout";
 import {
   ArrowLeft,
   Clock,
@@ -11,10 +11,12 @@ import {
   FileText,
   X,
   User,
-  Download
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import { getTicketDetails } from '../../http/requests/companyRequests';
+  Download,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { getTicketDetails } from "../../http/requests/companyRequests";
+import { uploadMessageAttachment } from "../../utils/fileUpload";
+import instance from "../../http/instance";
 
 interface Attachment {
   name: string;
@@ -37,9 +39,9 @@ interface Ticket {
   ticketNo: number;
   userId: string;
   subject: string;
-  category: 'ACCOUNT' | 'PAYMENT' | 'TECHNICAL';
-  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  category: "ACCOUNT" | "PAYMENT" | "TECHNICAL";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED";
+  priority: "HIGH" | "MEDIUM" | "LOW";
   isActivate: boolean;
   createdAt: string;
   updatedAt: string;
@@ -51,22 +53,22 @@ const TicketDetails = () => {
   const navigate = useNavigate();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
     const fetchTicketDetails = async () => {
       if (!location.state?.ticketId) {
-        toast.error('Ticket ID is missing');
+        toast.error("Ticket ID is missing");
         return;
       }
-
       try {
         const response = await getTicketDetails(location.state.ticketId);
+        console.log("Ticket details:", response);
         setTicket(response);
       } catch (error) {
-        console.error('Error fetching ticket details:', error);
-        toast.error('Failed to load ticket details');
+        console.error("Error fetching ticket details:", error);
+        toast.error("Failed to load ticket details");
       } finally {
         setLoading(false);
       }
@@ -78,61 +80,62 @@ const TicketDetails = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      setAttachments(prev => [...prev, ...newFiles]);
+      setAttachments((prev) => [...prev, ...newFiles]);
     }
   };
 
   const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmitMessage = async () => {
     if (!newMessage.trim() && attachments.length === 0) return;
 
     try {
-      // Here you would normally upload files and get their URLs
-      const messageData = {
-        message: newMessage,
-        attachments: attachments.map(file => ({
+      const attachment: Attachment[] = await Promise.all(
+        attachments.map(async (file) => ({
           name: file.name,
-          url: URL.createObjectURL(file),
-          type: file.type,
-          ticketId: ticket?.id
+          url: await uploadMessageAttachment(file, "ticket"),
+          type: "TicketAttachment",
         }))
+      );
+
+      const messageData = {
+        ticketId: ticket?.id,
+        message: newMessage,
+        attachments: attachment,
       };
 
-      // API call would go here
-      console.log('Submitting message:', messageData);
-      toast.success('Message sent successfully');
-      
-      // Clear form
-      setNewMessage('');
+      console.log("Message data:", messageData);
+      await instance.post(`/support/add-message-to-ticket`, messageData);
+      toast.success("Message sent successfully");
+      setNewMessage("");
       setAttachments([]);
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
     }
   };
 
-  const getStatusColor = (status: Ticket['status']) => {
+  const getStatusColor = (status: Ticket["status"]) => {
     switch (status) {
-      case 'RESOLVED':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'IN_PROGRESS':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case "RESOLVED":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "IN_PROGRESS":
+        return "bg-blue-50 text-blue-700 border-blue-200";
       default:
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
     }
   };
 
-  const getPriorityColor = (priority: Ticket['priority']) => {
+  const getPriorityColor = (priority: Ticket["priority"]) => {
     switch (priority) {
-      case 'HIGH':
-        return 'bg-red-50 text-red-700 border-red-200';
-      case 'MEDIUM':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-      case 'LOW':
-        return 'bg-green-50 text-green-700 border-green-200';
+      case "HIGH":
+        return "bg-red-50 text-red-700 border-red-200";
+      case "MEDIUM":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "LOW":
+        return "bg-green-50 text-green-700 border-green-200";
     }
   };
 
@@ -163,18 +166,28 @@ const TicketDetails = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/dashboard/support')}
+              onClick={() => navigate("/dashboard/support")}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft size={20} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">Ticket #{ticket.ticketNo}</h1>
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(ticket.status)}`}>
+                <h1 className="text-2xl font-bold">
+                  Ticket #{ticket.ticketNo}
+                </h1>
+                <span
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
+                    ticket.status
+                  )}`}
+                >
                   {ticket.status}
                 </span>
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPriorityColor(ticket.priority)}`}>
+                <span
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${getPriorityColor(
+                    ticket.priority
+                  )}`}
+                >
                   {ticket.priority} Priority
                 </span>
               </div>
@@ -199,7 +212,7 @@ const TicketDetails = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium">
-                          {message.isStaff ? 'Support Team' : 'You'}
+                          {message.isStaff ? "Support Team" : "You"}
                         </span>
                         {message.isStaff && (
                           <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
@@ -211,9 +224,11 @@ const TicketDetails = () => {
                         </span>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-gray-700 whitespace-pre-wrap">{message.message}</p>
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {message.message}
+                        </p>
                       </div>
-                      
+
                       {message.attachments.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {message.attachments.map((attachment, index) => (
@@ -329,16 +344,20 @@ const TicketDetails = () => {
 
                 <div className="pt-4 border-t border-gray-200">
                   <p className="text-sm text-gray-500 mb-1">Status</p>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm 
-                    font-medium ${getStatusColor(ticket.status)}`}>
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm 
+                    font-medium ${getStatusColor(ticket.status)}`}
+                  >
                     {ticket.status}
                   </span>
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
                   <p className="text-sm text-gray-500 mb-1">Priority</p>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm 
-                    font-medium ${getPriorityColor(ticket.priority)}`}>
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm 
+                    font-medium ${getPriorityColor(ticket.priority)}`}
+                  >
                     <AlertCircle size={14} />
                     {ticket.priority} Priority
                   </span>
