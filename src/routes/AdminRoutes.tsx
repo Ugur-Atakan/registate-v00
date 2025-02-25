@@ -9,6 +9,7 @@ import AdminTasks from "../pages/admin/Tasks";
 import AdminFormationDashboard from "../pages/admin/Formation";
 import AdminOrderDashboard from "../pages/admin/Orders";
 import AdminTicketDetailsPage from "../pages/admin/TicketDetails";
+import AdminTaskDetailPage from "../pages/admin/TaskDetailPage";
 
 export default function AdminRoutes() {
   return (
@@ -21,6 +22,7 @@ export default function AdminRoutes() {
         <Route path="/companies" element={<AdminCompanies />} />
         <Route path="/products" element={<AdminProducts />} />
         <Route path="/tasks" element={<AdminTasks />} />
+        <Route path="/tasks/details" element={<AdminTaskDetailPage />} />
         <Route path="/formation" element={<AdminFormationDashboard/>} />
         <Route path="/orders" element={<AdminOrderDashboard />} />
       </Routes>

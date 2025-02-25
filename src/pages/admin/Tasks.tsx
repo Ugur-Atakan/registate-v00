@@ -8,6 +8,7 @@ import {
 import CreateTaskPage from "./CreateTaskPage";
 import TaskDetailPage from "./TaskDetailPage";
 import { Task } from "../../types/types";
+import { useNavigate } from "react-router-dom";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -77,9 +78,9 @@ export default function AdminTasks() {
   const [isCreating, setIsCreating] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-
+const navigate=useNavigate();
   const fetchTasks = async () => {
-    const res = await instance.get("/admin/tasks");
+    const res = await instance.get("/admin/task/all");
     setTasks(res.data);
   };
 
@@ -319,7 +320,7 @@ export default function AdminTasks() {
                 </div>
                 <div className="col-span-1 flex space-x-2">
                   <button 
-                    onClick={() => setSelectedTaskId(task.id)}
+                    onClick={() => navigate(`/admin/tasks/details`, { state: { taskId: task.id } })}
                     className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                   >
                     <Eye className="w-4 h-4" />

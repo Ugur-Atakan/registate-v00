@@ -3,6 +3,8 @@ import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import instance from "../../http/instance";
 import { Bell, Eye, MessageSquare } from 'lucide-react';
 import AdminTicketDetailsPage from "./TicketDetails";
+import { useNavigate } from "react-router-dom";
+import { User } from "../../types/User";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -55,6 +57,7 @@ export default function AdminSupport() {
     createdAt: string;
     message: string;
     ticketNo:number;
+    user:User
   }
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -64,6 +67,7 @@ export default function AdminSupport() {
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
 
+  const navigate=useNavigate();
   useEffect(() => {
     const fetchTickets = async () => {
       const res = await instance.get("/admin/support/tickets");
@@ -97,7 +101,7 @@ export default function AdminSupport() {
 
 
   if (selectedTicket) {
-    return <AdminTicketDetailsPage onBack={() => setSelectedTicket(null)} />;
+    return <AdminTicketDetailsPage/>;
   }
 
   return (
@@ -243,7 +247,7 @@ export default function AdminSupport() {
                 <div className="col-span-1 text-sm">{formatDate(ticket.createdAt)}</div>
                 <div className="col-span-1 flex space-x-2">
                   <button 
-                    onClick={() => setSelectedTicket(ticket.id)}
+                     onClick={() => navigate(`/admin/support/details`, { state: { ticketId: ticket.id } })}
                     className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                   >
                     <Eye className="w-4 h-4" />

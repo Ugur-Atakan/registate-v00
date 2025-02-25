@@ -3,6 +3,7 @@ import { ArrowLeft, Bell, Upload, X, Calendar, Clock, Search, Building2, Check }
 import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
 import { uploadMessageAttachment } from '../../utils/fileUpload';
 import instance from '../../http/instance';
+import toast from 'react-hot-toast';
 
 interface CreateTaskPageProps {
   onBack: () => void;
@@ -72,7 +73,8 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
       attachments: ticketAttachments,
     };
 
-
+    await instance.post('/admin/task/create',taskData);
+    toast .success('Task created successfully');
 
     console.log('Task Data:', taskData);
     // Here you would make the API call to create the task
