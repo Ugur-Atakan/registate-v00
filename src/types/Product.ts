@@ -8,6 +8,7 @@ export interface Price {
     productId: string;
     isDefault: boolean;
     stripePriceId: string;
+    isActivePlan?: boolean;
     type: "one_time" | "recurring";
     recurringId: string | null;
     unit_amount: number;
@@ -27,6 +28,7 @@ export interface Product {
     stripeProductId: string;
     active: boolean;
     name: string;
+    isActiveProduct?: boolean;
     description: string;
     marketing_features: string[];
     metadata: any | null;

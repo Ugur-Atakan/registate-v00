@@ -16,8 +16,6 @@ import toast from "react-hot-toast";
 import instance from "../../http/instance";
 import { logOut, setUserData } from "../../store/slices/userSlice";
 import { uploadProfilePicture } from "../../utils/fileUpload";
-import { getUserData } from "../../http/requests";
-import { saveUserTokens } from "../../utils/storage";
 import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
@@ -42,6 +40,7 @@ export default function Settings() {
 
 
   const navigate=useNavigate();
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -56,7 +55,7 @@ export default function Settings() {
 
     try {
       const response = await instance.post("/user/update-me", formData);
-      dispatch(setUserData(response.data));
+      dispatch(setUserData({ ...response.data,profileImage:formData.profileImage }));
       toast.success("Settings updated successfully");
     } catch (error) {
       console.error("Error updating settings:", error);

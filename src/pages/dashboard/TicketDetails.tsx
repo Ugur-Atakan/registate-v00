@@ -56,23 +56,25 @@ const TicketDetails = () => {
   const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
+  const fetchTicketDetails = async () => {
+    if (!location.state?.ticketId) {
+      toast.error("Ticket ID is missing");
+      return;
+    }
+    try {
+      const response = await getTicketDetails(location.state.ticketId);
+      console.log("Ticket details:", response);
+      setTicket(response);
+    } catch (error) {
+      console.error("Error fetching ticket details:", error);
+      toast.error("Failed to load ticket details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTicketDetails = async () => {
-      if (!location.state?.ticketId) {
-        toast.error("Ticket ID is missing");
-        return;
-      }
-      try {
-        const response = await getTicketDetails(location.state.ticketId);
-        console.log("Ticket details:", response);
-        setTicket(response);
-      } catch (error) {
-        console.error("Error fetching ticket details:", error);
-        toast.error("Failed to load ticket details");
-      } finally {
-        setLoading(false);
-      }
-    };
+    
 
     fetchTicketDetails();
   }, [location.state?.ticketId]);
@@ -109,7 +111,7 @@ const TicketDetails = () => {
       console.log("Message data:", messageData);
       await instance.post(`/support/add-message-to-ticket`, messageData);
       toast.success("Message sent successfully");
-      navigate(`/dashboard/ticket/details`, { state: { ticketId: ticket?.id } })
+      await fetchTicketDetails();
       setNewMessage("");
       setAttachments([]);
     } catch (error) {

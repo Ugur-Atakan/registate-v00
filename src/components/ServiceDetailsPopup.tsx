@@ -81,6 +81,16 @@ export default function productDetailsPopup({
     },
   ];
 
+  let buyNowText = 'Buy Now';
+  if (product.isActiveProduct) {
+    if (product.prices.length === 1) {
+      buyNowText = 'Already Purchased';
+    } else {
+      buyNowText = 'Change Plan';
+    }
+  }
+
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm"
@@ -326,12 +336,13 @@ export default function productDetailsPopup({
                       <div className="flex flex-col gap-3 max-w-5xl mx-auto">
                         <button
                           onClick={onBuyNow}
+                          disabled={buyNowText === "Already Purchased"}
                           className="w-full px-6 py-4 bg-[--primary] text-white rounded-xl font-medium 
                             hover:bg-[--primary]/90 transition-all duration-200 transform hover:scale-[1.02] 
                             focus:outline-none focus:ring-2 focus:ring-[--primary] focus:ring-offset-2
                             shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                         >
-                          Buy Now
+                       {buyNowText}
                           <ArrowRight size={20} />
                         </button>
                         <button

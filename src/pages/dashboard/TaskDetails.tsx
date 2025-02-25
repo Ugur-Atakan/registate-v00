@@ -6,7 +6,6 @@ import {
   Clock,
   AlertCircle,
   Calendar,
-  CheckCircle2,
   Paperclip,
   Send,
   FileText,
@@ -81,20 +80,20 @@ const TaskDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const fetchTaskDetails = async () => {
+    setLoading(true);
+    try {
+      const task = await getTaskDetails(location.state?.taskId);
+      setTask(task);
+    } catch (error) {
+      console.error("Error fetching task details:", error);
+      toast.error("Failed to load task details");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchTaskDetails = async () => {
-      setLoading(true);
-      try {
-        const task = await getTaskDetails(location.state?.taskId);
-        setTask(task);
-      } catch (error) {
-        console.error("Error fetching task details:", error);
-        toast.error("Failed to load task details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTaskDetails();
   }, [location.state?.taskId]);
 
@@ -111,33 +110,34 @@ const TaskDetails = () => {
 
   const handleSubmitMessage = async () => {
     if (!newMessage.trim() && attachments.length === 0) return;
-
+  
     setSubmitting(true);
     try {
-      // In production, this would be an API call  this will be connect supabase
-
       const attachment: Attachment[] = await Promise.all(
-              attachments.map(async (file) => ({
-                name: file.name,
-                url: await uploadMessageAttachment(file, "task"),
-                type: "TaskAttachment",
-              }))
-            );
-      
+        attachments.map(async (file) => ({
+          name: file.name,
+          url: await uploadMessageAttachment(file, "task"),
+          type: "TaskAttachment",
+        }))
+      );
+  
       const messageData = {
         message: newMessage,
         attachments: attachment,
         taskId: task?.id,
-        isStaff: false
+        isStaff: false,
       };
+  
       const res = await instance.post("/tasks/add-message", messageData);
-      navigate("/dashboard/tasks/details", { state: { taskId: task?.id } });
       console.log("Submitting message:", messageData);
       if (res) {
         toast.success("Message sent successfully");
       }
-
-      // Clear form
+  
+      // Mesaj başarılı şekilde gönderildikten sonra, task detaylarını tekrar çekiyoruz.
+      await fetchTaskDetails();
+  
+      // Formu temizle
       setNewMessage("");
       setAttachments([]);
     } catch (error) {

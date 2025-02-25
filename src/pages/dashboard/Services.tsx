@@ -1,42 +1,24 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ServiceDetailsPopup from '../../components/ServiceDetailsPopup';
 import PlanSelectionPopup from '../../components/PlanSelectionPopup';
-import { useNavigate } from 'react-router-dom';
 import { Price, Product } from '../../types/Product';
 import ServiceCard from '../../components/ServiceCard';
-import instance from '../../http/instance';
 import { buySingleItem } from '../../http/requests/companyRequests';
+import { useDynamicProducts } from '../../hooks/useDynamicProducts';
 
 interface DynamicProduct extends Product {
   icon?: JSX.Element;
   badge?: string;
+  isActiveProduct?: boolean;
+  isActivePlan?: boolean;
 }
 
 export default function Services() {
-  const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState<DynamicProduct | null>(null);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
   const [showServiceDetails, setShowServiceDetails] = useState(false);
-  const [products, setProducts] = useState<DynamicProduct[]>();
-  const [loading, setLoading] = useState(false);
-
-  const fetchServices = async () => {
-    setLoading(true);
-    try {
-      const response = await instance.get('/product/products');
-      const dynamicProducts = response.data;
-      setProducts(dynamicProducts);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  const { products,loading,setLoading } = useDynamicProducts();
 
   const handlePlanSelection = (price: Price) => {
     setShowPlanSelection(false);
@@ -44,35 +26,25 @@ export default function Services() {
   };
 
   const handleBuyNow = async (product: DynamicProduct) => {
-    setLoading(true);
-    setSelectedProduct(product);
     console.log("Selected Product:", product);
-  
+    setSelectedProduct(product);
     if (product.prices.length === 1) {
-      // ✅ Tek fiyatlı ürünlerde ilk fiyatı al
-      await handleBuy(product.prices[0]);
-    } else if (product.defaultPriceId) {
-      // ✅ Çok fiyatlı ürünlerde defaultPriceId'yi bul
-      const defaultPrice = product.prices.find((price) => price.id === product.defaultPriceId);
-      if (defaultPrice) {
-        await handleBuy(defaultPrice);
-      } else {
-        setShowPlanSelection(true);
-      }
+      setLoading(true);
+      const checkoutLink= await buySingleItem({productId: product.id, priceId: product.prices[0].id});
+      setLoading(false);
+      window.location.href = checkoutLink;
     } else {
       setShowPlanSelection(true);
     }
-  
-    setLoading(false);
-  };
+    };
   
 
 
   const handleBuy = async (price: Price) => {
-    console.log('Selected Product:', selectedProduct);
-    console.log('Selected Price:', price);
     if (selectedProduct) {
+      setLoading(true);
       const checkoutLink= await buySingleItem({productId: selectedProduct.id, priceId: price.id});
+      setLoading(false);
       window.location.href = checkoutLink;
     }
   };
