@@ -1,47 +1,148 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
-import { ArrowLeft, Bell, Bold, Italic, Link, List, Paperclip } from 'lucide-react';
+import { ArrowLeft, Bell, Bold, Download, FileText, Italic, Link, List, Paperclip, User } from 'lucide-react';
+import instance from '../../http/instance';
+import toast from 'react-hot-toast';
+import { uploadMessageAttachment } from '../../utils/fileUpload';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { User as UserType } from '../../types/User';
 
-const demoTicket = {
-  id: "t1",
-  userId: "u1",
-  subject: "Payment not processing",
-  message: "Hello, I'm having issues processing my payment. When I try to complete the checkout, it shows an error message saying 'Transaction Failed'. I've tried multiple times but getting the same error. Please help.",
-  status: "OPEN",
-  priority: "HIGH",
-  isActivate: true,
-  createdAt: new Date(Date.now() - 7200000).toISOString(),
-  updatedAt: new Date(Date.now() - 7200000).toISOString(),
-  messages: [
-    {
-      id: "m1",
-      ticketId: "t1",
-      userId: "u1",
-      message: "Hello, I'm having issues processing my payment. When I try to complete the checkout, it shows an error message saying 'Transaction Failed'. I've tried multiple times but getting the same error. Please help.",
-      isStaff: false,
-      createdAt: new Date(Date.now() - 7200000).toISOString()
-    }
-  ]
-};
+interface Attachment {
+  name: string;
+  url: string;
+  type: string;
+}
 
-const demoUser = {
-  firstName: "John",
-  lastName: "Smith",
-  telephone: "5374352423",
-  profileImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=user1",
-  notifications: true,
-  isActivate: true
-};
+interface Message {
+  id: string;
+  ticketId: string;
+  userId: string;
+  message: string;
+  isStaff: boolean;
+  createdAt: string;
+  attachments: Attachment[];
+}
+
+interface Ticket {
+  id: string;
+  ticketNo: number;
+  userId: string;
+  subject: string;
+  category: "ACCOUNT" | "PAYMENT" | "TECHNICAL";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED";
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  isActivate: boolean;
+  createdAt: string;
+  updatedAt: string;
+  messages: Message[];
+  user: UserType;
+}
+
+
 interface TicketDetailPageProps {
   onBack: () => void;
 }
 
 
-const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
+const AdminTicketDetailsPage = () => {
   const [replyText, setReplyText] = useState('');
-  const [status, setStatus] = useState(demoTicket.status);
-  const [priority, setPriority] = useState(demoTicket.priority);
   const [showSidebar, setShowSidebar] = useState(false);
+
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [newMessage, setNewMessage] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
+
+  const fetchTicketDetails = async () => {
+    if (!location.state?.ticketId) {
+      toast.error("Ticket ID is missing");
+      return;
+    }
+    try {
+      const response = await instance.get(`/admin/ticket/${location.state.ticketId}/details`);
+      console.log("Ticket details:", response.data);
+      setTicket(response.data);
+    } catch (error) {
+      console.error("Error fetching ticket details:", error);
+      toast.error("Failed to load ticket details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    
+    fetchTicketDetails();
+  }, [location.state?.ticketId]);
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setAttachments((prev) => [...prev, ...newFiles]);
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmitMessage = async () => {
+    if (!newMessage.trim() && attachments.length === 0) return;
+
+    try {
+      const attachment: Attachment[] = await Promise.all(
+        attachments.map(async (file) => ({
+          name: file.name,
+          url: await uploadMessageAttachment(file, "ticket"),
+          type: "TicketAttachment",
+        }))
+      );
+
+      const messageData = {
+        ticketId: ticket?.id,
+        message: newMessage,
+        attachments: attachment,
+      };
+
+      console.log("Message data:", messageData);
+      await instance.post(`/support/add-message-to-ticket`, messageData);
+      toast.success("Message sent successfully");
+      await fetchTicketDetails();
+      setNewMessage("");
+      setAttachments([]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
+    }
+  };
+
+  const getStatusColor = (status: Ticket["status"]) => {
+    switch (status) {
+      case "RESOLVED":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "IN_PROGRESS":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      default:
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+    }
+  };
+
+  const getPriorityColor = (priority: Ticket["priority"]) => {
+    switch (priority) {
+      case "HIGH":
+        return "bg-red-50 text-red-700 border-red-200";
+      case "MEDIUM":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "LOW":
+        return "bg-green-50 text-green-700 border-green-200";
+    }
+  };
+
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -55,6 +156,9 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
     return date.toLocaleDateString();
   };
 
+  if(!ticket){
+    return <div>Loading...</div>
+  }
   return (
     <AdminDashboardLayout>
     <main className="lg:p-8">
@@ -69,14 +173,14 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <button 
-            onClick={onBack}
+            onClick={() => navigate(-1)}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl lg:text-2xl font-semibold">Ticket #{demoTicket.id}</h1>
-            <p className="text-sm text-gray-500 truncate max-w-[200px] lg:max-w-none">{demoTicket.subject}</p>
+            <h1 className="text-xl lg:text-2xl font-semibold">Ticket #{ticket.id}</h1>
+            <p className="text-sm text-gray-500 truncate max-w-[200px] lg:max-w-none">{ticket.subject}</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -104,16 +208,16 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
           <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm">
             <div className="flex items-start space-x-4">
               <img 
-                src={demoUser.profileImage} 
-                alt={`${demoUser.firstName} ${demoUser.lastName}`}
+                src={ticket.user.profileImage?? "https://api.dicebear.com/7.x/avataaars/svg?seed=user"} 
+                alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
                 className="w-10 h-10 rounded-full flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 lg:gap-0">
                   <div>
-                    <span className="font-medium">{demoUser.firstName} {demoUser.lastName}</span>
+                    <span className="font-medium">{ticket.user.firstName} {ticket.user.lastName}</span>
                     <span className="text-sm text-gray-500 ml-2">
-                      {formatDate(demoTicket.createdAt)}
+                      {formatDate(ticket.createdAt)}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -124,25 +228,68 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
                         ? 'bg-[#E8FFF3] text-[#9EE248]'
                         : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ')}
+                      {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase().replace('_', ' ')}
                     </span>
                     <span className={`px-2 py-1 text-xs rounded-full ${
-                      priority === 'HIGH'
+                      ticket.priority === 'HIGH'
                         ? 'bg-red-100 text-red-600'
-                        : priority === 'MEDIUM'
+                        : ticket.priority === 'MEDIUM'
                         ? 'bg-[#EEF2FF] text-[#1649FF]'
                         : 'bg-[#E8FFF3] text-[#9EE248]'
                     }`}>
-                      {priority.charAt(0) + priority.slice(1).toLowerCase()}
+                      {ticket.priority.charAt(0) + ticket.priority.slice(1).toLowerCase()}
                     </span>
                   </div>
                 </div>
-                <p className="mt-2 text-gray-600 break-words">{demoTicket.message}</p>
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Paperclip className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">payment_error_screenshot.png</span>
+                
+                {ticket.messages.map((message) => (
+                  <div key={message.id} className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <User className="w-5 h-5 text-gray-500" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium">
+                          {message.isStaff ? "Support Team" : "You"}
+                        </span>
+                        {message.isStaff && (
+                          <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
+                            Staff
+                          </span>
+                        )}
+                        <span className="text-sm text-gray-500">
+                          {new Date(message.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {message.message}
+                        </p>
+                      </div>
+
+                      {message.attachments.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {message.attachments.map((attachment, index) => (
+                            <a
+                              key={index}
+                              href={attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 
+                                rounded-lg text-sm text-gray-600 transition-colors"
+                            >
+                              <FileText size={14} />
+                              {attachment.name}
+                              <Download size={14} className="text-gray-400" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
+                ))}
                 </div>
               </div>
             </div>
@@ -209,8 +356,8 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
                 <div>
                   <label className="block text-sm text-gray-500 mb-1">Status</label>
                   <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
+                    value={ticket.status}
+                    onChange={(e) => setTicket({...ticket, status: e.target.value as Ticket["status"]})}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   >
                     <option value="OPEN">Open</option>
@@ -221,8 +368,8 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
                 <div>
                   <label className="block text-sm text-gray-500 mb-1">Priority</label>
                   <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
+                    value={ticket.priority}
+                    onChange={(e) => setTicket({...ticket, priority: e.target.value as Ticket["priority"]})}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   >
                     <option value="HIGH">High</option>
@@ -238,13 +385,13 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <img
-                    src={demoUser.profileImage}
-                    alt={`${demoUser.firstName} ${demoUser.lastName}`}
+                    src={ticket.user.profileImage?? "https://api.dicebear.com/7.x/avataaars/svg?seed=user"}
+                    alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
                     className="w-12 h-12 rounded-full"
                   />
                   <div className="ml-3 min-w-0">
-                    <p className="font-medium truncate">{demoUser.firstName} {demoUser.lastName}</p>
-                    <p className="text-sm text-gray-500 truncate">{demoUser.telephone}</p>
+                    <p className="font-medium truncate">{ticket.user.firstName} {ticket.user.lastName}</p>
+                    <p className="text-sm text-gray-500 truncate">{ticket.user?.telephone?? " "}</p>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-gray-200">
@@ -265,7 +412,6 @@ const AdminTicketDetailsPage = ({ onBack }:TicketDetailPageProps) => {
             </div>
           </div>
         </div>
-      </div>
     </main>
     </AdminDashboardLayout>
   );

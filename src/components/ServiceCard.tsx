@@ -5,21 +5,37 @@ import {
   Package,
 } from 'lucide-react';
 import { Product } from '../types/Product';
+import { useAppSelector } from '../store/hooks';
 
 interface DynamicProduct extends Product {
   icon?: JSX.Element;
   badge?: string;
 }
 
-const ServiceCard = ({ 
-  product, 
+const ServiceCard = ({
+  product,
   onLearnMore,
-  onBuyNow 
-}: { 
+  onBuyNow,
+}:{ 
   product: DynamicProduct;
   onLearnMore: () => void;
   onBuyNow: () => void;
-}) => (
+}) => {
+  
+  
+  
+  
+  let buyNowText = 'Buy Now';
+  if (product.isActiveProduct) {
+    if (product.prices.length === 1) {
+      buyNowText = 'Already Purchased';
+    } else {
+      buyNowText = 'Change Plan';
+    }
+  }
+
+  
+  return (
   <div 
     className="group bg-white rounded-xl border border-gray-200 hover:border-[--primary]/30 
       hover:shadow-lg transition-all duration-300 h-full flex flex-col"
@@ -83,12 +99,13 @@ const ServiceCard = ({
     <div className="p-6 pt-0 mt-auto">
       <div className="flex flex-col gap-2">
         <button
+        disabled={ buyNowText === 'Already Purchased'? true : false}
           onClick={onBuyNow}
           className="w-full px-4 py-2.5 bg-[--primary] text-white rounded-lg 
             hover:bg-[--primary]/90 transition-all duration-200 text-sm font-medium 
             flex items-center justify-center gap-2 group shadow-sm hover:shadow-md"
         >
-          Buy Now
+          {buyNowText}  
           <ArrowRight size={16} className="transition-transform duration-200 
             group-hover:translate-x-0.5" />
         </button>
@@ -106,5 +123,6 @@ const ServiceCard = ({
     </div>
   </div>
 );
+}
 
 export default ServiceCard;

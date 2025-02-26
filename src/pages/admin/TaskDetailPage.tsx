@@ -1,6 +1,75 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Bell, Building2, Calendar, Clock, Paperclip, Send, X, Bold, Italic, List, Link } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Bell,
+  Building2,
+  Calendar,
+  Clock,
+  Paperclip,
+  Send,
+  X,
+  Bold,
+  Italic,
+  List,
+  Link as LinkIcon,
+} from 'lucide-react';
 import { uploadMessageAttachment } from '../../utils/fileUpload';
+import instance from '../../http/instance';
+import toast from 'react-hot-toast';
+
+interface Attachment {
+  name: string;
+  url: string;
+  type: string;
+}
+
+interface Message {
+  id: string;
+  taskId: string;
+  userId: string;
+  message: string;
+  isStaff: boolean;
+  createdAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  attachments: {
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    uploadedBy: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
+  }[];
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  Icon: string;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED';
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  type: string;
+  companyId: string;
+  dueDate: string;
+  createdAt: string;
+  updatedAt: string;
+  assignedCompany: {
+    id: string;
+    companyName: string;
+  };
+  attachments: any[];
+  messages: Message[];
+}
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -45,11 +114,11 @@ const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
-  
+
   const minutes = Math.floor(diff / (1000 * 60));
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (minutes < 60) {
     return `${minutes}m ago`;
   } else if (hours < 24) {
@@ -61,62 +130,83 @@ const formatDate = (dateString: string) => {
   }
 };
 
-export default function TaskDetailPage() {
-  const [task, setTask] = useState();
+export default function AdminTaskDetailPage() {
+  const [task, setTask] = useState<Task | undefined>();
   const [newMessage, setNewMessage] = useState('');
-  const [showSidebar, setShowSidebar] = useState(false);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const fetchTaskDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await instance.get(`/admin/task/${location.state?.taskId}`);
+      console.log('Task Details:', response.data);
+      setTask(response.data);
+    } catch (error) {
+      console.error('Error fetching task details:', error);
+      toast.error('Failed to load task details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTaskDetails();
+  }, [location.state?.taskId]);
 
   const handleStatusChange = (newStatus: string) => {
-    setTask(prev => ({
-      ...prev,
-      status: newStatus 
-    }));
-    // Here you would make an API call to update the task status
+    setTask(prev => prev ? { ...prev, status: newStatus as Task['status'] } : prev);
+    // API çağrısı ekleyebilirsin
   };
 
   const handlePriorityChange = (newPriority: string) => {
-    setTask(prev => ({
-      ...prev,
-      priority: newPriority
-    }));
-    // Here you would make an API call to update the task priority
+    setTask(prev => prev ? { ...prev, priority: newPriority as Task['priority'] } : prev);
+    // API çağrısı ekleyebilirsin
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-          const xnewAttachments= await Promise.all(
-                  newAttachments.map(async (file) => ({
-                    name: file.name,
-                    url: await uploadMessageAttachment(file, "task"),
-                    type: "TaskAttachment",
-                  }))
-                );
-    const newMessageObj = {
-      id: Math.random().toString(),
-      taskId: task?.id,
-      userId: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-      message: newMessage,
-      isStaff: true,
-      createdAt: new Date().toISOString(),
-      user: {
-        id: "c8f3de36-c259-4e8f-b944-9f37b8c161fb",
-        firstName: "John",
-        lastName: "Doe",
-        email: "user@example.com"
-      },
-      attachments:xnewAttachments
-    };
+    try {
+      // Attachment'ları sunucuya yükle
+      const uploadedAttachments = await Promise.all(
+        newAttachments.map(async (file) => ({
+          name: file.name,
+          url: await uploadMessageAttachment(file, 'task'),
+          type: 'TaskAttachment',
+        }))
+      );
 
-    setTask(prev => ({
-      ...prev,
-      messages: [...prev.messages, newMessageObj]
-    }));
-    setNewMessage('');
-    setNewAttachments([]);
-    // Here you would make an API call to send the message
+      // Yeni mesaj nesnesi oluştur
+      const newMessageObj: Message = {
+        id: Math.random().toString(),
+        taskId: task?.id || '',
+        userId: 'c8f3de36-c259-4e8f-b944-9f37b8c161fb',
+        message: newMessage,
+        isStaff: true,
+        createdAt: new Date().toISOString(),
+        user: {
+          id: 'c8f3de36-c259-4e8f-b944-9f37b8c161fb',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'user@example.com',
+        },
+        attachments: uploadedAttachments,
+      };
+
+      // Local state güncellemesi
+      setTask(prev => prev ? { ...prev, messages: [...prev.messages, newMessageObj] } : prev);
+      setNewMessage('');
+      setNewAttachments([]);
+      // API çağrısı ekleyerek mesajı sunucuya gönderebilirsin
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message');
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,10 +216,18 @@ export default function TaskDetailPage() {
     }
   };
 
-
   const handleGoBack = () => {
-    // Here you would navigate back to the previous page
+    navigate(-1);
   };
+
+  if (loading || !task) {
+    return (
+      <main className="flex items-center justify-center h-screen">
+        <p className="text-gray-600">Loading task details...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="lg:p-8">
       {/* Mobile Sidebar Overlay */}
@@ -143,10 +241,7 @@ export default function TaskDetailPage() {
       {/* Header */}
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <button 
-            onClick={handleGoBack}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={handleGoBack} className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -187,13 +282,13 @@ export default function TaskDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Task Description */}
-          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <section className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-lg font-medium mb-4">Description</h2>
             <p className="text-gray-600">{task.description}</p>
-          </div>
+          </section>
 
-          {/* Messages */}
-          <div className="bg-white p-6 rounded-lg shadow-sm">
+          {/* Messages Section */}
+          <section className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-lg font-medium mb-4">Messages</h2>
             <div className="space-y-6 mb-6">
               {task.messages.map((message) => (
@@ -203,7 +298,7 @@ export default function TaskDetailPage() {
                     alt={`${message.user.firstName} ${message.user.lastName}`}
                     className="w-10 h-10 rounded-full flex-shrink-0"
                   />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center">
                         <span className="font-medium">
@@ -215,9 +310,7 @@ export default function TaskDetailPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {formatDate(message.createdAt)}
-                      </span>
+                      <span className="text-sm text-gray-500">{formatDate(message.createdAt)}</span>
                     </div>
                     <p className="text-gray-600 mb-3">{message.message}</p>
                     {message.attachments.length > 0 && (
@@ -252,7 +345,7 @@ export default function TaskDetailPage() {
                     <Italic className="w-4 h-4" />
                   </button>
                   <button type="button" className="p-2 hover:bg-gray-100 rounded">
-                    <Link className="w-4 h-4" />
+                    <LinkIcon className="w-4 h-4" />
                   </button>
                   <button type="button" className="p-2 hover:bg-gray-100 rounded">
                     <List className="w-4 h-4" />
@@ -274,7 +367,9 @@ export default function TaskDetailPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => setNewAttachments(prev => prev.filter((_, i) => i !== index))}
+                          onClick={() =>
+                            setNewAttachments((prev) => prev.filter((_, i) => i !== index))
+                          }
                           className="p-1 hover:bg-gray-200 rounded"
                         >
                           <X className="w-4 h-4 text-gray-500" />
@@ -288,29 +383,23 @@ export default function TaskDetailPage() {
                 <label className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200">
                   <Paperclip className="w-4 h-4 mr-2" />
                   <span>Attach Files</span>
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
+                  <input type="file" multiple className="hidden" onChange={handleFileChange} />
                 </label>
-                <button
-                  type="submit"
-                  className="flex items-center px-6 py-2 bg-[#1649FF] text-white rounded-lg hover:bg-blue-600"
-                >
+                <button type="submit" className="flex items-center px-6 py-2 bg-[#1649FF] text-white rounded-lg hover:bg-blue-600">
                   <Send className="w-4 h-4 mr-2" />
                   Send Message
                 </button>
               </div>
             </form>
-          </div>
+          </section>
         </div>
 
         {/* Sidebar */}
-        <div className={`fixed inset-y-0 right-0 w-80 lg:w-auto lg:static bg-white lg:bg-transparent transform transition-transform duration-300 ease-in-out ${
-          showSidebar ? 'translate-x-0' : 'translate-x-full'
-        } lg:translate-x-0 z-50 overflow-y-auto lg:overflow-visible`}>
+        <aside
+          className={`fixed inset-y-0 right-0 w-80 lg:w-auto lg:static bg-white lg:bg-transparent transform transition-transform duration-300 ease-in-out ${
+            showSidebar ? 'translate-x-0' : 'translate-x-full'
+          } lg:translate-x-0 z-50 overflow-y-auto lg:overflow-visible`}
+        >
           <div className="space-y-6 p-4 lg:p-0">
             {/* Task Details */}
             <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -357,7 +446,7 @@ export default function TaskDetailPage() {
               </div>
             </div>
 
-            {/* Company Information */}
+            {/* Assigned Company */}
             <div className="bg-white p-6 rounded-lg shadow-sm">
               <h2 className="text-lg font-medium mb-4">Assigned Company</h2>
               <div className="flex items-center p-3 bg-gray-50 rounded-lg">
@@ -390,7 +479,7 @@ export default function TaskDetailPage() {
               </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </main>
   );

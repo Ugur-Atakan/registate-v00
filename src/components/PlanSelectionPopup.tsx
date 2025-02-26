@@ -35,21 +35,6 @@ export default function PlanSelectionPopup({
   }, [onClose]);
 
 
-
-  // API den gelecek olan product objesi içerisindeki prices arrayindeki price öğelerinin features bölümü yok. onları burada göstermek için aşağıdaki gibi bir yapı oluşturulabilir.
-  // const features = [
-  //   'Same-day processing available',
-  //   'Secure online application',
-  //   'Dedicated support throughout the process'
-  // ];
-  
-  // const plans = product.prices.map((plan) => ({
-  //   ...plan,
-  //   features
-  // }));
-
-
-
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
       <div 
@@ -96,11 +81,12 @@ export default function PlanSelectionPopup({
                   </div>
 
                   <button
+                  disabled={plan.isActivePlan}
                     onClick={() => onSelectPlan(plan)}
                     className="w-full px-4 py-2 bg-[--primary] text-white rounded-lg font-medium 
                       hover:bg-[--primary]/90 transition-colors flex items-center justify-center gap-2"
                   >
-                    Select Plan
+                    {plan.isActivePlan ? 'Selected Plan' : 'Select Plan'}
                     <ArrowRight size={18} />
                   </button>
                 </div>

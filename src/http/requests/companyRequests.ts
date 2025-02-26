@@ -3,6 +3,14 @@ import instance from "../instance"
 import { getActiveCompanyId } from "../../utils/storage";
 
 
+const getServices= async () => {
+  try {
+    const response = await instance.get('/product/products');
+    return response.data;
+  } catch (error: any) {
+    throw error; 
+  }
+};
 
 const buySingleItem = async ({productId,priceId}:{productId:string,priceId:string}):Promise<string> => {
   try {
@@ -104,4 +112,5 @@ const getCompanyDetails = async (companyId?: string): Promise<CompanyResponse> =
     getTaskDetails,
     getTicketDetails,
     buySingleItem,
+    getServices
   };

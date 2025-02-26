@@ -66,10 +66,12 @@ export default function NewSupportTicket() {
       toast.error('Please fill in all required fields');
       return;
     }
-
+  
     setLoading(true);
     try {
-      // In production, you would first upload the files and get their URLs
+      // Dosyaların başarılı şekilde seçildiğini kontrol et
+      console.log("Selected files:", files);
+  
       const attachments: Attachment[] = await Promise.all(
         files.map(async (file) => ({
           name: file.name,
@@ -77,14 +79,18 @@ export default function NewSupportTicket() {
           type: "TicketAttachment",
         }))
       );
+  
       const finalTicketData = {
         ...ticketData,
-        message: [{
-          ...ticketData.message[0],
-          attachments
-        }]
+        message: [
+          {
+            ...ticketData.message[0],
+            attachments, // Burada attachments array'ini ekliyoruz
+          },
+        ],
       };
 
+      console.log("Final Ticket Data:", finalTicketData);
       await instance.post('/support/create-ticket', finalTicketData);
       toast.success('Ticket created successfully');
       navigate('/dashboard/support');
