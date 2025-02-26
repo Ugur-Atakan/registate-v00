@@ -3,6 +3,7 @@ import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import instance from "../../http/instance";
 import { Bell, Eye, MessageSquare } from 'lucide-react';
 import AdminTicketDetailsPage from "./TicketDetails";
+import { Ticket } from "../../http/requests/admin/support";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -46,16 +47,6 @@ const formatDate = (dateString: string) => {
 
 
 export default function AdminSupport() {
-  interface Ticket {
-    id: string;
-    userId: string;
-    subject: string;
-    status: string;
-    priority: string;
-    createdAt: string;
-    message: string;
-    ticketNo:number;
-  }
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedStatus, setSelectedStatus] = useState('ALL');
@@ -272,7 +263,6 @@ export default function AdminSupport() {
                 </div>
                 <div>
                   <h3 className="font-medium mb-1">{ticket.subject}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">{ticket.message}</p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex space-x-2">
