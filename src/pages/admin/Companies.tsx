@@ -15,19 +15,35 @@ export default function AdminCompanies() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [selectedFilter, setSelectedFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchCompanies = async () => {
+    setLoading(true);
     try {
       const response = await instance.get("/admin/company/all");
       setCompanies(response.data);
+      setTotalPages(Math.ceil(response.data.length / recordsPerPage));
     } catch (error) {
       console.error("Error fetching companies:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  // Update total pages when records per page changes
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredCompanies.length / recordsPerPage));
+    setCurrentPage(1); // Reset to first page when changing records per page
+  }, [recordsPerPage, companies, selectedFilter, searchQuery]);
 
   // Filtre ve aramaya göre listelenen şirketler
   const filteredCompanies = companies.filter((company) => {
@@ -42,11 +58,27 @@ export default function AdminCompanies() {
     );
   });
 
+  // Get current page records
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredCompanies.slice(indexOfFirstRecord, indexOfLastRecord);
+
+  // Change page
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   // Overview kartları için metrikler
   const totalCompanies = companies.length;
   const paymentPendingCount = companies.filter(
     (c) => c.status === "PAYMENT_PENDING"
   ).length;
+
+  // Generate page numbers
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
 
   return (
     <AdminDashboardLayout>
@@ -119,7 +151,6 @@ export default function AdminCompanies() {
             >
               <option value="ALL">All Companies</option>
               <option value="PAYMENT_PENDING">Payment Pending</option>
-              {/* Ek filtreler ekleyebilirsin */}
             </select>
             <div className="relative">
               <input
@@ -131,6 +162,22 @@ export default function AdminCompanies() {
               />
               <Search className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
             </div>
+          </div>
+
+          {/* Records per page selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Show</span>
+            <select
+              value={recordsPerPage}
+              onChange={(e) => setRecordsPerPage(Number(e.target.value))}
+              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1649FF]"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className="text-sm text-gray-500">entries</span>
           </div>
         </div>
 
@@ -147,8 +194,16 @@ export default function AdminCompanies() {
               </tr>
             </thead>
             <tbody>
-              {filteredCompanies.length > 0 ? (
-                filteredCompanies.map((company) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-4">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1649FF]"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : currentRecords.length > 0 ? (
+                currentRecords.map((company) => (
                   <tr key={company.id} className="border-b hover:bg-gray-50">
                     <td className="py-2 px-4">{company.companyName}</td>
                     <td className="py-2 px-4">
@@ -169,13 +224,58 @@ export default function AdminCompanies() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center py-4">
+                  <td colSpan={5} className="text-center py-4">
                     No companies found.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+          {/* Records info */}
+          <div className="text-sm text-gray-600">
+            Showing {indexOfFirstRecord + 1} to{" "}
+            {Math.min(indexOfLastRecord, filteredCompanies.length)} of{" "}
+            {filteredCompanies.length} entries
+          </div>
+
+          {/* Pagination controls */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            {pageNumbers.map((number) => (
+              <button
+                key={number}
+                onClick={() => paginate(number)}
+                className={`px-4 py-2 rounded-lg ${
+                  currentPage === number
+                    ? "bg-[#1649FF] text-white"
+                    : "border border-gray-200 hover:bg-gray-50"
+                }`}
+              >
+                {number}
+              </button>
+            ))}
+
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </AdminDashboardLayout>

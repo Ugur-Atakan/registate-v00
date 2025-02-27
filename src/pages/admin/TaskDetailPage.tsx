@@ -18,11 +18,6 @@ import { uploadMessageAttachment } from '../../utils/fileUpload';
 import instance from '../../http/instance';
 import toast from 'react-hot-toast';
 
-interface Attachment {
-  name: string;
-  url: string;
-  type: string;
-}
 
 interface Message {
   id: string;
