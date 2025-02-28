@@ -82,10 +82,6 @@ const demoCompany= {
   ]
 };
 
-interface CompanyDetailPageProps {
-  onBack: () => void;
-}
-
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'PAYMENT_PENDING':
@@ -125,7 +121,7 @@ const getStepStatusIcon = (status: FormationStep['status']) => {
   }
 };
 
-export default function CompanyDetailPage({ onBack }: CompanyDetailPageProps) {
+export default function AdminCompanyDetailPage() {
   const [formationSteps, setFormationSteps] = useState([...demoCompany.formationSteps].sort((a, b) => a.order - b.order));
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
 
@@ -139,7 +135,9 @@ export default function CompanyDetailPage({ onBack }: CompanyDetailPageProps) {
     );
     setEditingStepId(null);
   };
-
+const handleGoBack = () => {
+    // Go back to the previous page
+  };
   return (
     <AdminDashboardLayout>
     <main className="lg:p-8">
@@ -147,7 +145,7 @@ export default function CompanyDetailPage({ onBack }: CompanyDetailPageProps) {
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <button 
-            onClick={onBack}
+            onClick={handleGoBack}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -293,7 +291,7 @@ export default function CompanyDetailPage({ onBack }: CompanyDetailPageProps) {
                               onClick={() => setEditingStepId(step.id)}
                               className="flex items-center space-x-2 opacity-0 opacity-100 transition-opacity"
                             >
-                              {getStepStatusIcon(step.status)}
+                              {getStepStatusIcon(step.status as FormationStep['status'])}
                             </button>
                           )}
                         </div>

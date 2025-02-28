@@ -125,3 +125,12 @@ export interface Task {
       throw error;
     }
   }
+
+  export const updateTaskStatus= async (taskId:string, status:string):Promise<Task> => {
+    try {
+     const res= await instance.put(`/admin/task/${taskId}/status`,{status})
+     return res.data;
+    } catch (error) {
+      throw error;
+    }
+  }

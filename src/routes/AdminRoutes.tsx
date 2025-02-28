@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminDashboard from "../pages/admin";
 import AdminUsers from "../pages/admin/Users";
 import AdminCompanies from "../pages/admin/Companies";
+import AdminCompanyDetailPage from "../pages/admin/CompanyDetailPage";
 import AdminSupport from "../pages/admin/Support";
 import AdminProducts from "../pages/admin/Products";
 import AdminTasks from "../pages/admin/Tasks";
@@ -21,6 +22,7 @@ export default function AdminRoutes() {
         <Route path="/support" element={<AdminSupport />} />
         <Route path="/support/details" element={<AdminTicketDetailsPage />} />
         <Route path="/companies" element={<AdminCompanies />} />
+        <Route path="/company/details" element={<AdminCompanyDetailPage />} />
         <Route path="/products" element={<AdminProducts />} />
         <Route path="/tasks" element={<AdminTasks />} />
         <Route path="/tasks/details" element={<AdminTaskDetailPage />} />
