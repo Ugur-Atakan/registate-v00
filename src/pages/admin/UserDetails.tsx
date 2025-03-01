@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Bell, FileText, Headphones, ListTodo, Building2, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 
-import CompanyDetailPage from './CompanyDetailPage';
+import CompanyDetailPage from './Companies/CompanyDetailPage';
 import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
 
 // Demo data

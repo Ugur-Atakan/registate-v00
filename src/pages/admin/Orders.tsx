@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { getAllOrders, Order } from "../../http/requests/admin/orders";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -96,6 +96,13 @@ export default function AdminOrders() {
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+    const location = useLocation();
+  
+    const companyId = location.state?.companyId;
+    // if(companyId){ 
+    //   return <div>Company Gönderildi</div>
+    // }
 
   useEffect(() => {
     fetchOrders();

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import instance from "../../http/instance";
-import { Bell, Eye, MessageSquare } from 'lucide-react';
 import AdminTicketDetailsPage from "./TicketDetails";
 import { Ticket } from "../../http/requests/admin/support";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Bell, Eye, MessageSquare } from 'lucide-react';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -54,7 +54,12 @@ export default function AdminSupport() {
   const [sortBy, setSortBy] = useState('latest');
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const location = useLocation();
 
+  const companyId = location.state?.companyId;
+  // if(companyId){ 
+  //   return <div>Company Gönderildi</div>
+  // }
   const navigate=useNavigate();
   useEffect(() => {
     const fetchTickets = async () => {
@@ -198,8 +203,8 @@ export default function AdminSupport() {
         {/* Table Header - Desktop */}
         <div className="hidden lg:grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-sm font-medium">
           <div className="col-span-1">ID</div>
-          <div className="col-span-2">Customer</div>
-          <div className="col-span-3">Subject</div>
+          <div className="col-span-3">Customer</div>
+          <div className="col-span-2">Subject</div>
           <div className="col-span-2">Status</div>
           <div className="col-span-2">Priority</div>
           <div className="col-span-1">Created</div>
@@ -213,15 +218,10 @@ export default function AdminSupport() {
               {/* Desktop View */}
               <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
                 <div className="col-span-1 text-sm">#{ticket.ticketNo}</div>
-                <div className="col-span-2 flex items-center">
-                  <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${ticket.userId}`}
-                    alt="User Avatar"
-                    className="w-8 h-8 rounded-full mr-2"
-                  />
-                  <span className="text-sm">{ticket.user.firstName} {ticket.user.lastName}</span>
+                <div className="col-span-3 flex items-center">
+                  <span className="text-sm">{ticket.company[0]?.companyName}/{ticket.user.firstName}</span>
                 </div>
-                <div className="col-span-3 text-sm">{ticket.subject}</div>
+                <div className="col-span-2 text-sm">{ticket.subject}</div>
                 <div className="col-span-2">
                   <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(ticket.status)}`}>
                     {ticket.status.charAt(0) + ticket.status.slice(1).toLowerCase().replace('_', ' ')}
@@ -250,14 +250,9 @@ export default function AdminSupport() {
               <div className="lg:hidden space-y-3">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
-                    <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${ticket.userId}`}
-                      alt="User Avatar"
-                      className="w-10 h-10 rounded-full"
-                    />
                     <div>
-                      <p className="font-medium">User {ticket.userId}</p>
-                      <p className="text-sm text-gray-500">#{ticket.id}</p>
+                      <p className="font-medium">User {ticket.user.firstName}</p>
+                      <p className="text-sm text-gray-500">#{ticket.ticketNo}</p>
                     </div>
                   </div>
                   <span className="text-sm text-gray-500">{formatDate(ticket.createdAt)}</span>

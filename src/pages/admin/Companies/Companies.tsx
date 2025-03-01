@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
+import AdminDashboardLayout from "../../../components/layout/AdminDashboardLayout";
 import { 
   Search, Plus, Building2, ArrowUpRight,  Filter,
   ChevronDown, ArrowUpDown, TrendingUp, TrendingDown, FileText,
   Info, User2, CheckCircle2, XCircle, Clock
 } from "lucide-react";
-import { getAllCompanies } from "../../http/requests/admin/company";
-import { Company } from "../../http/requests/admin/company";
+import { getAllCompanies } from "../../../http/requests/admin/company";
+import { Company } from "../../../http/requests/admin/company";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 

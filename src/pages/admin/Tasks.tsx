@@ -9,7 +9,7 @@ import {
 import CreateTaskPage from "./CreateTaskPage";
 import TaskDetailPage from "./TaskDetailPage";
 import { Task } from "../../types/types";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const getStatusColor = (status: string) => {
@@ -68,6 +68,12 @@ export default function AdminTasks() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const companyId = location.state?.companyId;
+  // if(companyId){ 
+  //   return <div>Company Gönderildi</div>
+  // }
 
   const fetchTasks = async () => {
     setLoading(true);
