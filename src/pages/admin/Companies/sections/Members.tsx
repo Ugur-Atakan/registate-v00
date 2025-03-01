@@ -8,12 +8,10 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-
-
   const getCompanyUsers = async () =>{
-    //Böyle bir endpoint yok geliştilecek
     setLoading(true);
-    const response = await instance.get(`/admin/company/${companyId}/users`);
+    const response = await instance.get(`/admin/company/${companyId}/members`);
+    console.log(response.data);
     setMembers(response.data);
     setLoading(false);
   };
