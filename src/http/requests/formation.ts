@@ -1,5 +1,4 @@
 import { baseApi } from "..";
-import { CompanyResponse } from "../../types/Company";
 
 const getPricingPlans = async () => {
   try {

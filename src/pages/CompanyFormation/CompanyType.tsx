@@ -18,7 +18,7 @@ const companyTypesFeatures = [
   {
     name: "LLC",
     features: [
-      "Suitable for freelancers, startups, and small businesses",
+      "Suitable for freelancers, and small businesses",
       "Limited liability protection & pass-through taxation",
       "Less paperwork, easy to manage",
     ],
@@ -27,11 +27,11 @@ const companyTypesFeatures = [
   {
     name: "C-Corp",
     features: [
-      "Ideal for scaling businesses & attracting investors",
+      "Ideal for scaling businesses & attracting investors, startups",
       "Ability to issue shares & raise venture capital",
       "More formal structure with taxation at the corporate level",
     ],
-    bestFor: "Companies planning to raise funds & expand",
+    bestFor: "Best for: Companies planning to raise funds & expand",
   },
 ];
 
@@ -121,7 +121,7 @@ const [loading, setLoading] = useState(false);
               Choose Your Company Type
             </h1>
             <p className="text-gray-600">
-              Select the best structure for your business
+              Select the best structure for your business.
             </p>
           </div>
 

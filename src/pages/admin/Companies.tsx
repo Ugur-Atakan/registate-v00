@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import { 
-  Search, Plus, Bell, Building2, ArrowUpRight, Download, Filter,
+  Search, Plus, Building2, ArrowUpRight,  Filter,
   ChevronDown, ArrowUpDown, TrendingUp, TrendingDown, FileText,
   Info, User2, CheckCircle2, XCircle, Clock
 } from "lucide-react";
@@ -459,7 +459,7 @@ export default function AdminCompanies() {
                       <tr 
                         key={company.id} 
                         className="hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => navigate(`/admin/companies/details`, { state: { companyId: company.id } })}
+                        onClick={() =>navigate(`/admin/company/details`, { state: { companyId: company.id } })}
                       >
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">

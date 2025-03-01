@@ -1,15 +1,36 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
-import { 
-  ArrowLeft, Bell, Bold, Download, FileText, Italic, Link as LinkIcon, List, 
-  Paperclip, Send, User, X, Clock, AlertCircle, Info, Search, Filter,
-  Image, FileIcon, Video, Archive, CheckCircle2, MessageSquare, Users,
-  MoreVertical, ChevronDown
-} from 'lucide-react';
-import instance from '../../http/instance';
-import toast from 'react-hot-toast';
-import { uploadMessageAttachment } from '../../utils/fileUpload';
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
+import {
+  ArrowLeft,
+  Bell,
+  Bold,
+  Download,
+  FileText,
+  Italic,
+  Link as LinkIcon,
+  List,
+  Paperclip,
+  Send,
+  User,
+  X,
+  Clock,
+  Info,
+  Search,
+  Filter,
+  Image,
+  FileIcon,
+  Video,
+  Archive,
+  CheckCircle2,
+  MessageSquare,
+  Users,
+  MoreVertical,
+  ChevronDown,
+} from "lucide-react";
+import instance from "../../http/instance";
+import toast from "react-hot-toast";
+import { uploadMessageAttachment } from "../../utils/fileUpload";
 
 interface Attachment {
   name: string;
@@ -50,14 +71,16 @@ interface Ticket {
 }
 
 const AdminTicketDetailsPage = () => {
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [messageFilter, setMessageFilter] = useState<'all' | 'admin' | 'user'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [messageFilter, setMessageFilter] = useState<"all" | "admin" | "user">(
+    "all"
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [showAssignMenu, setShowAssignMenu] = useState(false);
   const [isDraftSaved, setIsDraftSaved] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -71,7 +94,9 @@ const AdminTicketDetailsPage = () => {
       return;
     }
     try {
-      const response = await instance.get(`/admin/ticket/${location.state.ticketId}/details`);
+      const response = await instance.get(
+        `/admin/ticket/${location.state.ticketId}/details`
+      );
       setTicket(response.data);
     } catch (error) {
       console.error("Error fetching ticket details:", error);
@@ -89,7 +114,10 @@ const AdminTicketDetailsPage = () => {
   useEffect(() => {
     const autoSaveInterval = setInterval(() => {
       if (newMessage.trim()) {
-        localStorage.setItem(`ticket_draft_${location.state?.ticketId}`, newMessage);
+        localStorage.setItem(
+          `ticket_draft_${location.state?.ticketId}`,
+          newMessage
+        );
         setIsDraftSaved(true);
         setTimeout(() => setIsDraftSaved(false), 3000);
       }
@@ -100,7 +128,9 @@ const AdminTicketDetailsPage = () => {
 
   // Load saved draft on component mount
   useEffect(() => {
-    const savedDraft = localStorage.getItem(`ticket_draft_${location.state?.ticketId}`);
+    const savedDraft = localStorage.getItem(
+      `ticket_draft_${location.state?.ticketId}`
+    );
     if (savedDraft) {
       setNewMessage(savedDraft);
     }
@@ -112,7 +142,7 @@ const AdminTicketDetailsPage = () => {
       setIsUploading(true);
       try {
         const newFiles = Array.from(files);
-        setAttachments(prev => [...prev, ...newFiles]);
+        setAttachments((prev) => [...prev, ...newFiles]);
       } catch (error) {
         toast.error("Error uploading files");
       } finally {
@@ -128,7 +158,7 @@ const AdminTicketDetailsPage = () => {
       setIsUploading(true);
       try {
         const newFiles = Array.from(files);
-        setAttachments(prev => [...prev, ...newFiles]);
+        setAttachments((prev) => [...prev, ...newFiles]);
       } catch (error) {
         toast.error("Error uploading files");
       } finally {
@@ -138,7 +168,7 @@ const AdminTicketDetailsPage = () => {
   };
 
   const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmitMessage = async () => {
@@ -157,7 +187,7 @@ const AdminTicketDetailsPage = () => {
         ticketId: ticket?.id,
         message: newMessage,
         attachments: uploadedAttachments,
-        isStaff: true
+        isStaff: true,
       };
 
       await instance.post(`/admin/support/add-message-to-ticket`, messageData);
@@ -174,7 +204,9 @@ const AdminTicketDetailsPage = () => {
 
   const handleStatusChange = async (newStatus: string) => {
     try {
-      await instance.put(`/admin/ticket/${ticket?.id}/edit`, { status: newStatus });
+      await instance.put(`/admin/ticket/${ticket?.id}/edit`, {
+        status: newStatus,
+      });
       await fetchTicketDetails();
       toast.success("Status updated successfully");
     } catch (error) {
@@ -183,35 +215,36 @@ const AdminTicketDetailsPage = () => {
   };
 
   const getFileIcon = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
-      case 'pdf':
+      case "pdf":
         return <FileText className="text-red-500" size={20} />;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
         return <Image className="text-blue-500" size={20} />;
-      case 'mp4':
-      case 'mov':
+      case "mp4":
+      case "mov":
         return <Video className="text-purple-500" size={20} />;
-      case 'zip':
-      case 'rar':
+      case "zip":
+      case "rar":
         return <Archive className="text-orange-500" size={20} />;
       default:
         return <FileIcon className="text-gray-500" size={20} />;
     }
   };
 
-  const filteredMessages = ticket?.messages.filter(message => {
-    const matchesFilter = 
-      messageFilter === 'all' || 
-      (messageFilter === 'admin' && message.isStaff) || 
-      (messageFilter === 'user' && !message.isStaff);
-    
-    const matchesSearch = 
-      message.message.toLowerCase().includes(searchQuery.toLowerCase());
-    
+  const filteredMessages = ticket?.messages.filter((message) => {
+    const matchesFilter =
+      messageFilter === "all" ||
+      (messageFilter === "admin" && message.isStaff) ||
+      (messageFilter === "user" && !message.isStaff);
+
+    const matchesSearch = message.message
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
     return matchesFilter && matchesSearch;
   });
 
@@ -261,11 +294,21 @@ const AdminTicketDetailsPage = () => {
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">Ticket #{ticket.ticketNo}</h1>
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(ticket.status)}`}>
+                <h1 className="text-2xl font-bold">
+                  Ticket #{ticket.ticketNo}
+                </h1>
+                <span
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
+                    ticket.status
+                  )}`}
+                >
                   {ticket.status}
                 </span>
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPriorityColor(ticket.priority)}`}>
+                <span
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${getPriorityColor(
+                    ticket.priority
+                  )}`}
+                >
                   {ticket.priority} Priority
                 </span>
               </div>
@@ -287,8 +330,12 @@ const AdminTicketDetailsPage = () => {
               {showAssignMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
                   {/* Add your team members list here */}
-                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">John Doe</button>
-                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">Jane Smith</button>
+                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
+                    John Doe
+                  </button>
+                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
+                    Jane Smith
+                  </button>
                 </div>
               )}
             </div>
@@ -308,7 +355,10 @@ const AdminTicketDetailsPage = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="relative flex-grow max-w-md">
-                  <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+                  <Search
+                    className="absolute left-3 top-2.5 text-gray-400"
+                    size={20}
+                  />
                   <input
                     type="text"
                     placeholder="Search in conversation..."
@@ -322,7 +372,11 @@ const AdminTicketDetailsPage = () => {
                   <Filter size={18} className="text-gray-400" />
                   <select
                     value={messageFilter}
-                    onChange={(e) => setMessageFilter(e.target.value as 'all' | 'admin' | 'user')}
+                    onChange={(e) =>
+                      setMessageFilter(
+                        e.target.value as "all" | "admin" | "user"
+                      )
+                    }
                     className="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none 
                       focus:ring-2 focus:ring-[--primary] focus:border-transparent"
                   >
@@ -336,24 +390,34 @@ const AdminTicketDetailsPage = () => {
 
             {/* Messages */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="max-h-[60vh] overflow-y-auto overflow-x-hidden pr-4 
+              <div
+                className="max-h-[60vh] overflow-y-auto overflow-x-hidden pr-4 
                 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 
-                hover:scrollbar-thumb-gray-400 transition-colors">
+                hover:scrollbar-thumb-gray-400 transition-colors"
+              >
                 <div className="space-y-6">
                   {filteredMessages?.map((message) => (
-                    <div 
-                      key={message.id} 
-                      className={`flex gap-4 group ${message.isStaff ? 'flex-row-reverse' : ''}`}
+                    <div
+                      key={message.id}
+                      className={`flex gap-4 group ${
+                        message.isStaff ? "flex-row-reverse" : ""
+                      }`}
                     >
                       <div className="flex-shrink-0">
                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                           <User className="w-5 h-5 text-gray-500" />
                         </div>
                       </div>
-                      <div className={`flex-1 max-w-[80%] ${message.isStaff ? 'items-end' : ''}`}>
+                      <div
+                        className={`flex-1 max-w-[80%] ${
+                          message.isStaff ? "items-end" : ""
+                        }`}
+                      >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium">
-                            {message.isStaff ? "Support Team" : `${ticket.user.firstName} ${ticket.user.lastName}`}
+                            {message.isStaff
+                              ? "Support Team"
+                              : `${ticket.user.firstName} ${ticket.user.lastName}`}
                           </span>
                           {message.isStaff && (
                             <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
@@ -361,17 +425,20 @@ const AdminTicketDetailsPage = () => {
                             </span>
                           )}
                         </div>
-                        <div className={`relative group ${
-                          message.isStaff 
-                            ? 'bg-[--primary]/5 text-[--primary]' 
-                            : 'bg-gray-50 text-gray-700'
+                        <div
+                          className={`relative group ${
+                            message.isStaff
+                              ? "bg-[--primary]/5 text-[--primary]"
+                              : "bg-gray-50 text-gray-700"
                           } rounded-lg p-4`}
                         >
-                          <p className="whitespace-pre-wrap">{message.message}</p>
+                          <p className="whitespace-pre-wrap">
+                            {message.message}
+                          </p>
                           <span className="absolute bottom-2 right-2 text-xs text-gray-400">
                             {new Date(message.createdAt).toLocaleTimeString()}
                           </span>
-                          
+
                           {/* Message Actions on Hover */}
                           <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2">
                             <button className="p-1 hover:bg-gray-200 rounded-full">
@@ -396,9 +463,14 @@ const AdminTicketDetailsPage = () => {
                                   rounded-lg transition-all group"
                               >
                                 {getFileIcon(attachment.name)}
-                                <span className="text-sm text-gray-600">{attachment.name}</span>
-                                <Download size={14} className="text-gray-400 opacity-0 group-hover:opacity-100 
-                                  transition-opacity" />
+                                <span className="text-sm text-gray-600">
+                                  {attachment.name}
+                                </span>
+                                <Download
+                                  size={14}
+                                  className="text-gray-400 opacity-0 group-hover:opacity-100 
+                                  transition-opacity"
+                                />
                               </a>
                             ))}
                           </div>
@@ -412,7 +484,7 @@ const AdminTicketDetailsPage = () => {
 
             {/* Reply Box */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div 
+              <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
                 className="border-2 border-dashed border-gray-200 rounded-lg p-4 transition-all
@@ -456,7 +528,10 @@ const AdminTicketDetailsPage = () => {
                           onClick={() => removeAttachment(index)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <X size={14} className="text-gray-400 hover:text-red-500" />
+                          <X
+                            size={14}
+                            className="text-gray-400 hover:text-red-500"
+                          />
                         </button>
                       </div>
                     ))}
@@ -466,8 +541,10 @@ const AdminTicketDetailsPage = () => {
                 {/* Actions */}
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center gap-4">
-                    <label className="cursor-pointer flex items-center gap-2 text-gray-500 
-                      hover:text-[--primary] transition-colors">
+                    <label
+                      className="cursor-pointer flex items-center gap-2 text-gray-500 
+                      hover:text-[--primary] transition-colors"
+                    >
                       <Paperclip size={20} />
                       <span className="text-sm">Attach files</span>
                       <input
@@ -488,7 +565,10 @@ const AdminTicketDetailsPage = () => {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => {
-                        localStorage.setItem(`ticket_draft_${ticket.id}`, newMessage);
+                        localStorage.setItem(
+                          `ticket_draft_${ticket.id}`,
+                          newMessage
+                        );
                         toast.success("Draft saved");
                       }}
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -497,7 +577,10 @@ const AdminTicketDetailsPage = () => {
                     </button>
                     <button
                       onClick={handleSubmitMessage}
-                      disabled={(!newMessage.trim() && attachments.length === 0) || isUploading}
+                      disabled={
+                        (!newMessage.trim() && attachments.length === 0) ||
+                        isUploading
+                      }
                       className="flex items-center gap-2 px-6 py-2 bg-[--primary] text-white rounded-lg
                         hover:bg-[--primary]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -517,7 +600,9 @@ const AdminTicketDetailsPage = () => {
               <h3 className="text-lg font-semibold mb-4">Ticket Information</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-gray-500 mb-2">Status</label>
+                  <label className="block text-sm text-gray-500 mb-2">
+                    Status
+                  </label>
                   <select
                     value={ticket.status}
                     onChange={(e) => handleStatusChange(e.target.value)}
@@ -531,11 +616,20 @@ const AdminTicketDetailsPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-500 mb-2">Priority</label>
+                  <label className="block text-sm text-gray-500 mb-2">
+                    Priority
+                  </label>
                   <select
                     value={ticket.priority}
                     onChange={(e) => {
-                      setTicket(prev => prev ? { ...prev, priority: e.target.value as Ticket["priority"] } : null);
+                      setTicket((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              priority: e.target.value as Ticket["priority"],
+                            }
+                          : null
+                      );
                     }}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none 
                       focus:ring-2 focus:ring-[--primary] focus:border-transparent"
@@ -547,7 +641,9 @@ const AdminTicketDetailsPage = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-                  <label className="block text-sm text-gray-500 mb-2">Category</label>
+                  <label className="block text-sm text-gray-500 mb-2">
+                    Category
+                  </label>
                   <div className="flex items-center gap-2 text-gray-700">
                     <MessageSquare size={16} className="text-gray-400" />
                     {ticket.category}
@@ -555,7 +651,9 @@ const AdminTicketDetailsPage = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-                  <label className="block text-sm text-gray-500 mb-2">Created</label>
+                  <label className="block text-sm text-gray-500 mb-2">
+                    Created
+                  </label>
                   <div className="flex items-center gap-2 text-gray-700">
                     <Clock size={16} className="text-gray-400" />
                     {new Date(ticket.createdAt).toLocaleString()}
@@ -563,7 +661,9 @@ const AdminTicketDetailsPage = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-                  <label className="block text-sm text-gray-500 mb-2">Last Updated</label>
+                  <label className="block text-sm text-gray-500 mb-2">
+                    Last Updated
+                  </label>
                   <div className="flex items-center gap-2 text-gray-700">
                     <Clock size={16} className="text-gray-400" />
                     {new Date(ticket.updatedAt).toLocaleString()}
@@ -574,49 +674,58 @@ const AdminTicketDetailsPage = () => {
 
             {/* Customer Information */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                Customer Information
+              </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <img
-                    src={ticket.user.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${ticket.user.id}`}
+                    src={
+                      ticket.user.profileImage ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${ticket.user.id}`
+                    }
                     alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
                     className="w-12 h-12 rounded-full"
                   />
                   <div>
-                    <p className="font-medium">{ticket.user.firstName} {ticket.user.lastName}</p>
+                    <p className="font-medium">
+                      {ticket.user.firstName} {ticket.user.lastName}
+                    </p>
                     <p className="text-sm text-gray-500">{ticket.user.email}</p>
                   </div>
                 </div>
-
                 {ticket.user.telephone && (
                   <div className="flex items-center gap-2 text-gray-600">
                     <span className="text-sm">Phone:</span>
                     <span>{ticket.user.telephone}</span>
                   </div>
                 )}
-
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-500">Member Since</span>
-                    <span>{new Date(ticket.user.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Total Tickets</span>
-                    <span>5</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() =>
+                    navigate(`/admin/users/`, {
+                      state: { userId: ticket.user.id },
+                    })
+                  }
+                  className="mt-4 px-4 py-2 bg-[--primary] text-white rounded-lg hover:bg-[--primary]/90 transition-colors"
+                >
+                  View Profile
+                </button>
               </div>
             </div>
 
             {/* Help Text */}
             <div className="bg-blue-50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
+                <Info
+                  className="text-blue-600 flex-shrink-0 mt-0.5"
+                  size={20}
+                />
                 <div>
                   <h4 className="font-medium text-blue-900">Quick Tips</h4>
                   <p className="text-sm text-blue-700 mt-1">
-                    Use quick replies and saved responses to handle common inquiries efficiently.
-                    Update ticket status promptly to keep customers informed.
+                    Use quick replies and saved responses to handle common
+                    inquiries efficiently. Update ticket status promptly to keep
+                    customers informed.
                   </p>
                 </div>
               </div>
