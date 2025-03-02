@@ -1,9 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bell, Upload, X, Calendar, Clock, Search, Building2, Check } from 'lucide-react';
-import AdminDashboardLayout from '../../components/layout/AdminDashboardLayout';
-import { uploadMessageAttachment } from '../../utils/fileUpload';
-import instance from '../../http/instance';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import {
+  ArrowLeft,
+  Bell,
+  Upload,
+  X,
+  Calendar,
+  Clock,
+  Search,
+  Building2,
+  Check,
+} from "lucide-react";
+import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
+import { uploadMessageAttachment } from "../../utils/fileUpload";
+import instance from "../../http/instance";
+import toast from "react-hot-toast";
 
 interface CreateTaskPageProps {
   onBack: () => void;
@@ -20,77 +30,76 @@ interface Company {
   companyName: string;
 }
 
+
 export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('OPEN');
-  const [priority, setPriority] = useState('MEDIUM');
-  const [type, setType] = useState('GENERAL');
-  const [dueDate, setDueDate] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("OPEN");
+  const [priority, setPriority] = useState("MEDIUM");
+  const [type, setType] = useState("GENERAL");
+  const [dueDate, setDueDate] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [files, setFiles] = useState([] as File[]);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [companySearchQuery, setCompanySearchQuery] = useState('');
+  const [companySearchQuery, setCompanySearchQuery] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
-
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      const res=await instance.get('/admin/company/all');
+      const res = await instance.get("/admin/company/all");
       setCompanies(res.data);
     };
     fetchCompanies();
   }, []);
 
-  const filteredCompanies = companies.filter(company =>
+  const filteredCompanies = companies.filter((company) =>
     company.companyName.toLowerCase().includes(companySearchQuery.toLowerCase())
   );
 
-  const handleSubmit =async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCompany) {
-      alert('Please select a company');
+      alert("Please select a company");
       return;
     }
-    
-      const ticketAttachments: Attachment[] = await Promise.all(
-                  files.map(async (file) => ({
-                    name: file.name,
-                    url: await uploadMessageAttachment(file, "task"),
-                    type: "TaskAttachment",
-                  }))
-                );
+
+    const taskAttachments: Attachment[] = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        url: await uploadMessageAttachment(file, "task"),
+        type: "TaskAttachment",
+      }))
+    );
+
+    const parsedDate = new Date(dueDate);
+    if (isNaN(parsedDate.getTime())) {
+      throw new Error("Invalid dueDate format. Please provide a valid ISO-8601 date.");
+    }
+    const formattedDueDate = parsedDate.toISOString();
 
     const taskData = {
       title,
       description,
-      icon: "https://example.com/icon.png", // Replace with actual icon URL
+      icon: "TaskIcon", // Replace with actual icon URL
       status,
       priority,
       type,
       companyId: selectedCompany.id,
-      dueDate: new Date(dueDate).toISOString(),
-      attachments: ticketAttachments,
+      dueDate: formattedDueDate,
+      attachments: taskAttachments,
     };
+console.log('taska data', taskData)
+    await instance.post("/admin/task/create", taskData);
+    toast.success("Task created successfully");
 
-    await instance.post('/admin/task/create',taskData);
-    toast .success('Task created successfully');
-
-    console.log('Task Data:', taskData);
+    console.log("Task Data:", taskData);
     // Here you would make the API call to create the task
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      // In a real implementation, you would upload these files to your storage
-      // and get back URLs. This is just for demonstration.
-      const newAttachments = Array.from(files).map(file => ({
-        name: file.name,
-        url: URL.createObjectURL(file),
-        type: file.type.split('/')[1]
-      }));
-      setAttachments([...attachments, ...newAttachments]);
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
@@ -103,15 +112,19 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
       {/* Header */}
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             onClick={onBack}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl lg:text-2xl font-semibold text-[#333333]">Create New Task</h1>
-            <p className="text-sm text-gray-500">Create a new task for a company</p>
+            <h1 className="text-xl lg:text-2xl font-semibold text-[#333333]">
+              Create New Task
+            </h1>
+            <p className="text-sm text-gray-500">
+              Create a new task for a company
+            </p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -135,7 +148,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
               <h2 className="text-lg font-medium mb-4">Basic Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Task Title
                   </label>
                   <input
@@ -149,7 +165,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Description
                   </label>
                   <textarea
@@ -170,7 +189,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
               <h2 className="text-lg font-medium mb-4">Task Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="dueDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Due Date
                   </label>
                   <div className="relative">
@@ -186,7 +208,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Status
                   </label>
                   <select
@@ -201,7 +226,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="priority"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Priority
                   </label>
                   <select
@@ -216,7 +244,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="type"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Type
                   </label>
                   <select
@@ -240,7 +271,9 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-8">
                   <div className="flex flex-col items-center">
                     <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600 mb-2">Drag and drop files here, or</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Drag and drop files here, or
+                    </p>
                     <label className="px-4 py-2 bg-[#1649FF] text-white rounded-lg cursor-pointer hover:bg-blue-600">
                       Browse Files
                       <input
@@ -255,7 +288,10 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                 {files.length > 0 && (
                   <div className="space-y-2">
                     {files.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
                         <div className="flex items-center">
                           <Clock className="w-5 h-5 text-gray-400 mr-2" />
                           <span className="text-sm">{file.name}</span>
@@ -316,13 +352,15 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
                     onClick={() => setSelectedCompany(company)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                       selectedCompany?.id === company.id
-                        ? 'bg-[#EEF2FF] text-[#1649FF]'
-                        : 'hover:bg-gray-50'
+                        ? "bg-[#EEF2FF] text-[#1649FF]"
+                        : "hover:bg-gray-50"
                     }`}
                   >
                     <div className="flex items-center">
                       <Building2 className="w-5 h-5 mr-3 text-gray-400" />
-                      <span className="text-sm font-medium">{company.companyName}</span>
+                      <span className="text-sm font-medium">
+                        {company.companyName}
+                      </span>
                     </div>
                     {selectedCompany?.id === company.id && (
                       <Check className="w-5 h-5 text-[#1649FF]" />
@@ -332,7 +370,9 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
               </div>
               {selectedCompany && (
                 <div className="mt-4 p-4 bg-[#EEF2FF] rounded-lg">
-                  <p className="text-sm font-medium text-[#1649FF]">Selected Company</p>
+                  <p className="text-sm font-medium text-[#1649FF]">
+                    Selected Company
+                  </p>
                   <p className="text-sm mt-1">{selectedCompany.companyName}</p>
                 </div>
               )}
@@ -340,5 +380,6 @@ export default function CreateTaskPage({ onBack }: CreateTaskPageProps) {
           </div>
         </div>
       </div>
-      </AdminDashboardLayout>  );
+    </AdminDashboardLayout>
+  );
 }

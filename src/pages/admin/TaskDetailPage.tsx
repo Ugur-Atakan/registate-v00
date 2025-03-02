@@ -174,7 +174,8 @@ export default function AdminTaskDetailPage() {
     // API çağrısı ekleyebilirsin
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e:any) => {
+    e.preventDefault();
     if (!newMessage.trim() && newAttachments.length === 0) return;
     try {
       const attachment: Attachment[] = await Promise.all(
@@ -197,7 +198,6 @@ export default function AdminTaskDetailPage() {
       if (res) {
         toast.success("Message sent successfully");
       }
-      // Mesaj başarılı şekilde gönderildikten sonra, task detaylarını tekrar çekiyoruz.
       await fetchTaskDetails();
 
       // Formu temizle
@@ -302,6 +302,24 @@ export default function AdminTaskDetailPage() {
           <section className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-lg font-medium mb-4">Description</h2>
             <p className="text-gray-600">{task.description}</p>
+            {task.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {task.attachments.map((attachment) => (
+                            <a
+                              key={attachment.id}
+                              href={attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center px-3 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              <Paperclip className="w-4 h-4 text-gray-400 mr-2" />
+                              <span className="text-sm text-gray-600">
+                                {attachment.name}
+                              </span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
           </section>
 
           {/* Messages Section */}
