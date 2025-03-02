@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import CreateServicePage from "../CreateServicePage";
 import toast from "react-hot-toast";
+import {useNavigate} from "react-router-dom";
 
 const formatCurrency = (amount: number, currency: string) => {
   return new Intl.NumberFormat('en-US', {
@@ -41,6 +42,7 @@ export default function AdminProducts() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
 
+  const navigate=useNavigate();
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -56,7 +58,6 @@ export default function AdminProducts() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
 
   const handleBulkAction = async (action: 'delete' | 'toggleActive') => {
     if (!selectedItems.length) return;
@@ -80,6 +81,11 @@ export default function AdminProducts() {
     }
   };
 
+
+  const handleGoDetails = (id: string) => {
+    console.log("Go to details", id);
+    navigate('/admin/products/details', { state: { productId: id } });
+  }
   const handleSort = (key: string) => {
     if (sortBy === key) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -448,6 +454,7 @@ export default function AdminProducts() {
                         <td className="p-4">
                           <div className="flex items-center justify-end gap-2">
                             <button
+                              onClick={()=>handleGoDetails(service.id)}
                               className="p-2 text-gray-400 hover:text-[#1649FF] hover:bg-[#1649FF]/10 
                                 rounded-lg transition-colors group relative"
                               title="View Details"
