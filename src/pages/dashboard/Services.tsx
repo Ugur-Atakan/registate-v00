@@ -6,6 +6,7 @@ import { Price, Product } from '../../types/Product';
 import ServiceCard from '../../components/ServiceCard';
 import { buySingleItem } from '../../http/requests/companyRequests';
 import { useDynamicProducts } from '../../hooks/useDynamicProducts';
+import LoadingComponent from '../../components/Loading';
 
 interface DynamicProduct extends Product {
   icon?: JSX.Element;
@@ -60,15 +61,18 @@ export default function Services() {
     setShowPlanSelection(false);
   };
 
+
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-10 h-10 border-4 border-[--primary] border-t-transparent rounded-full animate-spin"></div>
-        </div>
+      
+          <LoadingComponent />;
+        
+      
       </DashboardLayout>
     );
   }
+
 
   return (
     <DashboardLayout>
