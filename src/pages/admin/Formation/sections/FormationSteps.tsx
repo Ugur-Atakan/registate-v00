@@ -10,24 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import instance from "../../../../http/instance";
 import toast from "react-hot-toast";
-import { FormationStep } from "../../../../types/Company";
-
-interface SectionProps {
-  companyId: string;
-}
-
-const updateCompanyFormationStepStatus = async (
-  stepId: string,
-  status: FormationStep["status"]
-) => {
-  const response = await instance.put(
-    `/admin/company/${stepId}/update-step-status`,
-    {
-      status,
-    }
-  );
-  return response.data;
-};
+import LoadingComponent from "../../../../components/Loading";
 
 const getStepIcon = (iconName: string) => {
   switch (iconName) {
@@ -55,25 +38,16 @@ const getStepStatusIcon = (status: string) => {
   }
 };
 
-export default function CompanyFormationStepsSection({
-  companyId,
-}: SectionProps) {
+export default function FormationStepsSection() {
   const [formationSteps, setFormationSteps] = useState<any[]>([]);
   const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchCompanyDetails = async () => {
+  const fetchSteps = async () => {
     setLoading(true);
     try {
-      const response = await instance.get(
-        `/admin/company/${companyId}/details`
-      );
-      if (response.data.formationSteps) {
-        setFormationSteps(
-          [...response.data.formationSteps].sort((a, b) => a.order - b.order)
-        );
-      }
-      console.log(response.data.formationSteps);
+      const response = await instance.get(`/admin/formation/`);
+      setFormationSteps(response.data);
     } catch (error) {
       console.error("Error fetching company details", error);
       toast.error("Failed to load company details");
@@ -82,26 +56,13 @@ export default function CompanyFormationStepsSection({
     }
   };
 
-  const handleStatusChange =async (
-    stepId: string,
-    newStatus: FormationStep["status"]
-  ) => {
-    setFormationSteps((steps) =>
-      steps.map((step) =>
-        step.id === stepId
-          ? { ...step, status: newStatus, updatedAt: new Date().toISOString() }
-          : step
-      )
-    );
-    await updateCompanyFormationStepStatus(stepId, newStatus);
-    setEditingStepId(null);
-  };
-
   useEffect(() => {
-    if (companyId) {
-      fetchCompanyDetails();
-    }
-  }, [companyId]);
+    fetchSteps();
+  }, []);
+
+  if (loading) {
+    return <LoadingComponent />;
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -158,27 +119,6 @@ export default function CompanyFormationStepsSection({
                           </span>
                           <ChevronDown className="w-4 h-4" />
                         </button>
-                        <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                          {["pending", "completed", "error","other"].map((status) => (
-                            <button
-                              key={status}
-                              className="w-full px-4 py-2 text-left text-sm bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center space-x-2"
-                              onClick={() =>
-                                handleStatusChange(
-                                  step.id,
-                                  status as FormationStep["status"]
-                                )
-                              }
-                            >
-                              <span>
-                                {getStepStatusIcon(
-                                  status as FormationStep["status"]
-                                )}
-                              </span>
-                              <span className="capitalize">{status}</span>
-                            </button>
-                          ))}
-                        </div>
                       </div>
                     ) : (
                       <button

@@ -182,6 +182,7 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
   };
 
   return (
+    <div>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -287,32 +288,26 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left p-4">
                       <button
-                        onClick={() => handleSort('name')}
                         className="flex items-center gap-2 text-sm font-medium text-gray-500 
                           hover:text-gray-700"
                       >
                         Member
-                        <ArrowUpDown size={14} />
                       </button>
                     </th>
                     <th className="text-left p-4">
                       <button
-                        onClick={() => handleSort('email')}
                         className="flex items-center gap-2 text-sm font-medium text-gray-500 
                           hover:text-gray-700"
                       >
                         Contact
-                        <ArrowUpDown size={14} />
                       </button>
                     </th>
                     <th className="text-left p-4">
                       <button
-                        onClick={() => handleSort('role')}
                         className="flex items-center gap-2 text-sm font-medium text-gray-500 
                           hover:text-gray-700"
                       >
                         Role
-                        <ArrowUpDown size={14} />
                       </button>
                     </th>
                     <th className="text-right p-4">Actions</th>
@@ -464,115 +459,6 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
         )}
       </div>
 
-      {/* Add Member Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold">Add New Member</h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddMember} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  value={newMember.firstName}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                    focus:ring-2 focus:ring-[--primary]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  value={newMember.lastName}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                    focus:ring-2 focus:ring-[--primary]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={newMember.email}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                    focus:ring-2 focus:ring-[--primary]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={newMember.password}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                    focus:ring-2 focus:ring-[--primary]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={newMember.role}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
-                    focus:ring-2 focus:ring-[--primary]"
-                >
-                  <option value="MEMBER">Member</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="OWNER">Owner</option>
-                  <option value="SUPERADMIN">Super Admin</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[--primary] text-white rounded-lg hover:bg-[--primary]/90 
-                    transition-colors"
-                >
-                  Add Member
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Help Text */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
@@ -587,5 +473,114 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
         </div>
       </div>
     </div>
+          {/* Add Member Modal */}
+          {showAddModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl max-w-lg w-full p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold">Add New Member</h3>
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+    
+                <form onSubmit={handleAddMember} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.firstName}
+                      onChange={(e) => setNewMember(prev => ({ ...prev, firstName: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                        focus:ring-2 focus:ring-[--primary]"
+                      required
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.lastName}
+                      onChange={(e) => setNewMember(prev => ({ ...prev, lastName: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                        focus:ring-2 focus:ring-[--primary]"
+                      required
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={newMember.email}
+                      onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                        focus:ring-2 focus:ring-[--primary]"
+                      required
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={newMember.password}
+                      onChange={(e) => setNewMember(prev => ({ ...prev, password: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                        focus:ring-2 focus:ring-[--primary]"
+                      required
+                    />
+                  </div>
+    
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Role
+                    </label>
+                    <select
+                      value={newMember.role}
+                      onChange={(e) => setNewMember(prev => ({ ...prev, role: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none 
+                        focus:ring-2 focus:ring-[--primary]"
+                    >
+                      <option value="MEMBER">Member</option>
+                      <option value="ADMIN">Admin</option>
+                      <option value="OWNER">Owner</option>
+                      <option value="SUPERADMIN">Super Admin</option>
+                    </select>
+                  </div>
+    
+                  <div className="flex justify-end gap-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[--primary] text-white rounded-lg hover:bg-[--primary]/90 
+                        transition-colors"
+                    >
+                      Add Member
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          </div>
   );
 }

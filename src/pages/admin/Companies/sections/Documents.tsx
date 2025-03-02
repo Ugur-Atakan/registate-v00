@@ -177,6 +177,7 @@ export default function CompanyDocumentsSection({ companyId }: SectionProps) {
   }
 
   return (
+    <div>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -463,9 +464,23 @@ export default function CompanyDocumentsSection({ companyId }: SectionProps) {
         )}
       </div>
 
-      {/* Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      {/* Help Text */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
+          <div>
+            <h3 className="font-medium text-blue-900">Managing Documents</h3>
+            <p className="text-sm text-blue-700 mt-1">
+              Upload and manage important company documents here. You can view, download, or update documents 
+              as needed. Use filters and search to quickly find specific documents.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+          {/* Upload Modal */}
+          {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl max-w-lg w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Upload Document</h3>
@@ -478,7 +493,19 @@ export default function CompanyDocumentsSection({ companyId }: SectionProps) {
             </div>
 
             <div className="space-y-4">
-              <div>
+              
+              {/* Document Type */}
+              <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Document Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Document Name"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none
+                    focus:ring-2 focus:ring-[--primary]"
+                />
+            
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Document Type
                 </label>
@@ -510,19 +537,6 @@ export default function CompanyDocumentsSection({ companyId }: SectionProps) {
         </div>
       )}
 
-      {/* Help Text */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h3 className="font-medium text-blue-900">Managing Documents</h3>
-            <p className="text-sm text-blue-700 mt-1">
-              Upload and manage important company documents here. You can view, download, or update documents 
-              as needed. Use filters and search to quickly find specific documents.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

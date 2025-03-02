@@ -1,40 +1,36 @@
 import { useEffect, useState } from "react";
 import instance from "../../../../http/instance";
 
-interface SectionProps {
-  companyId: string;
-}
+export default function PricingPlansSection() {
+  const [plans, setPlans] = useState<any[]>([]);
 
-export default function CompanyDocumentsSection({ companyId }: SectionProps) {
-  const [documents, setDocuments] = useState<any[]>([]);
-  const getCompanyDocuments = async () => {
-    const response = await instance.get(
-      `/admin/company/${companyId}/documents`
-    );
-    setDocuments(response.data);
+  const getPricingPlans = async () => {
+    const response = await instance.get(`admin/pricing-plans/all`);
+    setPlans(response.data);
   };
   useEffect(() => {
-    if (companyId) {
-      getCompanyDocuments();
-    }
-  }, [companyId]);
+    getPricingPlans();
+  }, []);
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Company Documents</h2>
-      {documents.length > 0 ? (
+      <h2 className="text-xl font-semibold mb-4">Pricing Plans</h2>
+      {plans.length > 0 ? (
         <ul className="space-y-4">
-          {documents.map((doc) => (
+          {plans.map((plan) => (
             <li
-              key={doc.id}
+              key={plan.id}
               className="p-4 border rounded-lg flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">{doc.title}</p>
-                <p className="text-sm text-gray-500">Type: {doc.type}</p>
+                <p className="font-medium">{plan.name}</p>
+                <p className="text-sm text-gray-500">
+                  Subtitle: {plan.subtitle}
+                </p>
+                <p className="text-sm text-gray-500">Price: {plan.price}</p>
               </div>
               <button className="px-3 py-1 bg-blue-600 text-white rounded">
-                Update Document
+                Update Plan
               </button>
             </li>
           ))}

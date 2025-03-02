@@ -4,6 +4,10 @@ import { useState } from "react";
 import {Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../../components/Loading";
+import StateFeesSection from "./sections/Fees";
+import PricingPlansSection from "./sections/Plans";
+import StatesSection from "./sections/States";
+import CompanyTypesSection from "./sections/CompanyTypes";
 const sections = [
   { key: "pricing_plans", label: "Pricing Plans" },
   { key: "fees", label: "State Fees & Expedited Fees" },
@@ -70,29 +74,21 @@ export default function AdminFormationDashboard() {
 
         <div>
           {activeTab === "pricing_plans" && (
-            <div>
-              <p>Pricing Plans</p>
-            </div>
+           <PricingPlansSection />
           )}
 
   
           {activeTab === "fees" && (
-            <div>
-              <p>State Fees & Expedited Fees</p>
-            </div>
+           <StateFeesSection />
           )}
 
           {activeTab === "states" && (
-            <div>
-              <p>States</p>
-            </div>
+           <StatesSection />
           )}
 
        
           {activeTab === "company_types" && (
-            <div>
-              <p>Company Types</p>
-            </div>
+          <CompanyTypesSection />
           )}
                   
         {activeTab === "formation_steps" && (
