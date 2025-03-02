@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import { Plus, Bell, X, Menu, Search, Eye, Trash } from "lucide-react";
-import UserDetailPage from "./UserDetails";
 import { User } from "../../types/User";
 import { getAllUsers } from "../../http/requests/admin/user";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminUsers() {
     const [users, setUsers] = useState<User[]>([]);
@@ -16,6 +16,8 @@ export default function AdminUsers() {
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    const navigate=useNavigate();
 
     const [selectedFilter, setSelectedFilter] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
@@ -46,9 +48,11 @@ export default function AdminUsers() {
       }
     });
   
-    if (selectedUserId) {
-      return <UserDetailPage onBack={() => setSelectedUserId(null)} />;
+
+    const handleGoDetails = (userId: string) => {
+        navigate(`/admin/users/details`, { state: { userId } });
     }
+ 
     return (
         <AdminDashboardLayout>
             <main className="lg:p-8">
@@ -182,7 +186,7 @@ export default function AdminUsers() {
                 <div className="col-span-4 text-sm">{user.email}</div>
                 <div className="col-span-2 flex space-x-2">
                   <button 
-                    onClick={() => setSelectedUserId(user.id)}
+                    onClick={() => handleGoDetails(user.id)}
                     className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                   >
                     <Eye className="w-4 h-4" />
@@ -209,7 +213,7 @@ export default function AdminUsers() {
                   </div>
                   <div className="flex space-x-2">
                     <button 
-                      onClick={() => setSelectedUserId(user.id)}
+                      onClick={() => handleGoDetails(user.id)}
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                     >
                       <Eye className="w-4 h-4" />

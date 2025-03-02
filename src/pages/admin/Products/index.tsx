@@ -57,6 +57,7 @@ export default function AdminProducts() {
     fetchProducts();
   }, []);
 
+
   const handleBulkAction = async (action: 'delete' | 'toggleActive') => {
     if (!selectedItems.length) return;
     
