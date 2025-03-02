@@ -17,12 +17,11 @@ interface SectionProps {
 }
 
 const updateCompanyFormationStepStatus = async (
-  companyId: string,
-  formationStepDefinitionId: string,
+  stepId: string,
   status: FormationStep["status"]
 ) => {
   const response = await instance.put(
-    `/admin/company/${companyId}/${formationStepDefinitionId}`,
+    `/admin/company/${stepId}/update-step-status`,
     {
       status,
     }
@@ -74,6 +73,7 @@ export default function CompanyFormationStepsSection({
           [...response.data.formationSteps].sort((a, b) => a.order - b.order)
         );
       }
+      console.log(response.data.formationSteps);
     } catch (error) {
       console.error("Error fetching company details", error);
       toast.error("Failed to load company details");
@@ -93,7 +93,7 @@ export default function CompanyFormationStepsSection({
           : step
       )
     );
-    await updateCompanyFormationStepStatus(companyId, stepId, newStatus);
+    await updateCompanyFormationStepStatus(stepId, newStatus);
     setEditingStepId(null);
   };
 
