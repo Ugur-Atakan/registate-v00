@@ -48,7 +48,7 @@ const getStepStatusIcon = (status: string) => {
       return <CheckCircle2 className="w-5 h-5 text-[#9EE248]" />;
     case "pending":
       return <Clock className="w-5 h-5 text-[#1649FF]" />;
-    case "failed":
+    case "error":
       return <XCircle className="w-5 h-5 text-red-500" />;
     default:
       return <Clock className="w-5 h-5 text-[#1649FF]" />;
@@ -136,7 +136,9 @@ export default function CompanyFormationStepsSection({
                     ? "bg-[#E8FFF3]"
                     : step.status === "pending"
                     ? "bg-[#EEF2FF]"
-                    : "bg-red-50"
+                    : step.status === "error"
+                    ? "bg-red-50"
+                    : "bg-gray-50"
                 }`}
               >
                 {getStepIcon(step.icon)}
@@ -157,7 +159,7 @@ export default function CompanyFormationStepsSection({
                           <ChevronDown className="w-4 h-4" />
                         </button>
                         <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                          {["pending", "completed", "failed"].map((status) => (
+                          {["pending", "completed", "error","other"].map((status) => (
                             <button
                               key={status}
                               className="w-full px-4 py-2 text-left text-sm bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center space-x-2"

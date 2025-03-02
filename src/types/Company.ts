@@ -1,6 +1,6 @@
 export type CompanyStatus = 'ACTIVE' | 'INACTIVE' | 'PAID' | 'PAYMENT_PENDING' | 'INPROGRESS' | 'APPROVED' | 'REJECTED';
 export type AddressPreferenceType = 'PROVIDED' | 'CUSTOM';
-export type FormationStatus = 'completed' | 'in_progress' | 'pending';
+export type FormationStatus = 'completed' | 'in_progress' | 'pending'|'error'|'other';
 export type DirectorRole = 'FOUNDER' | 'INVESTOR';
 export type OfficerTitle = 'CEO' | 'CFO' | 'PRESIDENT' | 'SECRETARY';
 export type ShareholderType = 'FOUNDER' | 'INVESTOR';
