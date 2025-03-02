@@ -11,10 +11,11 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { getPricingPlans } from "../../http/requests/formation"; // API çağrısı
-import {PricingPlan } from "../../utils/plans"; // Statik özellik listesi
+import { PricingPlan } from "../../utils/plans"; // Statik özellik listesi
 import { useAppDispatch } from "../../store/hooks";
 import { setPricingPlan } from "../../store/slices/checkoutSlice";
 import { allFeatures, staticPricingplans } from "../../statics/pricingPlans";
+import LoadingComponent from "../../components/Loading";
 
 interface PlanSelectionProps {
   nextStep?: () => void;
@@ -36,7 +37,7 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
             ...staticPlan,
             id: apiPlan?.id || staticPlan.id, // ID'yi API'den
             stripeId: apiPlan?.stripeId || staticPlan.stripeId, // Stripe ID'yi API'den
-            price:apiPlan.price
+            price: apiPlan.price,
           };
         });
 
@@ -48,10 +49,16 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
 
     fetchPricingPlans();
   }, []);
-  const handleSelectPlan = async (plan:PricingPlan ) => {
+  const handleSelectPlan = async (plan: PricingPlan) => {
     setLoading(true);
     try {
-      dispatch(setPricingPlan({ pricingPlanId: plan.id, pricingPlanName: plan.name,price:plan.price }));
+      dispatch(
+        setPricingPlan({
+          pricingPlanId: plan.id,
+          pricingPlanName: plan.name,
+          price: plan.price,
+        })
+      );
       setSelectedPlan(plan);
       nextStep && nextStep();
     } catch (error) {
@@ -74,6 +81,8 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
         return null;
     }
   };
+
+  if (loading) return <LoadingComponent />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,7 +137,7 @@ export default function PlanSelection({ nextStep }: PlanSelectionProps) {
               </div>
 
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-3xl font-bold">${plan.price/100}</span>
+                <span className="text-3xl font-bold">${plan.price / 100}</span>
                 <span className="text-gray-600">/year</span>
               </div>
 

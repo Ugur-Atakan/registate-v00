@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { getStateFeesAndExpeditedFees } from "../../http/requests/formation";
 import { staticStateFees } from "../../statics/stateFees";
 import { setExpeditedFee, setStateFee } from "../../store/slices/checkoutSlice";
+import LoadingComponent from "../../components/Loading";
 
 interface FilingOption {
   id: string;
@@ -114,6 +115,10 @@ export default function ExpeditedFiling({
       setLoading(false);
     }
   };
+
+
+    if (loading) return <LoadingComponent />;
+  
 
   return (
     <div className="h-screen grid md:grid-cols-2 grid-cols-1">

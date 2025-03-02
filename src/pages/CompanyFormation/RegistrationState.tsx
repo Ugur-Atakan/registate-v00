@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { setCompanyState } from "../../store/slices/checkoutSlice";
+import LoadingComponent from "../../components/Loading";
 
 interface CompanyStateProps {
   nextStep?: () => void;
@@ -119,6 +120,9 @@ export default function RegistrationState({ nextStep }: CompanyStateProps) {
       setLoading(false);
     }
   };
+
+    if (loading) return <LoadingComponent />;
+
 
   return (
     <div className="auth-container">

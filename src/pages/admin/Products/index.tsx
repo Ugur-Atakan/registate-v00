@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
-import instance from "../../http/instance";
+import AdminDashboardLayout from "../../../components/layout/AdminDashboardLayout";
+import instance from "../../../http/instance";
 import { 
   Bell, Plus, Search, Eye, Trash, Menu, X, DollarSign, Tag, Package, 
   Star, Info, ChevronDown, Filter, ArrowUpDown, CheckCircle2 
 } from 'lucide-react';
-import CreateServicePage from "./CreateServicePage";
+import CreateServicePage from "../CreateServicePage";
 import toast from "react-hot-toast";
 
 const formatCurrency = (amount: number, currency: string) => {

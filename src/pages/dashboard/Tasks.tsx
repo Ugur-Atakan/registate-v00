@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import Loader from "../../components/Loader";
 import { 
   ListTodo, 
   Search, 
@@ -17,6 +16,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { getCompanyTasks } from '../../http/requests/companyRequests';
+import LoadingComponent from '../../components/Loading';
 
 interface Task {
   id: string;
@@ -247,7 +247,8 @@ const Tasks = () => {
     return (
       <DashboardLayout>
       
-          <Loader/>
+          <LoadingComponent />;
+         
       
       </DashboardLayout>
     );
