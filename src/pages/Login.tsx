@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { loginWithEmail } from '../http/requests';
 import { useAppDispatch } from '../store/hooks';
 import { setUserData } from '../store/slices/userSlice';
-import { setActiveCompany, setCompanies } from '../store/slices/companySlice';
+import { setCompanies } from '../store/slices/companySlice';
 import { saveUserTokens } from '../utils/storage';
 
 interface LocationState {
@@ -32,11 +32,10 @@ export default function Login() {
       dispatch(setUserData(login.user));
       if(login.user&&login.user.companies){
       dispatch(setCompanies(login.user.companies));
-      navigate('/dashboard', { replace: true });
+      
       saveUserTokens(login.tokens);
-     } else {
-      navigate('/company-formation', { replace: true });
      }
+     navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Invalid email or password');

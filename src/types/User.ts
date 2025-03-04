@@ -71,7 +71,7 @@ export interface User {
   deletedAt: string | null;
   isActive: boolean;
   loginProvider: string;
-  companies: Company[];
+  companies: UserCompany[];
   roles: string[];
   tickets: Ticket[];
 }
