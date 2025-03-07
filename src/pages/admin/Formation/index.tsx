@@ -8,6 +8,7 @@ import StateFeesSection from "./sections/Fees";
 import PricingPlansSection from "./sections/Plans";
 import StatesSection from "./sections/States";
 import CompanyTypesSection from "./sections/CompanyTypes";
+import AdminAvatar from "../../../components/AdminAvatar";
 const sections = [
   { key: "pricing_plans", label: "Pricing Plans" },
   { key: "fees", label: "State Fees & Expedited Fees" },
@@ -45,11 +46,7 @@ export default function AdminFormationDashboard() {
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-              alt="Admin"
-              className="w-10 h-10 rounded-full"
-            />
+            <AdminAvatar/>
           </div>
         </header>
 

@@ -9,6 +9,7 @@ import { getAllCompanies } from "../../../http/requests/admin/company";
 import { Company } from "../../../http/requests/admin/company";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import LoadingComponent from "../../../components/Loading";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -402,7 +403,7 @@ export default function AdminCompanies() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[--primary]"></div>
+<LoadingComponent />
             </div>
           ) : (
             <>

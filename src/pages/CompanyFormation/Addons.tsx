@@ -3,6 +3,7 @@ import { VirtualMailbox, AnnualReportFiling, BoiReportFiling, EIN } from "../add
 import { useAppSelector } from "../../store/hooks";
 import { getPlanAddons } from "../../http/requests/formation";
 import { Addon } from "../../types/Addons";
+import LoadingComponent from "../../components/Loading";
 
 interface AddonsProps {
   prevStep?: () => void;
@@ -107,7 +108,7 @@ export default function Addons({ nextStep }: AddonsProps) {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingComponent />
   }
 
   return renderCurrentAddon(currentIndex);

@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { getTaskDetails } from "../../http/requests/companyRequests";
 import instance from "../../http/instance";
 import { uploadMessageAttachment } from "../../utils/fileUpload";
+import LoadingComponent from "../../components/Loading";
 
 interface Attachment {
   name: string;
@@ -185,9 +186,8 @@ const TaskDetails = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-pulse text-gray-500">Loading task details...</div>
-        </div>
+<LoadingComponent />
+
       </DashboardLayout>
     );
   }

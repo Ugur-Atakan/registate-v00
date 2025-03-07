@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import instance from "../../../../http/instance";
+import LoadingComponent from "../../../../components/Loading";
 
 interface SectionProps {
   companyId: string;
@@ -268,7 +269,8 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[--primary]"></div>
+            <LoadingComponent />
+            
           </div>
         ) : members.length === 0 ? (
           <div className="text-center py-12">

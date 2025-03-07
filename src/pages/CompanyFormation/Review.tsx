@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAppSelector } from "../../store/hooks";
 import instance from "../../http/instance";
+import LoadingComponent from "../../components/Loading";
 
 export default function Review() {
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ export default function Review() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingComponent />
   }
 
   return (

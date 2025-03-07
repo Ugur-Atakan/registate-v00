@@ -31,6 +31,7 @@ import {
 import instance from "../../http/instance";
 import toast from "react-hot-toast";
 import { uploadMessageAttachment } from "../../utils/fileUpload";
+import Avvvatars from "avvvatars-react";
 
 interface Attachment {
   name: string;
@@ -679,14 +680,17 @@ const AdminTicketDetailsPage = () => {
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={
-                      ticket.user.profileImage ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${ticket.user.id}`
-                    }
-                    alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
-                    className="w-12 h-12 rounded-full"
-                  />
+                   {
+                                          ticket.user.profileImage? (
+                                            <img
+                                              src={ticket.user.profileImage}
+                                              alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
+                                              className="w-10 h-10 rounded-full"
+                                            />
+                                          ):(
+                                            <Avvvatars value={ticket.user.email} style="character" />
+                                          )
+                                        }
                   <div>
                     <p className="font-medium">
                       {ticket.user.firstName} {ticket.user.lastName}

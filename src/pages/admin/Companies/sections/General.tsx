@@ -5,6 +5,7 @@ import {
   Activity, Building2, DollarSign, MapPin, Users, Ticket, Briefcase 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../../../../components/Loading";
 
 interface SectionProps {
   companyId: string;
@@ -64,6 +65,9 @@ export default function CompanyGeneralSection({ companyId }: SectionProps) {
     }
   }, [companyId]);
 
+  if (loading) {
+    return <LoadingComponent />
+  }
   return (
     <div>
       {/* Quick Actions Butonları */}

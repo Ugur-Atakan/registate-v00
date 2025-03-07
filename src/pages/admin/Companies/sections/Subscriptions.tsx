@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import instance from "../../../../http/instance";
 import { Plus, Package, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../../../../components/Loading";
 
 interface SectionProps {
   companyId: string;
@@ -95,7 +96,7 @@ export default function CompanySubscriptionsSection({ companyId }: SectionProps)
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[--primary]"></div>
+        <LoadingComponent />
       </div>
     );
   }

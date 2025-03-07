@@ -7,6 +7,7 @@ import { logOut, setUserData } from '../store/slices/userSlice';
 import instance from '../http/instance';
 import { getUserTokens, removeTokens } from '../utils/storage';
 import { setCompanies } from '../store/slices/companySlice';
+import LoadingComponent from '../components/Loading';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -53,7 +54,7 @@ export default function ProtectedRoute({ children, requiredRoles }: ProtectedRou
   }
 
   if (loading) {
-    return <p>Loading</p>;
+    return <LoadingComponent />;
   }
   if (requiredRoles && (!userData?.roles || !requiredRoles.some(role => userData.roles.includes(role)))) {
     return <AccessDenied />;

@@ -18,6 +18,8 @@ import { uploadMessageAttachment } from "../../utils/fileUpload";
 import instance from "../../http/instance";
 import toast from "react-hot-toast";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
+import AdminAvatar from "../../components/AdminAvatar";
+import Avvvatars from "avvvatars-react";
 
 interface Message {
   id: string;
@@ -31,6 +33,7 @@ interface Message {
     firstName: string;
     lastName: string;
     email: string;
+    profileImage: string;
   };
   attachments: {
     id: string;
@@ -287,11 +290,7 @@ export default function AdminTaskDetailPage() {
           <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Bell className="w-5 h-5" />
           </button>
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-            alt="Admin"
-            className="w-10 h-10 rounded-full"
-          />
+          <AdminAvatar />
         </div>
       </header>
 
@@ -330,11 +329,7 @@ export default function AdminTaskDetailPage() {
               <div className="space-y-6">
                 {task.messages.map((message) => (
                   <div key={message.id} className="flex space-x-4">
-                    <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${message.user.id}`}
-                      alt={`${message.user.firstName} ${message.user.lastName}`}
-                      className="w-10 h-10 rounded-full flex-shrink-0"
-                    />
+ <Avvvatars value={message.user.profileImage}/>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center">

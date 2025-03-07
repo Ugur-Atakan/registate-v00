@@ -19,7 +19,7 @@ import AddSubscriptionPage from "../pages/admin/Companies/AddSubscriptionPage";
 
 export default function AdminRoutes() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['ADMIN', 'SUPERADMIN']}>
       <Routes>
         <Route path="/" element={<AdminDashboard />} />
         <Route path="/users" element={<AdminUsers />} />

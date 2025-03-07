@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import instance from "../../../http/instance";
 import toast from "react-hot-toast";
+import LoadingComponent from "../../../components/Loading";
 
 interface Price {
   id: string;
@@ -32,6 +33,8 @@ interface Price {
     interval: string;
     interval_count: number;
   };
+  createdAt: string;
+  isDefault: boolean;
 }
 
 interface Product {
@@ -113,9 +116,7 @@ export default function ProductDetails() {
   if (loading) {
     return (
       <AdminDashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[--primary]"></div>
-        </div>
+<LoadingComponent />
       </AdminDashboardLayout>
     );
   }

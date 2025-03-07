@@ -9,6 +9,8 @@ import {
 import { getOrderDetails, updateOrderStatus } from '../../http/requests/admin/orders';
 import toast from 'react-hot-toast';
 import { OrderDetails } from '../../types/OrderDetails';
+import LoadingComponent from '../../components/Loading';
+import AdminAvatar from '../../components/AdminAvatar';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -107,9 +109,8 @@ export default function AdminOrderDetails() {
   if (loading) {
     return (
       <AdminDashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1649FF]"></div>
-        </div>
+<LoadingComponent />
+
       </AdminDashboardLayout>
     );
   }
@@ -153,11 +154,7 @@ export default function AdminOrderDetails() {
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-              alt="Admin"
-              className="w-10 h-10 rounded-full"
-            />
+            <AdminAvatar />
           </div>
         </header>
 

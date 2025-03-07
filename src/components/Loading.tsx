@@ -7,7 +7,7 @@ export const LoadingComponent = () => {
       <div className="p-6 shadow-lg rounded-2xl bg-white flex flex-col items-center">
         <Lottie animationData={companyAnimation} className="w-48 h-48" />
         <p className="mt-4 text-xl font-semibold text-blue-600 animate-pulse">
-         Registate (r) Company Formation in USA
+          Registate ®, {'\n'} Company Formation in USA
         </p>
       </div>
     </div>

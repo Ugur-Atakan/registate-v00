@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -15,10 +15,14 @@ import {
   PlusCircle,
   ListTodo,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 import CompanyChanger from '../CompanyChanger';
 import { getCompanyTasks } from '../../http/requests/companyRequests';
+import { useAppDispatch } from '../../store/hooks';
+import { logOut } from '../../store/slices/userSlice';
+import { removeTokens } from '../../utils/storage';
 
 interface Props {
   children: React.ReactNode;
@@ -29,6 +33,9 @@ export default function DashboardLayout({ children }: Props) {
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
   const [incompleteTasks, setIncompleteTasks] = useState(0);
   const location = useLocation();
+
+  const dispatch=useAppDispatch();
+  const navigate=useNavigate();
 
   // Fetch incomplete tasks count
   useEffect(() => {
@@ -226,6 +233,13 @@ export default function DashboardLayout({ children }: Props) {
     );
   };
 
+
+  const handleLogout = () => {
+    dispatch(logOut());
+    removeTokens();
+    navigate('/', { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
@@ -242,6 +256,17 @@ export default function DashboardLayout({ children }: Props) {
             <CompanyChanger />
             <nav className="flex-1 space-y-1 px-2">
               {navigation.map(item => renderNavigationItem(item))}
+            </nav>
+            <nav className="flex-1 space-y-1 px-2">
+              <button
+                onClick={handleLogout}
+                className="group flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50"
+              >
+                <div className="flex items-center">
+                  <LogOut className="mr-3 h-5 w-5 flex-shrink-0 text-red-500" />
+                  Logout
+                </div>
+              </button>
             </nav>
           </div>
         </div>

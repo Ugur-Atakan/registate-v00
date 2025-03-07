@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRegistrationProgress } from '../hooks/useRegistrationProgress';
 import IncompleteRegistrationModal from './IncompleteRegistrationModal';
+import LoadingComponent from './Loading';
 
 interface Props {
   children: React.ReactNode;
@@ -37,7 +38,7 @@ export default function RegistrationGuard({ children, requiredStep }: Props) {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingComponent />
   }
 
   return (

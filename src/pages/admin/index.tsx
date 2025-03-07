@@ -1,8 +1,67 @@
+import Avvvatars from "avvvatars-react";
+import AdminAvatar from "../../components/AdminAvatar";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import { Lock, Mail, LayoutDashboard, Users, Headphones, ListTodo, Tag, Briefcase, Settings, LogOut, Bell, Menu, X } from 'lucide-react';
+import { useEffect, useState } from "react";
+import instance from "../../http/instance";
+import LoadingComponent from "../../components/Loading";
+
+interface Stats{
+  totalUsers:number;
+  activeCompanies:number;
+  orders:number;
+  pendingTasks:number;
+  activeTickets:number;
+  latesTickets:Ticket[];
+  recentUsers:User[];
+}
+interface Ticket{
+  id:string;
+  ticketNo:number;
+  priority:string;
+  subject:string;
+  status:string;
+  createdAt:string;
+  updatedAt:string;
+}
+interface User{
+  id:string;
+  firstName:string;
+  lastName:string;
+  profileImage:string;
+  email:string;
+  createdAt:string;
+}
+
+
 
 export default function AdminDashboard(){
-    return (
+
+const [stats,setStats]=useState<Stats>();
+const [loading,setLoading]=useState(false);
+
+  const getSystemStats=async()=>{
+    setLoading(true);
+    try{
+      const response=await instance.get('/admin/stats');
+      console.log('System stats:',response.data);
+      setStats(response.data);
+    }catch(error){
+      console.error('Error fetching system stats:',error);
+    }
+    setLoading(false);
+  }
+  useEffect(()=>{
+    getSystemStats();
+  },[]);
+  
+  if(loading || !stats){
+    return (<AdminDashboardLayout>
+      <LoadingComponent/>
+    </AdminDashboardLayout>)
+  }
+
+  return (
         <AdminDashboardLayout>
       <header className="flex items-center justify-between mb-8">
         <div>
@@ -13,11 +72,7 @@ export default function AdminDashboard(){
           <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Bell className="w-5 h-5" />
           </button>
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-            alt="Admin"
-            className="w-10 h-10 rounded-full"
-          />
+          <AdminAvatar />
         </div>
       </header>
 
@@ -29,7 +84,7 @@ export default function AdminDashboard(){
             </div>
             <span className="text-xs px-2 py-1 bg-[#E8FFF3] text-[#9EE248] rounded-full">+12.5%</span>
           </div>
-          <h3 className="text-2xl font-semibold mb-1">2,543</h3>
+          <h3 className="text-2xl font-semibold mb-1">{stats.totalUsers}</h3>
           <p className="text-sm text-gray-500">Total Users</p>
         </div>
 
@@ -40,7 +95,7 @@ export default function AdminDashboard(){
             </div>
             <span className="text-xs px-2 py-1 bg-[#E8FFF3] text-[#9EE248] rounded-full">+5.2%</span>
           </div>
-          <h3 className="text-2xl font-semibold mb-1">182</h3>
+          <h3 className="text-2xl font-semibold mb-1">{stats.activeTickets}</h3>
           <p className="text-sm text-gray-500">Active Support Tickets</p>
         </div>
 
@@ -51,7 +106,7 @@ export default function AdminDashboard(){
             </div>
             <span className="text-xs px-2 py-1 bg-[#E8FFF3] text-[#9EE248] rounded-full">+8.7%</span>
           </div>
-          <h3 className="text-2xl font-semibold mb-1">1,234</h3>
+          <h3 className="text-2xl font-semibold mb-1">{stats.activeCompanies}</h3>
           <p className="text-sm text-gray-500">Active Companies</p>
         </div>
 
@@ -60,9 +115,8 @@ export default function AdminDashboard(){
             <div className="w-12 h-12 bg-[#EEF2FF] rounded-lg flex items-center justify-center">
               <ListTodo className="w-6 h-6 text-[#1649FF]" />
             </div>
-            <span className="text-xs px-2 py-1 bg-[#E8FFF3] text-[#9EE248] rounded-full">+15.3%</span>
           </div>
-          <h3 className="text-2xl font-semibold mb-1">456</h3>
+          <h3 className="text-2xl font-semibold mb-1">{stats.pendingTasks}</h3>
           <p className="text-sm text-gray-500">Pending Tasks</p>
         </div>
       </div>
@@ -74,30 +128,16 @@ export default function AdminDashboard(){
             <button className="text-sm text-gray-600 hover:text-gray-900">View all</button>
           </div>
           <div className="space-y-4">
+            {stats?.recentUsers.map((user:User)=>(
             <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-              <img
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1"
-                className="w-10 h-10 rounded-full mr-4"
-                alt="User Avatar"
-              />
+            <Avvvatars value={'User'} size={40} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">John Smith</p>
-                <p className="text-xs text-gray-500">Registered 2 days ago</p>
+                <p className="text-sm font-medium truncate">{`${user.firstName} ${user.lastName}`}</p>
+                <p className="text-xs text-gray-500">{(user.createdAt)}</p>
               </div>
               <span className="px-2 py-1 text-xs bg-[#E8FFF3] text-[#9EE248] rounded-full whitespace-nowrap ml-2">Active</span>
             </div>
-            <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-              <img
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=user2"
-                className="w-10 h-10 rounded-full mr-4"
-                alt="User Avatar"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Sarah Johnson</p>
-                <p className="text-xs text-gray-500">Registered 3 days ago</p>
-              </div>
-              <span className="px-2 py-1 text-xs bg-[#E8FFF3] text-[#9EE248] rounded-full whitespace-nowrap ml-2">Active</span>
-            </div>
+              ))}
           </div>
         </section>
 
@@ -107,7 +147,8 @@ export default function AdminDashboard(){
             <button className="text-sm text-gray-600 hover:text-gray-900">View all</button>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
+            {stats?.latesTickets.map((ticket:Ticket)=>(
+              <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
               <div className="w-10 h-10 bg-[#EEF2FF] rounded-lg flex items-center justify-center mr-4">
                 <Headphones className="w-5 h-5 text-[#1649FF]" />
               </div>
@@ -117,16 +158,8 @@ export default function AdminDashboard(){
               </div>
               <span className="px-2 py-1 text-xs bg-red-100 text-red-600 rounded-full whitespace-nowrap ml-2">High</span>
             </div>
-            <div className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 bg-[#EEF2FF] rounded-lg flex items-center justify-center mr-4">
-                <Headphones className="w-5 h-5 text-[#1649FF]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Account Access</p>
-                <p className="text-xs text-gray-500">Opened 3 hours ago</p>
-              </div>
-              <span className="px-2 py-1 text-xs bg-[#EEF2FF] text-[#1649FF] rounded-full whitespace-nowrap ml-2">Medium</span>
-            </div>
+            ))}
+            
           </div>
         </section>
       </div>

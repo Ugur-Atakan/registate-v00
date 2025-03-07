@@ -5,6 +5,8 @@ import AdminTicketDetailsPage from "./TicketDetails";
 import { Ticket } from "../../http/requests/admin/support";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bell, Eye, MessageSquare } from 'lucide-react';
+import { useAppSelector } from "../../store/hooks";
+import AdminAvatar from "../../components/AdminAvatar";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -109,11 +111,7 @@ export default function AdminSupport() {
           <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Bell className="w-5 h-5" />
           </button>
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-            alt="Admin"
-            className="w-10 h-10 rounded-full"
-          />
+          <AdminAvatar/>
         </div>
       </header>
 

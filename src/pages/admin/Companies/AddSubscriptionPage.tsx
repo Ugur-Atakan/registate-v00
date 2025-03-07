@@ -14,6 +14,7 @@ import {
 import instance from "../../../http/instance";
 import toast from "react-hot-toast";
 import AdminDashboardLayout from "../../../components/layout/AdminDashboardLayout";
+import AdminAvatar from "../../../components/AdminAvatar";
 
 interface Price {
   id: string;
@@ -138,11 +139,7 @@ export default function AddSubscriptionPage() {
           <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Bell className="w-5 h-5" />
           </button>
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-            alt="Admin"
-            className="w-10 h-10 rounded-full"
-          />
+          <AdminAvatar />
         </div>
       </header>
 

@@ -9,6 +9,8 @@ import CompanyFormationStepsSection from "./sections/FormationSteps";
 import CompanyMembersSection from "./sections/Members";
 import CompanySubscriptionsSection from "./sections/Subscriptions";
 import CompanyDocumentsSection from "./sections/Documents";
+import LoadingComponent from "../../../components/Loading";
+import AdminAvatar from "../../../components/AdminAvatar";
 
 const sections = [
   { key: "general", label: "General" },
@@ -54,7 +56,8 @@ export default function AdminCompanyDetailPageEnhanced() {
   if (loading || !company) {
     return (
       <AdminDashboardLayout>
-        <div className="p-8">Loading...</div>
+       <LoadingComponent />
+       
       </AdminDashboardLayout>
     );
   }
@@ -80,11 +83,7 @@ export default function AdminCompanyDetailPageEnhanced() {
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-              alt="Admin"
-              className="w-10 h-10 rounded-full"
-            />
+            <AdminAvatar />
           </div>
         </header>
 

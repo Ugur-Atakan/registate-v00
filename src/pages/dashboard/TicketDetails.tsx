@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { getTicketDetails } from "../../http/requests/companyRequests";
 import { uploadMessageAttachment } from "../../utils/fileUpload";
 import instance from "../../http/instance";
+import LoadingComponent from "../../components/Loading";
 
 interface Attachment {
   name: string;
@@ -145,9 +146,7 @@ const TicketDetails = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin w-8 h-8 border-4 border-[--primary] border-t-transparent rounded-full"></div>
-        </div>
+      <LoadingComponent />
       </DashboardLayout>
     );
   }

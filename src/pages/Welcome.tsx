@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { isUserExist } from '../http/requests/authRequest';
+import LoadingComponent from '../components/Loading';
 
 export default function Welcome() {
   const { t } = useTranslation();
@@ -52,6 +53,9 @@ export default function Welcome() {
       setLoading(false);
     }
   };
+  if (loading) {
+    return <LoadingComponent />;
+  }
 
   return (
     <div className="auth-container">

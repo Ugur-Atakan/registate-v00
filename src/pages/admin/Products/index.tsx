@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import AdminDashboardLayout from "../../../components/layout/AdminDashboardLayout";
 import instance from "../../../http/instance";
 import { 
-  Bell, Plus, Search, Eye, Trash, Menu, X, DollarSign, Tag, Package, 
-  Star, Info, ChevronDown, Filter, ArrowUpDown, CheckCircle2 
+  Bell, Plus, Search, Eye, Trash,  DollarSign, Tag, Package, 
+  Star, Info, ChevronDown, Filter, ArrowUpDown 
 } from 'lucide-react';
 import CreateServicePage from "../CreateServicePage";
 import toast from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
+import LoadingComponent from "../../../components/Loading";
+import AdminAvatar from "../../../components/AdminAvatar";
 
 const formatCurrency = (amount: number, currency: string) => {
   return new Intl.NumberFormat('en-US', {
@@ -161,11 +163,7 @@ export default function AdminProducts() {
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin"
-              alt="Admin"
-              className="w-10 h-10 rounded-full"
-            />
+          <AdminAvatar/>
           </div>
         </header>
 
@@ -328,7 +326,7 @@ export default function AdminProducts() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1649FF]"></div>
+              <LoadingComponent />
             </div>
           ) : (
             <>
