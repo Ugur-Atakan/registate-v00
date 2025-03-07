@@ -88,12 +88,13 @@ export default function AddSubscriptionPage() {
     }
 
     try {
-      await instance.post(`/admin/company/${companyId}/subscriptions`, {
+      await instance.post(`/admin/company/subscribe-item`, {
+        companyId: companyId,
         productId: selectedProduct.id,
-        productPriceId: selectedPrice.id,
+        priceId: selectedPrice.id,
         status,
-        startDate,
-        endDate: endDate || null
+        startDate: new Date("2025-03-07"),
+        endDate:  new Date(endDate) || null
       });
 
       toast.success('Subscription added successfully');
