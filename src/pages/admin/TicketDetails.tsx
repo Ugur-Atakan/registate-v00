@@ -55,7 +55,7 @@ interface Ticket {
   userId: string;
   subject: string;
   category: "ACCOUNT" | "PAYMENT" | "TECHNICAL";
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED";
+  status: "OPEN" | "IN_PROGRESS" | "CLOSED";
   priority: "HIGH" | "MEDIUM" | "LOW";
   isActivate: boolean;
   createdAt: string;
@@ -205,8 +205,30 @@ const AdminTicketDetailsPage = () => {
 
   const handleStatusChange = async (newStatus: string) => {
     try {
-      await instance.put(`/admin/ticket/${ticket?.id}/edit`, {
+      await instance.post(`/admin/ticket/${ticket?.id}/edit`, {
         status: newStatus,
+        priority: ticket?.priority,
+      });
+      await fetchTicketDetails();
+      toast.success("Status updated successfully");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handlePriorityChange = async (newPriority: string) => {
+    setTicket((prev) =>
+      prev
+        ? {
+            ...prev,
+            priority: newPriority as Ticket["priority"],
+          }
+        : null
+    );
+    try {
+      await instance.post(`/admin/ticket/${ticket?.id}/edit`, {
+        status: ticket?.status,
+        priority:newPriority,
       });
       await fetchTicketDetails();
       toast.success("Status updated successfully");
@@ -251,7 +273,7 @@ const AdminTicketDetailsPage = () => {
 
   const getStatusColor = (status: Ticket["status"]) => {
     switch (status) {
-      case "RESOLVED":
+      case "CLOSED":
         return "bg-green-50 text-green-700 border-green-200";
       case "IN_PROGRESS":
         return "bg-blue-50 text-blue-700 border-blue-200";
@@ -295,9 +317,7 @@ const AdminTicketDetailsPage = () => {
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">
-                  Ticket #{ticket.ticketNo}
-                </h1>
+                <h1 className="text-2xl font-bold">{ticket.subject}</h1>
                 <span
                   className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
                     ticket.status
@@ -313,7 +333,7 @@ const AdminTicketDetailsPage = () => {
                   {ticket.priority} Priority
                 </span>
               </div>
-              <p className="text-gray-600 mt-1">{ticket.subject}</p>
+              <p className="text-gray-600 mt-1"> Ticket #{ticket.ticketNo}</p>
             </div>
           </div>
 
@@ -612,7 +632,7 @@ const AdminTicketDetailsPage = () => {
                   >
                     <option value="OPEN">Open</option>
                     <option value="IN_PROGRESS">In Progress</option>
-                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Resolved</option>
                   </select>
                 </div>
 
@@ -622,16 +642,7 @@ const AdminTicketDetailsPage = () => {
                   </label>
                   <select
                     value={ticket.priority}
-                    onChange={(e) => {
-                      setTicket((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              priority: e.target.value as Ticket["priority"],
-                            }
-                          : null
-                      );
-                    }}
+                    onChange={(e) => handlePriorityChange(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none 
                       focus:ring-2 focus:ring-[--primary] focus:border-transparent"
                   >
@@ -680,17 +691,15 @@ const AdminTicketDetailsPage = () => {
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                   {
-                                          ticket.user.profileImage? (
-                                            <img
-                                              src={ticket.user.profileImage}
-                                              alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
-                                              className="w-10 h-10 rounded-full"
-                                            />
-                                          ):(
-                                            <Avvvatars value={ticket.user.email} style="character" />
-                                          )
-                                        }
+                  {ticket.user.profileImage ? (
+                    <img
+                      src={ticket.user.profileImage}
+                      alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <Avvvatars value={ticket.user.email} style="character" />
+                  )}
                   <div>
                     <p className="font-medium">
                       {ticket.user.firstName} {ticket.user.lastName}

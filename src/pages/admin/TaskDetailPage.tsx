@@ -163,18 +163,37 @@ export default function AdminTaskDetailPage() {
     fetchTaskDetails();
   }, [location.state?.taskId]);
 
-  const handleStatusChange = (newStatus: string) => {
+
+  const handleStatusChange = async (newStatus: string) => {
     setTask((prev) =>
       prev ? { ...prev, status: newStatus as Task["status"] } : prev
     );
-    // API çağrısı ekleyebilirsin
+    try {
+      await instance.post(`/admin/task/${task?.id}/edit`, {
+        status: newStatus,
+        priority: task?.priority,
+      });
+      await fetchTaskDetails();
+      toast.success("Status updated successfully");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
   };
 
-  const handlePriorityChange = (newPriority: string) => {
+  const handlePriorityChange = async (newPriority: string) => {
     setTask((prev) =>
       prev ? { ...prev, priority: newPriority as Task["priority"] } : prev
     );
-    // API çağrısı ekleyebilirsin
+    try {
+      await instance.post(`/admin/task/${task?.id}/edit`, {
+        status: task?.status,
+        priority:newPriority,
+      });
+      await fetchTaskDetails();
+      toast.success("Status updated successfully");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
   };
 
   const handleSendMessage = async (e:any) => {
@@ -222,6 +241,8 @@ export default function AdminTaskDetailPage() {
   const handleGoBack = () => {
     navigate(-1);
   };
+
+
 
   if (loading || !task) {
     return (
