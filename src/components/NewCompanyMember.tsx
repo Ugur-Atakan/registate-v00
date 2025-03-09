@@ -19,7 +19,6 @@ const NewCompanyMember = ({ companyId }: NewCompanyMemberProps) => {
     setError('');
 
     const data = {
-      companyId,
       role,
       member: {
         firstName,
@@ -30,7 +29,7 @@ const NewCompanyMember = ({ companyId }: NewCompanyMemberProps) => {
     };
 
     try {
-      await instance.post(`/admin/company/add-member`, data);
+      await instance.post(`/admin/company/${companyId}/add-member`, data);
       toast.success("Member created successfully");
       // Form reset
       setFirstName('');

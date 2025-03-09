@@ -24,7 +24,6 @@ interface Member {
 }
 
 interface NewMemberData {
-  companyId: string;
   role: string;
   member: {
     email: string;
@@ -78,7 +77,6 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
     e.preventDefault();
     try {
       const data: NewMemberData = {
-        companyId,
         role: newMember.role,
         member: {
           email: newMember.email,
@@ -88,7 +86,7 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
         }
       };
 
-      await instance.post('/admin/company/add-member', data);
+      await instance.post(`/admin/company/${companyId}/add-member`, data);
       toast.success('Member added successfully');
       
       // Refresh members list
