@@ -5,7 +5,6 @@ import { User } from "../../types/User";
 import { getAllUsers } from "../../http/requests/admin/user";
 import { useNavigate } from "react-router-dom";
 import Avvvatars from "avvvatars-react";
-import { useAppSelector } from "../../store/hooks";
 import AdminAvatar from "../../components/AdminAvatar";
 
 export default function AdminUsers() {
@@ -26,7 +25,6 @@ export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const filteredUsers = users
     .filter((user) => {

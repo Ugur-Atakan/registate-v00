@@ -238,9 +238,6 @@ export default function AdminSupport() {
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                    <MessageSquare className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
 
@@ -273,9 +270,6 @@ export default function AdminSupport() {
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                     >
                       <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <MessageSquare className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

@@ -15,7 +15,9 @@ import {
   Info,
   Edit,
   Trash,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import instance from "../../../http/instance";
 import toast from "react-hot-toast";
@@ -55,6 +57,7 @@ export default function ProductDetails() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [expandedPriceId, setExpandedPriceId] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -112,11 +115,15 @@ export default function ProductDetails() {
       minute: '2-digit'
     });
   };
+  
+  const togglePriceExpand = (priceId: string) => {
+    setExpandedPriceId(expandedPriceId === priceId ? null : priceId);
+  };
 
   if (loading) {
     return (
       <AdminDashboardLayout>
-<LoadingComponent />
+        <LoadingComponent />
       </AdminDashboardLayout>
     );
   }
@@ -133,9 +140,9 @@ export default function ProductDetails() {
 
   return (
     <AdminDashboardLayout>
-      <main className="lg:p-8">
+      <main className="lg:p-8 p-4">
         {/* Header */}
-        <header className="flex items-center justify-between mb-8">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/admin/products")}
@@ -243,69 +250,128 @@ export default function ProductDetails() {
                   </div>
                   <h2 className="text-lg font-semibold">Pricing Plans</h2>
                 </div>
-                <button className="text-[--primary] text-sm hover:underline">
+                <button 
+                  onClick={() => navigate(`/admin/products/edit/`, { state: { productId: product.id } })}
+                  className="text-[--primary] text-sm hover:underline flex items-center gap-1"
+                >
+                  <Edit size={14} />
                   Manage Prices
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
+                {product.prices.length === 0 && (
+                  <div className="p-8 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-center">
+                    <p className="text-gray-500 mb-3">No price packages defined yet</p>
+                    <button
+                      onClick={() => navigate(`/admin/products/edit/`, { state: { productId: product.id } })}
+                      className="px-4 py-2 bg-[--primary] text-white rounded-lg hover:bg-[--primary]/90 transition-colors"
+                    >
+                      Add Price Package
+                    </button>
+                  </div>
+                )}
+                
                 {product.prices.map((price) => (
-                  <div key={price.id} className="p-6 bg-gray-50 rounded-xl">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="font-semibold text-lg">{price.name}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-2xl font-bold">
-                            {formatCurrency(price.unit_amount, price.currency)}
-                          </span>
-                          {price.recurring && (
-                            <span className="text-gray-500">
-                              /{price.recurring.interval}
+                  <div key={price.id} className="border border-gray-200 rounded-xl overflow-hidden">
+                    {/* Price Header */}
+                    <div 
+                      className={`flex items-center justify-between p-4 cursor-pointer
+                        ${expandedPriceId === price.id ? 'bg-gray-50' : 'bg-white'}`}
+                      onClick={() => togglePriceExpand(price.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${price.isDefault ? 'bg-green-100' : 'bg-gray-100'}`}>
+                          <DollarSign className={`w-4 h-4 ${price.isDefault ? 'text-green-600' : 'text-gray-600'}`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">{price.name}</h3>
+                            {price.isDefault && (
+                              <span className="px-2 py-0.5 text-xs bg-green-50 text-green-600 rounded-full">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-lg font-bold">
+                              {formatCurrency(price.unit_amount, price.currency)}
                             </span>
-                          )}
+                            {price.recurring && (
+                              <span className="text-gray-500 text-sm">
+                                /{price.recurring.interval}
+                                {price.recurring.interval_count > 1 && `(${price.recurring.interval_count})`}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {price.type === 'recurring' && (
-                          <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
+                          <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full hidden sm:inline-block">
                             Recurring
                           </span>
                         )}
-                        {price.isDefault && (
-                          <span className="px-2 py-1 text-xs bg-green-50 text-green-600 rounded-full">
-                            Default
+                        {price.type === 'one_time' && (
+                          <span className="px-2 py-1 text-xs bg-purple-50 text-purple-600 rounded-full hidden sm:inline-block">
+                            One-time
                           </span>
                         )}
+                        <button className="p-1 text-gray-400">
+                          {expandedPriceId === price.id ? (
+                            <ChevronUp size={18} />
+                          ) : (
+                            <ChevronDown size={18} />
+                          )}
+                        </button>
                       </div>
                     </div>
 
-                    {price.features && price.features.length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {price.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <CheckCircle2 className="text-[--accent]" size={16} />
-                            <span className="text-sm text-gray-600">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Clock size={16} />
-                          <span>Created: {formatDate(price.createdAt)}</span>
-                        </div>
-                        {price.recurring && (
-                          <div className="flex items-center gap-1">
-                            <Repeat size={16} />
-                            <span>
-                              Every {price.recurring.interval_count} {price.recurring.interval}(s)
-                            </span>
+                    {/* Expanded Price Content */}
+                    {expandedPriceId === price.id && (
+                      <div className="p-6 bg-gray-50 border-t border-gray-200">
+                        {price.description && (
+                          <div className="mb-4 pb-4 border-b border-gray-200">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Description</h4>
+                            <p className="text-gray-600">{price.description}</p>
                           </div>
                         )}
+                        
+                        {price.features && price.features.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">Package Features</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {price.features.map((feature, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <CheckCircle2 className="text-[--accent]" size={16} />
+                                  <span className="text-sm text-gray-600">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Clock size={16} />
+                            <span>Created: {formatDate(price.createdAt)}</span>
+                          </div>
+                          {price.recurring && (
+                            <div className="flex items-center gap-1">
+                              <Repeat size={16} />
+                              <span>
+                                Every {price.recurring.interval_count} {price.recurring.interval}
+                                {price.recurring.interval_count > 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1">
+                            <DollarSign size={16} />
+                            <span>Currency: {price.currency.toUpperCase()}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -358,6 +424,18 @@ export default function ProductDetails() {
                   <span className="text-gray-600">Default Price</span>
                   <span className="font-medium">
                     {product.prices.find(p => p.isDefault)?.name || 'None'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Recurring Plans</span>
+                  <span className="font-medium">
+                    {product.prices.filter(p => p.type === 'recurring').length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">One-time Plans</span>
+                  <span className="font-medium">
+                    {product.prices.filter(p => p.type === 'one_time').length}
                   </span>
                 </div>
               </div>

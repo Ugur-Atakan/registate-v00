@@ -1,10 +1,11 @@
 import Avvvatars from "avvvatars-react";
 import AdminAvatar from "../../components/AdminAvatar";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
-import { Lock, Mail, LayoutDashboard, Users, Headphones, ListTodo, Tag, Briefcase, Settings, LogOut, Bell, Menu, X } from 'lucide-react';
+import { Users, Headphones, ListTodo,  Briefcase, Bell} from 'lucide-react';
 import { useEffect, useState } from "react";
 import instance from "../../http/instance";
 import LoadingComponent from "../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 interface Stats{
   totalUsers:number;
@@ -39,7 +40,7 @@ export default function AdminDashboard(){
 
 const [stats,setStats]=useState<Stats>();
 const [loading,setLoading]=useState(false);
-
+const navigate=useNavigate();
   const getSystemStats=async()=>{
     setLoading(true);
     try{
@@ -54,6 +55,8 @@ const [loading,setLoading]=useState(false);
   useEffect(()=>{
     getSystemStats();
   },[]);
+
+  
   
   if(loading || !stats){
     return (<AdminDashboardLayout>
@@ -125,7 +128,7 @@ const [loading,setLoading]=useState(false);
         <section className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Recent Users</h2>
-            <button className="text-sm text-gray-600 hover:text-gray-900">View all</button>
+            <button className="text-sm text-gray-600 hover:text-gray-900" onClick={()=>navigate('/admin/users')}>View all</button>
           </div>
           <div className="space-y-4">
             {stats?.recentUsers.map((user:User)=>(
@@ -144,7 +147,7 @@ const [loading,setLoading]=useState(false);
         <section className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Recent Support Tickets</h2>
-            <button className="text-sm text-gray-600 hover:text-gray-900">View all</button>
+            <button className="text-sm text-gray-600 hover:text-gray-900" onClick={()=>navigate('/admin/support')}>View all</button>
           </div>
           <div className="space-y-4">
             {stats?.latesTickets.map((ticket:Ticket)=>(

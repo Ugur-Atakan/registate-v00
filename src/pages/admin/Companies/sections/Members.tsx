@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { 
   Search, Plus, User2, Shield, MoreVertical, ChevronDown,
-  Mail, Phone, X, Info, CheckCircle2, Filter, ArrowUpDown
+  Mail, Phone, X, Info, CheckCircle2, Filter
 } from "lucide-react";
 import toast from "react-hot-toast";
 import instance from "../../../../http/instance";
@@ -180,7 +180,7 @@ export default function CompanyMembersSection({ companyId }: SectionProps) {
     }
   };
 
-  
+
   return (
     <div>
     <div className="space-y-6">

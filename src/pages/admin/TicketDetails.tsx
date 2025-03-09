@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AdminDashboardLayout from "../../components/layout/AdminDashboardLayout";
 import {
@@ -24,9 +24,11 @@ import {
   Archive,
   CheckCircle2,
   MessageSquare,
-  Users,
   MoreVertical,
-  ChevronDown,
+  Copy,
+  ArrowDown,
+  Calendar,
+  Smile,
 } from "lucide-react";
 import instance from "../../http/instance";
 import toast from "react-hot-toast";
@@ -71,9 +73,45 @@ interface Ticket {
   };
 }
 
+// Function to format dates relative to now
+const formatRelativeTime = (date: Date) => {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSecs < 60) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString();
+};
+
+// Function to group messages by date
+const groupMessagesByDate = (messages: Message[]) => {
+  const groups: { [key: string]: Message[] } = {};
+
+  messages.forEach((message) => {
+    const date = new Date(message.createdAt);
+    const dateKey = date.toDateString();
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+
+    groups[dateKey].push(message);
+  });
+
+  return Object.entries(groups).map(([date, messages]) => ({
+    date,
+    messages,
+  }));
+};
+
 const AdminTicketDetailsPage = () => {
-  const [replyText, setReplyText] = useState("");
-  const [showSidebar, setShowSidebar] = useState(false);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
@@ -82,9 +120,20 @@ const AdminTicketDetailsPage = () => {
     "all"
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [showAssignMenu, setShowAssignMenu] = useState(false);
   const [isDraftSaved, setIsDraftSaved] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [quickReplies] = useState([
+    "Thank you for reaching out to us. We're looking into this issue.",
+    "Could you please provide more details about the problem?",
+    "I've escalated this to our technical team, and they'll investigate further.",
+    "This issue has been resolved. Please let us know if you need anything else.",
+  ]);
+  const [showImagePreview, setShowImagePreview] = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -98,7 +147,17 @@ const AdminTicketDetailsPage = () => {
       const response = await instance.get(
         `/admin/ticket/${location.state.ticketId}/details`
       );
-      setTicket(response.data);
+
+      // Add status field to messages for demonstration
+      const messagesWithStatus = response.data.messages.map((msg: Message) => ({
+        ...msg,
+        status: msg.isStaff ? "read" : undefined,
+      }));
+
+      setTicket({
+        ...response.data,
+        messages: messagesWithStatus,
+      });
     } catch (error) {
       console.error("Error fetching ticket details:", error);
       toast.error("Failed to load ticket details");
@@ -136,6 +195,39 @@ const AdminTicketDetailsPage = () => {
       setNewMessage(savedDraft);
     }
   }, [location.state?.ticketId]);
+
+  // Scroll to bottom when new messages are added
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [ticket?.messages.length]);
+
+  // Handle scroll to detect when to show the scroll to bottom button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!messagesContainerRef.current) return;
+
+      const { scrollTop, scrollHeight, clientHeight } =
+        messagesContainerRef.current;
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+      // Show button when not at bottom
+      setShowScrollToBottom(distanceFromBottom > 100);
+    };
+
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
+
+  const handleScrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -216,25 +308,17 @@ const AdminTicketDetailsPage = () => {
     }
   };
 
-  const handlePriorityChange = async (newPriority: string) => {
-    setTicket((prev) =>
-      prev
-        ? {
-            ...prev,
-            priority: newPriority as Ticket["priority"],
-          }
-        : null
-    );
-    try {
-      await instance.post(`/admin/ticket/${ticket?.id}/edit`, {
-        status: ticket?.status,
-        priority:newPriority,
-      });
-      await fetchTicketDetails();
-      toast.success("Status updated successfully");
-    } catch (error) {
-      toast.error("Failed to update status");
-    }
+  const handleQuickReplyClick = (reply: string) => {
+    setNewMessage(reply);
+  };
+
+  const handleImagePreview = (url: string) => {
+    setShowImagePreview(url);
+  };
+
+  const handleCopyMessage = (message: string) => {
+    navigator.clipboard.writeText(message);
+    toast.success("Message copied to clipboard");
   };
 
   const getFileIcon = (fileName: string) => {
@@ -258,6 +342,33 @@ const AdminTicketDetailsPage = () => {
     }
   };
 
+  const handlePriorityChange = async (newPriority: string) => {
+    setTicket((prev) =>
+      prev
+        ? {
+            ...prev,
+            priority: newPriority as Ticket["priority"],
+          }
+        : null
+    );
+    try {
+      await instance.post(`/admin/ticket/${ticket?.id}/edit`, {
+        status: ticket?.status,
+        priority: newPriority,
+      });
+      await fetchTicketDetails();
+      toast.success("Status updated successfully");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  // Helper function to determine if file is an image
+  const isImageFile = (fileName: string) => {
+    const extension = fileName.split(".").pop()?.toLowerCase();
+    return ["jpg", "jpeg", "png", "gif"].includes(extension || "");
+  };
+
   const filteredMessages = ticket?.messages.filter((message) => {
     const matchesFilter =
       messageFilter === "all" ||
@@ -270,6 +381,11 @@ const AdminTicketDetailsPage = () => {
 
     return matchesFilter && matchesSearch;
   });
+
+  // Group messages by date for better organization
+  const groupedMessages = filteredMessages
+    ? groupMessagesByDate(filteredMessages)
+    : [];
 
   const getStatusColor = (status: Ticket["status"]) => {
     switch (status) {
@@ -339,27 +455,6 @@ const AdminTicketDetailsPage = () => {
 
           {/* Quick Actions */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <button
-                onClick={() => setShowAssignMenu(!showAssignMenu)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-              >
-                <Users size={18} />
-                <span>Assign</span>
-                <ChevronDown size={16} />
-              </button>
-              {showAssignMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
-                  {/* Add your team members list here */}
-                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
-                    John Doe
-                  </button>
-                  <button className="w-full px-4 py-2 text-left hover:bg-gray-50">
-                    Jane Smith
-                  </button>
-                </div>
-              )}
-            </div>
             <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Bell size={20} />
             </button>
@@ -410,101 +505,271 @@ const AdminTicketDetailsPage = () => {
             </div>
 
             {/* Messages */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 relative">
               <div
+                ref={messagesContainerRef}
                 className="max-h-[60vh] overflow-y-auto overflow-x-hidden pr-4 
                 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 
                 hover:scrollbar-thumb-gray-400 transition-colors"
               >
-                <div className="space-y-6">
-                  {filteredMessages?.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex gap-4 group ${
-                        message.isStaff ? "flex-row-reverse" : ""
-                      }`}
-                    >
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                          <User className="w-5 h-5 text-gray-500" />
+                <div className="space-y-8">
+                  {groupedMessages.map((group, groupIndex) => (
+                    <div key={groupIndex} className="space-y-6">
+                      {/* Date Header */}
+                      <div className="flex items-center justify-center my-4">
+                        <div className="bg-gray-100 rounded-full px-4 py-1 text-sm text-gray-500 flex items-center gap-1">
+                          <Calendar size={14} />
+                          <span>
+                            {new Date(group.date).toLocaleDateString(
+                              undefined,
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </span>
                         </div>
                       </div>
-                      <div
-                        className={`flex-1 max-w-[80%] ${
-                          message.isStaff ? "items-end" : ""
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium">
-                            {message.isStaff
-                              ? "Support Team"
-                              : `${ticket.user.firstName} ${ticket.user.lastName}`}
-                          </span>
-                          {message.isStaff && (
-                            <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
-                              Staff
-                            </span>
-                          )}
-                        </div>
-                        <div
-                          className={`relative group ${
-                            message.isStaff
-                              ? "bg-[--primary]/5 text-[--primary]"
-                              : "bg-gray-50 text-gray-700"
-                          } rounded-lg p-4`}
-                        >
-                          <p className="whitespace-pre-wrap">
-                            {message.message}
-                          </p>
-                          <span className="absolute bottom-2 right-2 text-xs text-gray-400">
-                            {new Date(message.createdAt).toLocaleTimeString()}
-                          </span>
 
-                          {/* Message Actions on Hover */}
-                          <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2">
-                            <button className="p-1 hover:bg-gray-200 rounded-full">
-                              <MessageSquare size={14} />
-                            </button>
-                            <button className="p-1 hover:bg-gray-200 rounded-full">
-                              <MoreVertical size={14} />
-                            </button>
-                          </div>
-                        </div>
+                      {group.messages.map((message, index) => {
+                        // Check if this is a consecutive message from the same sender
+                        const isSameSenderAsPrevious =
+                          index > 0 &&
+                          message.isStaff === group.messages[index - 1].isStaff;
 
-                        {/* Attachments */}
-                        {message.attachments.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {message.attachments.map((attachment, index) => (
-                              <a
-                                key={index}
-                                href={attachment.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 
-                                  rounded-lg transition-all group"
+                        // Time difference with previous message
+                        const timeGap =
+                          index > 0
+                            ? new Date(message.createdAt).getTime() -
+                              new Date(
+                                group.messages[index - 1].createdAt
+                              ).getTime()
+                            : 0;
+
+                        // Show sender info for first message or if time gap > 5 min
+                        const showSenderInfo =
+                          !isSameSenderAsPrevious || timeGap > 5 * 60 * 1000;
+
+                        return (
+                          <div
+                            key={message.id}
+                            className={`flex gap-4 group ${
+                              message.isStaff ? "flex-row-reverse" : ""
+                            }`}
+                          >
+                            {/* Avatar - only show for first message in a sequence */}
+                            {showSenderInfo ? (
+                              <div className="flex-shrink-0">
+                                {message.isStaff ? (
+                                  <div className="w-10 h-10 rounded-full bg-[--primary]/10 flex items-center justify-center">
+                                    <User className="w-5 h-5 text-[--primary]" />
+                                  </div>
+                                ) : ticket.user.profileImage ? (
+                                  <img
+                                    src={ticket.user.profileImage}
+                                    alt={`${ticket.user.firstName} ${ticket.user.lastName}`}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <Avvvatars
+                                    value={ticket.user.email}
+                                    style="character"
+                                    size={40}
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              <div className="w-10 flex-shrink-0"></div> // Spacer to maintain alignment
+                            )}
+
+                            <div
+                              className={`flex-1 max-w-[80%] ${
+                                message.isStaff ? "items-end" : ""
+                              }`}
+                            >
+                              {/* Sender info - only show for first message in a sequence */}
+                              {showSenderInfo && (
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium">
+                                    {message.isStaff
+                                      ? "Support Team"
+                                      : `${ticket.user.firstName} ${ticket.user.lastName}`}
+                                  </span>
+                                  {message.isStaff && (
+                                    <span className="px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
+                                      Staff
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Message bubble */}
+                              <div
+                                className={`relative group ${
+                                  message.isStaff
+                                    ? "bg-[--primary]/5 text-[--primary] border border-[--primary]/10"
+                                    : "bg-gray-50 text-gray-700 border border-gray-100"
+                                } rounded-lg p-4 mb-1 hover:shadow-sm transition-shadow`}
                               >
-                                {getFileIcon(attachment.name)}
-                                <span className="text-sm text-gray-600">
-                                  {attachment.name}
-                                </span>
-                                <Download
-                                  size={14}
-                                  className="text-gray-400 opacity-0 group-hover:opacity-100 
-                                  transition-opacity"
-                                />
-                              </a>
-                            ))}
+                                {/* If this is a reply to another message */}
+                                {message.message.startsWith("Replying to:") && (
+                                  <div className="text-xs italic text-gray-500 pb-2 mb-2 border-b border-gray-200">
+                                    {message.message.split("\n\n")[0]}
+                                  </div>
+                                )}
+
+                                <p className="whitespace-pre-wrap">
+                                  {message.message}
+                                </p>
+
+                                <div className="absolute bottom-2 right-2 flex items-center gap-1 text-xs text-gray-400">
+                                  {formatRelativeTime(
+                                    new Date(message.createdAt)
+                                  )}
+                                </div>
+
+                                {/* Message Actions on Hover */}
+                                <div className="absolute top-2 right-2 hidden group-hover:flex items-center gap-2">
+                                  <button
+                                    className="p-1 hover:bg-gray-200 rounded-full tooltip tooltip-left"
+                                    data-tip="Copy"
+                                    onClick={() =>
+                                      handleCopyMessage(message.message)
+                                    }
+                                  >
+                                    <Copy size={14} />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Attachments with improved display */}
+                              {message.attachments.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {message.attachments.map(
+                                    (attachment, index) =>
+                                      isImageFile(attachment.name) ? (
+                                        // Image preview for image files
+                                        <div
+                                          key={index}
+                                          className="relative group cursor-pointer"
+                                          onClick={() =>
+                                            handleImagePreview(attachment.url)
+                                          }
+                                        >
+                                          <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                                            <img
+                                              src={attachment.url}
+                                              alt={attachment.name}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          </div>
+                                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center">
+                                            <Download
+                                              size={18}
+                                              className="text-white opacity-0 group-hover:opacity-100"
+                                            />
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <a
+                                          key={index}
+                                          href={attachment.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 
+                                          rounded-lg transition-all group border border-gray-100"
+                                        >
+                                          {getFileIcon(attachment.name)}
+                                          <span className="text-sm text-gray-600">
+                                            {attachment.name.length > 20
+                                              ? attachment.name.substring(
+                                                  0,
+                                                  17
+                                                ) + "..."
+                                              : attachment.name}
+                                          </span>
+                                          <Download
+                                            size={14}
+                                            className="text-gray-400 opacity-0 group-hover:opacity-100 
+                                          transition-opacity"
+                                          />
+                                        </a>
+                                      )
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
+              </div>
+
+              {/* Scroll to bottom button */}
+              {showScrollToBottom && (
+                <button
+                  onClick={handleScrollToBottom}
+                  className="absolute bottom-4 right-4 p-2 bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-600 transition-colors z-10"
+                >
+                  <ArrowDown size={20} />
+                </button>
+              )}
+
+              {/* Image Preview Modal */}
+              {showImagePreview && (
+                <div
+                  className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                  onClick={() => setShowImagePreview(null)}
+                >
+                  <div className="relative max-w-4xl max-h-screen p-4">
+                    <button
+                      className="absolute top-2 right-2 p-2 bg-black bg-opacity-50 text-white rounded-full"
+                      onClick={() => setShowImagePreview(null)}
+                    >
+                      <X size={20} />
+                    </button>
+                    <img
+                      src={showImagePreview}
+                      alt="Preview"
+                      className="max-w-full max-h-[90vh] object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Replies */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center mb-3">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Quick Replies
+                </h3>
+                <div className="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">
+                  Save time
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {quickReplies.map((reply, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleQuickReplyClick(reply)}
+                    className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm rounded-lg border border-gray-200 transition-colors"
+                  >
+                    {reply.length > 40 ? reply.substring(0, 37) + "..." : reply}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Reply Box */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              {/* Replying to indicator */}
+
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
@@ -525,6 +790,23 @@ const AdminTicketDetailsPage = () => {
                   <button className="p-2 hover:bg-gray-100 rounded">
                     <List size={18} />
                   </button>
+                  <div className="h-6 border-l border-gray-200 mx-1"></div>
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded relative"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  >
+                    <Smile size={18} />
+                  </button>
+
+                  {/* Emoji picker (placeholder) */}
+                  {showEmojiPicker && (
+                    <div className="absolute z-10 bg-white shadow-lg rounded-lg border border-gray-200 p-2">
+                      {/* Emoji picker would go here */}
+                      <div className="p-2 text-center text-sm text-gray-500">
+                        Emoji picker would be here
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Text Area */}
@@ -541,10 +823,14 @@ const AdminTicketDetailsPage = () => {
                     {attachments.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg group"
+                        className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg group border border-gray-100"
                       >
                         {getFileIcon(file.name)}
-                        <span className="text-sm">{file.name}</span>
+                        <span className="text-sm">
+                          {file.name.length > 20
+                            ? file.name.substring(0, 17) + "..."
+                            : file.name}
+                        </span>
                         <button
                           onClick={() => removeAttachment(index)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -715,7 +1001,7 @@ const AdminTicketDetailsPage = () => {
                 )}
                 <button
                   onClick={() =>
-                    navigate(`/admin/users/`, {
+                    navigate(`/admin/users/details`, {
                       state: { userId: ticket.user.id },
                     })
                   }
