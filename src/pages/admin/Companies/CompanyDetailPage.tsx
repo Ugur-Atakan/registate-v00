@@ -148,7 +148,7 @@ export default function AdminCompanyDetailPageEnhanced() {
   return (
     <AdminDashboardLayout>
       <div className="bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="mx-auto px-4 sm:px-4 lg:px-8 pb-12">
           {/* Breadcrumbs - Desktop Only */}
           <nav className="hidden sm:flex py-4 text-sm text-gray-500" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-2">
@@ -246,7 +246,7 @@ export default function AdminCompanyDetailPageEnhanced() {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white shadow-sm rounded-lg min-h-[400px] transition-all duration-200 ease-in-out">
+          <div className="bg-white shadow-sm rounded-lg min-h-[400px] transition-all duration-200 ease-in-out p-4"> 
             {renderTabContent()}
           </div>
         </div>

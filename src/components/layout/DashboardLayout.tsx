@@ -233,7 +233,6 @@ export default function DashboardLayout({ children }: Props) {
     );
   };
 
-
   const handleLogout = () => {
     dispatch(logOut());
     removeTokens();
@@ -257,17 +256,18 @@ export default function DashboardLayout({ children }: Props) {
             <nav className="flex-1 space-y-1 px-2">
               {navigation.map(item => renderNavigationItem(item))}
             </nav>
-            <nav className="flex-1 space-y-1 px-2">
+            
+            {/* Logout Button - Fixed at bottom with separator */}
+            <div className="flex-shrink-0 p-2 border-t border-gray-200">
               <button
                 onClick={handleLogout}
-                className="group flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 
+                  hover:bg-red-50 rounded-lg transition-colors group"
               >
-                <div className="flex items-center">
-                  <LogOut className="mr-3 h-5 w-5 flex-shrink-0 text-red-500" />
-                  Logout
-                </div>
+                <LogOut className="h-5 w-5 text-red-500" />
+                <span>Logout</span>
               </button>
-            </nav>
+            </div>
           </div>
         </div>
       </div>
@@ -310,7 +310,7 @@ export default function DashboardLayout({ children }: Props) {
             isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="h-full overflow-y-auto">
+          <div className="h-full flex flex-col">
             {/* Logo in Mobile Menu */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
               <img
@@ -328,9 +328,21 @@ export default function DashboardLayout({ children }: Props) {
             </div>
 
             <CompanyChanger />
-            <nav className="px-2 py-4">
+            <nav className="flex-1 px-2 py-4">
               {navigation.map(item => renderNavigationItem(item, true))}
             </nav>
+
+            {/* Mobile Logout Button */}
+            <div className="flex-shrink-0 p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 
+                  hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <LogOut className="h-5 w-5 text-red-500" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

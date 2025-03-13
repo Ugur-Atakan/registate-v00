@@ -35,7 +35,11 @@ export default function Login() {
       
       saveUserTokens(login.tokens);
      }
+     if(login.user.roles.includes('ADMIN')){
+      navigate('/admin', { replace: true });
+     }else{
      navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Invalid email or password');

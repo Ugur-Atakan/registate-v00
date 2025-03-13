@@ -9,9 +9,11 @@ import {
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { changeActiveCompany } from "../store/slices/companySlice";
 import { useNavigate } from "react-router-dom";
+import NoCompanyComponentModal from "./NoCompanyComponent";
 
 const CompanyChanger = ({showModal,setShowModal}:any) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [hide,setHide]=useState(false); 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const selectedCompany = useAppSelector(
@@ -31,6 +33,15 @@ const CompanyChanger = ({showModal,setShowModal}:any) => {
 
   const handleShowModal = () => {
     setShowModal(!showModal);
+  };
+
+  const onModalClose = () => {
+    setHide(false);
+  };
+
+
+  const handleNewCompany = () => {
+    setHide(true);
   };
 
   // If there are no companies, show a special button to create one
@@ -114,7 +125,7 @@ const CompanyChanger = ({showModal,setShowModal}:any) => {
 
           {/* Add New Company Button */}
           <button
-            onClick={() => handleShowModal()}
+            onClick={() => handleNewCompany()}
             className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-[--primary]"
           >
             <div className="w-8 h-8 bg-[--primary]/10 rounded-lg flex items-center justify-center">
@@ -124,6 +135,8 @@ const CompanyChanger = ({showModal,setShowModal}:any) => {
           </button>
         </div>
       )}
+      <NoCompanyComponentModal isOpen={hide} onClose={onModalClose} />
+
     </div>
   );
 };

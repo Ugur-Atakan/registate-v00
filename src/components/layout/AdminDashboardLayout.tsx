@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Building2, 
@@ -9,8 +9,12 @@ import {
   User2,
   Ticket,
   ListTodo,
-  Receipt
+  Receipt,
+  LogOut
 } from 'lucide-react';
+import { useAppDispatch } from '../../store/hooks';
+import { removeTokens } from '../../utils/storage';
+import { logOut } from '../../store/slices/userSlice';
 
 interface Props {
   children: React.ReactNode;
@@ -19,6 +23,8 @@ interface Props {
 export default function AdminDashboardLayout({ children }: Props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const navigate=useNavigate();
 
   const navigation = [
     {
@@ -74,6 +80,12 @@ export default function AdminDashboardLayout({ children }: Props) {
     setIsMobileMenuOpen(false);
   }, [location]);
 
+  const handleLogout = () => {
+    dispatch(logOut());
+    removeTokens();
+    navigate('/', { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
@@ -108,6 +120,17 @@ export default function AdminDashboardLayout({ children }: Props) {
               ))}
             </nav>
           </div>
+          {/* Logout Button - Fixed at bottom with separator */}
+          <div className="flex-shrink-0 p-2 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 
+                  hover:bg-red-50 rounded-lg transition-colors group"
+              >
+                <LogOut className="h-5 w-5 text-red-500" />
+                <span>Logout</span>
+              </button>
+            </div>
         </div>
       </div>
 
@@ -131,6 +154,7 @@ export default function AdminDashboardLayout({ children }: Props) {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="border-t border-gray-200 bg-white py-2">
+            <>
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -149,14 +173,28 @@ export default function AdminDashboardLayout({ children }: Props) {
                 {item.name}
               </Link>
             ))}
+            <div className="flex-shrink-0 p-2 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 
+                  hover:bg-red-50 rounded-lg transition-colors group"
+              >
+                <LogOut className="h-5 w-5 text-red-500" />
+                <span>Logout</span>
+              </button>
+            </div>
+            </>
+            
           </div>
+          
         )}
+         
       </div>
 
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
         <div className="grid grid-cols-3">
-          {navigation.map((item) => (
+          {navigation.slice(0, 3).map((item) => (
             <Link
               key={item.name}
               to={item.href}

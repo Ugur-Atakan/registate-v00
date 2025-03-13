@@ -10,6 +10,7 @@ import { Company } from "../../../http/requests/admin/company";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import LoadingComponent from "../../../components/Loading";
+import CompanyConnect from "../../../components/CompanyConnect";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -47,6 +48,7 @@ const formatCurrency = (amount: number) => {
 
 export default function AdminCompanies() {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<{
     status: string;
     state: string;
@@ -175,6 +177,16 @@ export default function AdminCompanies() {
     document.body.removeChild(link);
   };
 
+
+
+  const onModalClose = () => {
+    setIsOpen(false);
+  };
+
+
+  const handleNewCompany = () => {
+    setIsOpen(true);
+  };
   return (
     <AdminDashboardLayout>
       <main className="lg:p-8">
@@ -196,6 +208,7 @@ export default function AdminCompanies() {
               Export Data
             </button>
             <button
+            onClick={handleNewCompany}
               className="flex items-center gap-2 px-4 py-2 bg-[--primary] text-white 
                 rounded-lg hover:bg-[--primary]/90 transition-colors"
             >
@@ -584,6 +597,7 @@ export default function AdminCompanies() {
           </div>
         </div>
       </main>
+      <CompanyConnect isOpen={isOpen} onClose={onModalClose} />
     </AdminDashboardLayout>
   );
 }

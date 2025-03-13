@@ -11,6 +11,7 @@ import TaskDetails from "../pages/dashboard/TaskDetails";
 import TicketDetailsPage from "../pages/dashboard/TicketDetails";
 import Companies from "../pages/dashboard/Companies";
 import Services from "../pages/dashboard/Services";
+import ConnectCompanyPage from "../pages/dashboard/ConnectCompanyPage";
 export default function DashboardRoutes() {
   return (
     <ProtectedRoute>
@@ -22,6 +23,7 @@ export default function DashboardRoutes() {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/documents" element={<Documents />} />
         <Route path="/companies" element={<Companies />} />
+        <Route path="/connect-company" element={<ConnectCompanyPage />} />
         <Route path="/services" element={<Services />} />
         <Route path="/tasks/details" element={<TaskDetails />} />
         <Route path="/ticket/details" element={<TicketDetailsPage />} />

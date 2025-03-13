@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCompanyTypes, getStates } from "../http/requests/formation";
-import { ArrowRight, Building2, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Building2, X } from "lucide-react";
 import { useAppSelector } from "../store/hooks";
 import instance from "../http/instance";
+import Modal from "react-modal";
+import toast from "react-hot-toast";
+
 
 interface CompanyType {
   id: string;
@@ -15,7 +18,7 @@ interface State {
 }
     
 
-const CompanyConnect = () => {
+const CompanyConnect = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [loading, setLoading] = useState(false);
   const [types, setTypes] = useState<CompanyType[]>([]);
   const [states, setStates] = useState<State[]>([]);
@@ -46,28 +49,19 @@ const CompanyConnect = () => {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
-  }, []);
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen]);
 
-  const handleSubmit = async () => {
+
+  const handleCompanyConnect = async () => {
     if (
       !selectedCompanyType ||
       !companyName ||
       !selectedState
     )
       return;
-    setLoading(true);
-    try {
-      // API’ye gönderme işlemi
-    } catch (error) {
-      console.error("Error saving company name:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const handleCompanyConnect = async () => {
     let data ={
         companyName,
         companyTypeId: selectedCompanyType?.id,
@@ -78,6 +72,8 @@ const CompanyConnect = () => {
             data = {...data, ...newMember}
             const response =await instance.post("admin/company/connect", data)
             console.log(response.data);
+            toast.success("Company connected successfully")
+            
         } catch (error) {
             console.error("Error connecting company:", error);
         }
@@ -92,12 +88,20 @@ const CompanyConnect = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Company Connect</h1>
+    <Modal
+    isOpen={isOpen}
+    onRequestClose={onClose}
+    className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+    ariaHideApp={false}
+  >
+    <X className="absolute top-4 right-4 text-white" size={24} onClick={onClose} />
+    <div>
+      <h1 className="text-2xl font-bold text-white">Company Connect</h1>
 
       {/* Şirket Türü Seçimi */}
       <div>
-        <h2 className="text-lg font-semibold">Select Company Type</h2>
+        <h2 className="text-lg font-semibold text-white">Select Company Type</h2>
         <div className="grid grid-cols-2 gap-4">
           {types.map((type) => (
             <button
@@ -117,7 +121,7 @@ const CompanyConnect = () => {
       </div>
       {/* Eyalet Seçimi */}
       <div>
-        <h2 className="text-lg font-semibold">Select State</h2>
+        <h2 className="text-lg font-semibold text-white">Select State</h2>
         <div className="grid grid-cols-2 gap-4">
           {states.map((state) => (
             <button
@@ -138,7 +142,7 @@ const CompanyConnect = () => {
 
       {/* Şirket Adı Girişi */}
       <div>
-        <h2 className="text-lg font-semibold">Company Name</h2>
+        <h2 className="text-lg font-semibold text-white">Company Name</h2>
         <div className="relative">
           <Building2
             className="absolute left-3 top-3.5 text-gray-400"
@@ -152,16 +156,12 @@ const CompanyConnect = () => {
             onChange={(e) => setCompanyName(e.target.value)}
           />
         </div>
-        <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-          <CheckCircle2 size={16} className="text-[--accent]" /> We’ll check
-          name availability for you
-        </p>
       </div>
 
       {/* Yeni Üye Ekleme */}
       {userData?.roles.map((role) => role == "ADMIN") && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <p>Create Owner Account for Company</p>
+        <div>
+          <p className="text-white font-medium text-lg">Create Owner Account for Company</p>
           <div className="bg-white rounded-xl max-w-lg w-full p-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -241,7 +241,7 @@ const CompanyConnect = () => {
 
       {/* Gönderme Butonu */}
       <button
-        onClick={handleSubmit}
+        onClick={handleCompanyConnect}
         disabled={
           !companyName ||
           loading ||
@@ -259,6 +259,7 @@ const CompanyConnect = () => {
         )}
       </button>
     </div>
+    </Modal>
   );
 };
 export default CompanyConnect;
